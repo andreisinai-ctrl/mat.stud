@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matthäus 2 – Interaktive Studienausgabe (Griechisch, Historie & Kirchenväter)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        parchment: {
+                            50: '#fcfaf5',
+                            100: '#f8f5ee',
+                            200: '#EFE7D4',
+                            300: '#DFD2B5',
+                            800: '#3D3529',
+                            900: '#231f1a',
+                        },
+                        burgundy: {
+                            700: '#7a2828',
+                            800: '#652020',
+                            900: '#4A1616',
+                        },
+                        gold: {
+                            600: '#9c6b22',
+                            700: '#825719',
+                        },
+                        greek: {
+                            50: '#F0F5F9',
+                            700: '#244b6e',
+                            800: '#193752',
+                        },
+                        history: {
+                            700: '#2f5d42',
+                            800: '#224631',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8f5ee;
+            color: #231f1a;
+            background-image: radial-gradient(#DFD2B5 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+
+        /* Buch-Schatten & Papier-Textur */
+        .folio-page {
+            background-color: #fcfaf5;
+            box-shadow: 0 10px 35px -5px rgba(35, 31, 26, 0.12), 0 0 1px 1px rgba(156, 107, 34, 0.25);
+        }
+
+        /* Griechisches Highlight im Text */
+        .greek-term {
+            border-bottom: 1.5px dotted #244b6e;
+            color: #244b6e;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .greek-term:hover {
+            background-color: #E2ECF5;
+            border-bottom-style: solid;
+        }
+
+        /* Kirchenvater Badge */
+        .father-link {
+            color: #7a2828;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px dashed #7a2828;
+            transition: color 0.15s ease;
+        }
+        .father-link:hover {
+            color: #9c6b22;
+            border-bottom-color: #9c6b22;
+        }
+
+        /* Versnummern im Stil klassischer Bibelausgaben */
+        .verse-num {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #9c6b22;
+            vertical-align: super;
+            margin-right: 2px;
+            user-select: none;
+        }
+
+        /* Sanfte Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8f5ee;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C3A3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9c6b22;
+        }
+
+        /* Unsichtbar-Klasse für Kapitel-Navigation (Kapitel 1 & Kapitel 28) */
+        .unsichtbar {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .folio-page { box-shadow: none; }
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-amber-200/60">
+
+    <!-- Kopfbereich / Navigationsleiste -->
+    <header class="sticky top-0 z-30 bg-parchment-100/95 backdrop-blur-md border-b border-parchment-300 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <!-- Titel -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-burgundy-700 text-parchment-50 flex items-center justify-center font-display text-xl font-bold shadow-inner border border-gold-600/40">
+                        Μθ
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-display text-xl sm:text-2xl font-bold text-parchment-900 tracking-tight">
+                                Evangelium nach Matthäus · Kapitel 2
+                            </h1>
+                            <span class="hidden sm:inline-block text-xs font-sans uppercase tracking-wider px-2 py-0.5 rounded bg-parchment-200 text-parchment-800 border border-parchment-300">
+                                Glossierte Studienausgabe
+                            </span>
+                        </div>
+                        <p class="text-xs font-sans text-stone-600">
+                            Bibeltext im Zentrum · Griechische Urtext-Analyse · Historischer &amp; Jüdischer Kontext · Kirchenväter
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Glossar & Kirchenväter-Übersicht -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="openGlossaryModal()" class="px-3.5 py-2 text-xs font-sans font-medium rounded-lg bg-parchment-50 hover:bg-parchment-200 text-parchment-900 border border-parchment-300 transition-colors flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-3.5 h-3.5 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                        Lexikon &amp; Kirchenväter
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ebenen-Filter & Kapitel-Sprungmarken -->
+            <div class="mt-3 pt-2.5 border-t border-parchment-300/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <!-- Filter Chips -->
+                <div class="flex flex-wrap items-center gap-1.5 text-xs font-sans">
+                    <span class="text-stone-500 mr-1 font-medium">Ebenen:</span>
+                    <button onclick="toggleFilter('greek')" id="filter-greek" class="filter-chip active px-2.5 py-1 rounded-full border border-greek-700/30 bg-greek-700/10 text-greek-800 font-medium flex items-center gap-1 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-greek-700"></span> Griechischer Urtext
+                    </button>
+                    <button onclick="toggleFilter('history')" id="filter-history" class="filter-chip active px-2.5 py-1 rounded-full border border-history-700/30 bg-history-700/10 text-history-800 font-medium flex items-center gap-1 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-history-700"></span> Historischer Kontext
+                    </button>
+                    <button onclick="toggleFilter('fathers')" id="filter-fathers" class="filter-chip active px-2.5 py-1 rounded-full border border-burgundy-700/30 bg-burgundy-700/10 text-burgundy-800 font-medium flex items-center gap-1 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-burgundy-700"></span> Kirchenväter
+                    </button>
+                </div>
+
+                <!-- Perikopen-Navigation -->
+                <div class="flex items-center gap-2 text-xs font-sans overflow-x-auto pb-1 sm:pb-0">
+                    <a href="#perikope-1" class="whitespace-nowrap px-2.5 py-1 rounded bg-parchment-200/80 hover:bg-parchment-300 text-parchment-900 transition">I. Die Weisen &amp; Herodes (1–12)</a>
+                    <a href="#perikope-2" class="whitespace-nowrap px-2.5 py-1 rounded bg-parchment-200/80 hover:bg-parchment-300 text-parchment-900 transition">II. Flucht &amp; Kindermord (13–18)</a>
+                    <a href="#perikope-3" class="whitespace-nowrap px-2.5 py-1 rounded bg-parchment-200/80 hover:bg-parchment-300 text-parchment-900 transition">III. Rückkehr nach Nazaret (19–23)</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Haupt-Container (Buchseite / Folio) -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+        
+        <!-- Einführungskasten im Stil einer Folio-Vorrede -->
+        <div class="folio-page rounded-xl p-5 sm:p-7 mb-8 border border-parchment-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-parchment-200 pb-4 mb-4">
+                <div>
+                    <span class="text-xs font-sans uppercase tracking-widest text-gold-600 font-semibold">Kindheitserzählung &amp; Geographie des Heils · Mt 2,1–23</span>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-parchment-900 mt-0.5">
+                        Der neugeborene König der Juden zwischen Anbetung und Verfolgung
+                    </h2>
+                </div>
+                <div class="text-xs font-sans text-stone-600 bg-parchment-100 px-3.5 py-2 rounded-lg border border-parchment-300">
+                    <strong class="text-parchment-900">Tipp zur Nutzung:</strong> Klicke auf <span class="greek-term">blau unterstrichene Begriffe</span> für die griechische Wortanalyse oder auf <span class="father-link">Kirchenväter-Namen</span> für ihre Biografie.
+                </div>
+            </div>
+            <p class="font-serif text-base sm:text-lg text-stone-700 leading-relaxed">
+                Im zweiten Kapitel seines Evangeliums zeichnet Matthäus eine faszinierende Doppelbewegung: Während die religiösen Fachleute in Jerusalem zwar die genaue Bibelstelle für den Geburtsort des Messias kennen, aber keinen einzigen Schritt gehen, machen sich heidnische Sterndeuter aus dem fernen Osten auf den Weg zur Anbetung. Zugleich durchläuft das Jesuskind im Kleinen die gesamte Heilsgeschichte Israels noch einmal: wie der Patriarch Josef durch Träume geführt, wie Mose vor einem kindermordenden König gerettet, aus Ägypten gerufen und schließlich als unscheinbarer „Nazoräer“ verborgen.
+            </p>
+        </div>
+
+        <!-- Dynamisch gerenderte Bibelabschnitte -->
+        <div id="study-container" class="space-y-10">
+            <!-- Inhalte werden über JavaScript sauber aufgebaut -->
+        </div>
+
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 mt-8 border-t border-parchment-300 text-center text-xs font-sans text-stone-600">
+        <p class="font-serif italic text-sm text-parchment-800 mb-1">
+            „Wir haben seinen Stern im Aufgang gesehen und sind gekommen, ihm zu huldigen.“ (Matthäus 2,2)
+        </p>
+        <p>Interaktive Studienbibel · Griechischer Grundtext (Nestle-Aland), historische Realienkunde &amp; Patristik (2.–6. Jh. n. Chr.).</p>
+    </footer>
+
+    <!-- Modal / Detail-Karte für Griechisch & Kirchenväter -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/60 backdrop-blur-xs p-4" onclick="closeModalOnBackdrop(event)">
+        <div class="bg-parchment-50 border border-parchment-300 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden transform transition-all">
+            <div id="modal-header" class="px-6 py-4 bg-parchment-100 border-b border-parchment-300 flex items-center justify-between">
+                <span id="modal-badge" class="text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded"></span>
+                <button onclick="closeModal()" class="text-stone-500 hover:text-stone-900 p-1 rounded-lg hover:bg-parchment-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 font-serif text-parchment-900 space-y-4 max-h-[75vh] overflow-y-auto">
+                <!-- Dynamischer Inhalt -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // DATENBANK: GRIECHISCHE SCHLÜSSELWÖRTER
+        // ==========================================
+        const greekLexicon = {
+            magoi: {
+                greek: "μάγοι",
+                translit: "magoi",
+                literal: "Magier / persisch-babylonische Priestergelehrte & Sterndeuter",
+                meaning: "Ursprünglich bezeichnete magoi die gelehrte Priesterkaste der Meder und Perser (bekannt durch Herodot und das Buch Daniel, wo Daniel Oberster der Weisen in Babylon war). Sie waren hochgebildete Astronomen, Traumdeuter und Naturphilosophen – keine ‚Könige‘ und auch nicht zwingend drei! Die Dreizahl entstand erst später wegen der drei Gaben, und der Königstitel kam ab Tertullian und Origenes durch Psalm 72,10 (‚Die Könige von Tarsis und den Inseln sollen Geschenke darbringen‘) hinzu.",
+                theology: "Gottes Schöpfung (der Sternenhimmel) selbst wird zum Missionar: Gott spricht zu den Heiden in genau der Sprache der Sternkunde, die sie verstehen, und führt sie so über ihre eigene Weisheit hinaus zu seinem Wort."
+            },
+            anatolai: {
+                greek: "ἀπὸ ἀνατολῶν / ἐν τῇ ἀνατολῇ",
+                translit: "apo anatolōn / en tē anatolē",
+                literal: "vom Osten (Plural) / bei seinem Aufgang (Singular)",
+                meaning: "Ein faszinierendes griechisches Wortspiel in V. 1 und V. 2: Steht anatolai im Plural (V. 1), bezeichnet es die Himmelsrichtung ‚Osten / Morgenland‘ (Mesopotamien/Persien). Steht es aber im Singular wie in V. 2 (en tē anatolē), ist es der antike astronomische Fachbegriff für den ‚heliakischen Aufgang‘ eines Gestirns – also den ersten sichtbaren Morgenaufgang eines Planeten direkt vor Sonnenaufgang!",
+                theology: "Der Messias ist selbst der ‚Aufgang aus der Höhe‘ (Lukas 1,78), dessen Licht die Finsternis der Völker durchbricht."
+            },
+            etarachthe: {
+                greek: "ἐταράχθη",
+                translit: "etarachthē",
+                literal: "er wurde heftig aufgewühlt / in Panik versetzt",
+                meaning: "Das griechische Verb tarassō beschreibt kein leichtes Unbehagen, sondern ein stürmisches Aufgewühltwerden wie ein aufgewühltes Meer. Herodes der Große war kein gebürtiger Jude, sondern Idumäer, und verdankte seinen Titel ‚König der Juden‘ allein dem römischen Senat (40 v. Chr.). Die Frage nach einem ‚neugeborenen König der Juden‘ traf seinen wundesten Punkt – und ‚ganz Jerusalem mit ihm‘ erschrak, weil die Bewohner aus bitterer Erfahrung wussten, dass Herodes in seiner Paranoia ganze Familien hinrichten ließ.",
+                theology: "Der wahre Friedefürst kommt in die Welt – und die irdische Macht reagiert sofort mit Angst und Gewalt."
+            },
+            poimanei: {
+                greek: "ποιμανεῖ",
+                translit: "poimanei",
+                literal: "er wird weiden / als Hirte führen",
+                meaning: "In V. 6 verschmelzen die Schriftgelehrten Micha 5,1 (die Verheißung des Herrschers aus dem kleinen Betlehem) mit 2. Samuel 5,2 (Gottes Wort an David: ‚Du sollst mein Volk Israel weiden‘). Im Griechischen steht poimanei (von poimēn = Hirte): Der Messias wird kein grausamer Despot wie Herodes sein, sondern ein fürsorglicher Hirte seines Volkes.",
+                theology: "Der große Kontrast des gesamten Kapitels: Herodes der Wolf auf dem Thron in Jerusalem – Jesus der gute Hirte in der Krippe von Betlehem."
+            },
+            proskynesai: {
+                greek: "προσκυνῆσαι αὐτῷ",
+                translit: "proskynēsai autō",
+                literal: "ihm huldigen / vor ihm niederfallen zur Anbetung",
+                meaning: "Proskynein bezeichnet im Orient das tiefe Niederwerfen auf die Knie mit der Stirn bis zur Erde (Proskynese) als Zeichen höchster Ehrerbietung vor einem Großkönig oder einer Gottheit. Im Matthäusevangelium ist dieses Wort ein Leitmotiv für die Anerkennung der göttlichen Hoheit Jesu.",
+                theology: "Die Magier schenken dem unscheinbaren Kind jene königliche und göttliche Ehre, die Herodes nur heuchlerisch vorgibt."
+            },
+            libanosSmyrna: {
+                greek: "χρυσὸν καὶ λίβανον καὶ σμύρναν",
+                translit: "chryson kai libanon kai smyrnan",
+                literal: "Gold und Weihrauch und Myrrhe",
+                meaning: "Drei der kostbarsten Handelsgüter der Antike aus Südarabien (Saba) und Ostafrika: Gold als königliches Metall, Weihrauch (libanos, das aromatische Harz des Boswellia-Baumes) für den Tempel- und Opferkult, und Myrrhe (smyrna, ein bitteres, kostbares Gummiharz), das als Heilmittel, Salböl und zur Einbalsamierung Verstorbener verwendet wurde (vgl. Joh 19,39).",
+                theology: "Schon in der Krippe liegen die Gaben bereit, die auf das ganze Geheimnis Jesu vorausweisen: König, Gott und leidender Erlöser."
+            },
+            katOnar: {
+                greek: "κατ’ ὄναρ",
+                translit: "kat’ onar",
+                literal: "im Traum / durch eine Traumweisung",
+                meaning: "Diese Wendung begegnet im gesamten Neuen Testament ausschließlich bei Matthäus – und dort gleich sechsmal (fünfmal in Mt 1–2 und einmal bei der Frau des Pilatus in Mt 27,19)! Wie schon beim Erzvater Josef im Alten Testament (1. Mose 37–41) nutzt Gott den nächtlichen Schlaf als geschützten Raum seiner Führung.",
+                theology: "Während die Mächtigen dieser Welt Pläne schmieden, lenkt Gott die Geschichte leise im Schlaf der Gehorsamen."
+            },
+            enepaichthe: {
+                greek: "ἐνεπαίχθη",
+                translit: "enepaichthē",
+                literal: "er wurde zum Narren gehalten / hintergangen / verspottet",
+                meaning: "Empaizō ist ein starkes Wort und bedeutet ‚jemanden zum Gespött machen, auslachen‘ (dasselbe Verb wird später bei der Verspottung Jesu durch die römischen Soldaten in Mt 27,29 gebraucht!). Für einen eitlen, krankhaft misstrauischen Autokraten wie Herodes war der Gedanke unerträglich, dass ausländische Gelehrte ihn ausgetrickst hatten.",
+                theology: "Die Weisheit Gottes macht die listige Diplomatie des Tyrannen zunichte."
+            },
+            nazoraios: {
+                greek: "Ναζωραῖος",
+                translit: "Nazōraios",
+                literal: "Nazoräer (Mann aus Nazaret / Spross / Geweihter)",
+                meaning: "Kein einzelner Prophetenvers im Alten Testament lautet wörtlich ‚Er wird Nazoräer heißen‘ – darum schreibt Matthäus bewusst im Plural ‚durch die Propheten‘! Dahinter steht ein tiefes hebräisches Wortspiel: Der Ortsname Nazaret leitet sich von der hebräischen Wurzel n-z-r ab, genau wie das berühmte messianische Wort ‚Nezer‘ (נֵצֶר = Spross, Reis) in Jesaja 11,1 (‚Ein Reis wird hervorgehen aus dem Stumpf Isais‘). Zugleich klingt darin das hebräische ‚Nasir‘ (Gottgeweihter, Richter 13,5) und die Verachtung eines unbedeutenden galiläischen Dorfes mit.",
+                theology: "Was den Menschen verächtlich erscheint (‚Kann aus Nazaret etwas Gutes kommen?‘, Joh 1,46), ist in Gottes Augen der verheißene Spross aus der Wurzel Davids."
+            }
+        };
+
+        // ==========================================
+        // DATENBANK: KIRCHENVÄTER
+        // ==========================================
+        const churchFathers = {
+            chrysostomus: {
+                name: "Johannes Chrysostomus",
+                dates: "ca. 349 – 407 n. Chr.",
+                role: "Erzbischof von Konstantinopel · ‚Goldmund‘",
+                bio: "Einer der bedeutendsten Prediger der Alten Kirche. Seine Homilien zum Matthäusevangelium (gehalten um 390 n. Chr. in Antiochia) erklären die Szenen des Evangeliums mit großer psychologischer Schärfe und pastoraler Wärme.",
+                focusInMt2: "Bewundert die Glaubenskraft der Magier: Sie sehen keine Engel, keinen Palast und keine Wunder – nur eine ärmliche Hütte und ein kleines Kind auf dem Schoß seiner Mutter, und dennoch fallen sie nieder und beten an."
+            },
+            irenaeus: {
+                name: "Irenäus von Lyon",
+                dates: "ca. 135 – 202 n. Chr.",
+                role: "Bischof von Lyon · Schüler Polykarps",
+                bio: "Schlug in seinem Hauptwerk ‚Adversus haereses‘ (Gegen die Häresien) die direkte Brücke von der Apostelzeit zur Kirche des 2. Jahrhunderts und verteidigte die Einheit von Altem und Neuem Testament.",
+                focusInMt2: "Überlieferte die klassische Deutung der drei Gaben der Magier: Myrrhe für den, der für das sterbliche Menschengeschlecht sterben und begraben werden sollte; Gold für den König, dessen Reich kein Ende hat; Weihrauch für Gott, der sich den Heiden offenbarte."
+            },
+            leo: {
+                name: "Leo der Große",
+                dates: "ca. 400 – 461 n. Chr.",
+                role: "Bischof von Rom · Kirchenlehrer der Menschwerdung",
+                bio: "Seine Epiphanias- und Weihnachtspredigten gehören zu den sprachlich und theologisch glänzendsten Texten der lateinischen Patristik.",
+                focusInMt2: "Prägte den berühmten Gedanken, dass den Magiern nicht nur äußerlich ein Stern am Himmel aufging, sondern zugleich ein inneres Licht der Gnade im Herzen leuchtete, das sie lehrte, das Geheimnis zu verstehen."
+            },
+            augustinus: {
+                name: "Augustinus von Hippo",
+                dates: "354 – 430 n. Chr.",
+                role: "Bischof von Hippo Regius (Nordafrika) · Kirchenlehrer",
+                bio: "Der prägendste Denker des westlichen Christentums. In seinen Predigten zum Epiphaniasfest und zum Tag der Unschuldigen Kinder entfaltet er die tiefen Kontraste von Matthäus 2.",
+                focusInMt2: "Vergleicht die Schriftgelehrten in Jerusalem mit Meilensteinen an der Straße: Sie zeigen allen Reisenden genau die richtige Richtung nach Betlehem – bleiben aber selbst reglos am Wegrand stehen."
+            },
+            hieronymus: {
+                name: "Hieronymus von Stridon",
+                dates: "ca. 347 – 420 n. Chr.",
+                role: "Bibelübersetzer (Vulgata) · Gelehrter in Bethlehem",
+                bio: "Lebte über dreißig Jahre in Bethlehem direkt neben der Geburtsgrotte, beherrschte Hebräisch, Griechisch und Latein und kannte die Geografie Judäas aus eigener Anschauung.",
+                focusInMt2: "Erklärt die alttestamentlichen Zitate in Matthäus 2 (Micha 5,1; Hosea 11,1; Jeremia 31,15; ‚Nazoräer‘) direkt aus dem hebräischen Grundtext und der Ortskenntnis um Betlehem und Rama."
+            },
+            gregor: {
+                name: "Gregor der Große",
+                dates: "ca. 540 – 604 n. Chr.",
+                role: "Papst und Kirchenlehrer · Verfasser der Evangelienhomilien",
+                bio: "In seiner zehnten Evangelienhomilie (gehalten am Epiphaniasfest in Rom) verbindet er die Auslegung der drei Gaben der Magier mit dem täglichen geistlichen Leben der Gläubigen.",
+                focusInMt2: "Überträgt Gold, Weihrauch und Myrrhe auf das Leben jedes Christen: Wir bringen dem König Gold (Weisheit und Liebe), Weihrauch (inniges Gebet, das zu Gott aufsteigt) und Myrrhe (Überwindung unserer selbstsüchtigen Leidenschaften)."
+            }
+        };
+
+        // ==========================================
+        // INHALT: MATTHÄUS 2 IN SINNABSCHNITTEN
+        // ==========================================
+        const studySections = [
+            {
+                id: "perikope-1",
+                sectionTitle: "I. Die Weisen aus dem Morgenland und der erschrockene König",
+                sectionRange: "Matthäus 2,1–12",
+                sectionIntro: "Zwei Welten prallen aufeinander: Fernstehende Heiden suchen das neugeborene Kind voller Sehnsucht, während der König in Jerusalem und die Schriftgelehrten in Angst oder Gleichgültigkeit verharren.",
+                blocks: [
+                    {
+                        verses: "1–2",
+                        bibleText: `<span class="verse-num">1</span>Als aber Jesus geboren war zu Bethlehem in Judäa, in den Tagen Herodes’, des Königs, siehe, da kamen <span class="greek-term" onclick="openGreek('magoi')">Weise</span> <span class="greek-term" onclick="openGreek('anatolai')">vom Morgenland</span> nach Jerusalem und sprachen: <span class="verse-num">2</span>Wo ist der neugeborene König der Juden? Denn wir haben seinen Stern <span class="greek-term" onclick="openGreek('anatolai')">im Aufgang</span> gesehen und sind gekommen, <span class="greek-term" onclick="openGreek('proskynesai')">ihm zu huldigen</span>.`,
+                        commentary: {
+                            history: `<em><strong>Astronomie &amp; Antike Erwartung:</strong> Im gesamten Römischen Reich und im Orient (bezeugt selbst von den römischen Historikern Sueton und Tacitus) herrschte um die Zeitenwende die Erwartung, dass aus Judäa ein Weltherrscher hervorgehen werde. In der antiken Sternkunde galt Jupiter als der Königsstern, Saturn als der Schutzstern Israels und das Sternbild der Fische als Zeichen des Landes Judäa. Im Jahr 7 v. Chr. kam es zu einer außergewöhnlichen dreifachen Konjunktion von Jupiter und Saturn im Sternbild der Fische – für babylonische <span class="greek-term" onclick="openGreek('magoi')">Sterndeuter</span> ein unübersehbares himmlisches Signal der Geburt eines jüdischen Weltkönigs!</em>`,
+                            greek: `<em>Die <span class="greek-term" onclick="openGreek('magoi')">magoi</span> waren keine Märchenkönige, sondern hochgebildete persisch-babylonische Priestergelehrte und Astronomen. Beachte auch die feine Nuance in V. 2: <span class="greek-term" onclick="openGreek('anatolai')">en tē anatolē</span> (Singular) ist der astronomische Fachausdruck für den ersten sichtbaren Morgenaufgang eines Gestirns am Horizont.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('leo')">Leo der Große</span> bemerkt in seiner Epiphaniaspredigt: „Den Augen der Weisen erschien ein Stern von ungewohntem Glanz, damit sie nicht an ihm vorübergingen; doch zugleich wurde ihr Herz von einem Strahl der göttlichen Wahrheit erleuchtet, damit sie nicht bei dem Zeichen stehen blieben, sondern den suchten, auf den das Zeichen hinwies.“</em>`
+                        }
+                    },
+                    {
+                        verses: "3–8",
+                        bibleText: `<span class="verse-num">3</span>Als aber der König Herodes es hörte, <span class="greek-term" onclick="openGreek('etarachthe')">wurde er bestürzt</span>, und ganz Jerusalem mit ihm; <span class="verse-num">4</span>und er versammelte alle Hohenpriester und Schriftgelehrten des Volkes und erkundigte sich bei ihnen, wo der Christus geboren werden sollte. <span class="verse-num">5</span>Sie aber sagten ihm: Zu Bethlehem in Judäa; denn so steht durch den Propheten geschrieben: <span class="verse-num">6</span>„Und du, Bethlehem, Land Juda, bist keineswegs die geringste unter den Fürsten Judas; denn aus dir wird ein Führer hervorkommen, der mein Volk Israel <span class="greek-term" onclick="openGreek('poimanei')">weiden</span> wird.“ <span class="verse-num">7</span>Dann berief Herodes die Weisen heimlich und erforschte genau von ihnen die Zeit der Erscheinung des Sterns; <span class="verse-num">8</span>und er sandte sie nach Bethlehem und sprach: Zieht hin und forscht genau nach dem Kind; wenn ihr es aber gefunden habt, so berichtet es mir, damit auch ich komme und ihm huldige!`,
+                        commentary: {
+                            history: `<em><strong>Wer war Herodes der Große?</strong> Herodes (reg. 37–4 v. Chr.) war ein brillanter Bauherr (er erweiterte den Jerusalemer Tempel prachtvoll), aber ein krankhaft misstrauischer Tyrann. Da er von Herkunft Idumäer (Edomiter) war, betrachteten ihn viele fromme Juden als unrechtmäßigen Usurpator auf dem Thron Davids. In seinen letzten Lebensjahren ließ er aus Angst vor Thronräubern sogar seine Lieblingsfrau Mariamne und drei seiner eigenen Söhne hinrichten! Darum erschrak „ganz Jerusalem mit ihm“ – die Stadt wusste, welches Blutvergießen drohte, sobald Herodes in Panik geriet.</em>`,
+                            greek: `<em>Das Verb <span class="greek-term" onclick="openGreek('etarachthe')">etarachthē</span> („er geriet in heftigen Aufruhr“) steht in scharfem Kontrast zum ruhigen Zitat der Schriftgelehrten aus Micha 5,1 und 2. Samuel 5,2: Der verheißene Herrscher wird sein Volk nicht unterdrücken, sondern als guter Hirte <span class="greek-term" onclick="openGreek('poimanei')">weiden (poimanei)</span>.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('augustinus')">Augustinus</span> und <span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> weisen auf eine tiefe geistliche Tragik hin: Betlehem liegt nur knapp neun Kilometer südlich von Jerusalem! Die Schriftgelehrten kannten die Bibel auswendig und wiesen den Heiden exakt den Weg – doch keiner von ihnen machte sich die Mühe, die zwei Stunden Fußweg nach Betlehem selbst zu gehen. Sie glichen Wegweisern aus Stein, die anderen das Ziel zeigen, aber selbst nicht vom Fleck kommen.</em>`
+                        }
+                    },
+                    {
+                        verses: "9–12",
+                        bibleText: `<span class="verse-num">9</span>Sie aber hörten den König und zogen hin. Und siehe, der Stern, den sie im Aufgang gesehen hatten, ging vor ihnen her, bis er kam und über dem Ort stand, wo das Kind war. <span class="verse-num">10</span>Als sie aber den Stern sahen, freuten sie sich mit sehr großer Freude. <span class="verse-num">11</span>Und als sie in das Haus gekommen waren, sahen sie das Kind mit Maria, seiner Mutter, und fielen nieder und <span class="greek-term" onclick="openGreek('proskynesai')">huldigten</span> ihm; und sie taten ihre Schätze auf und brachten ihm Gaben dar: <span class="greek-term" onclick="openGreek('libanosSmyrna')">Gold und Weihrauch und Myrrhe</span>. <span class="verse-num">12</span>Und als sie <span class="greek-term" onclick="openGreek('katOnar')">im Traum</span> göttlich angewiesen worden waren, nicht wieder zu Herodes zurückzukehren, zogen sie auf einem anderen Weg in ihr Land zurück.`,
+                        commentary: {
+                            history: `<em>Beachte ein kleines Detail in Vers 11: Maria und Josef wohnen inzwischen nicht mehr in einem Stall, sondern in einem <strong>Haus (oikia)</strong> in Betlehem, und Jesus wird nicht mehr als Säugling (<em>brephos</em>), sondern als kleines Kind (<em>paidion</em>) bezeichnet – zwischen der Geburt und dem Besuch der Weisen ist also einige Zeit (bis zu rund ein bis zwei Jahren) vergangen.</em>`,
+                            greek: `<em>In Vers 10 häuft Matthäus die griechischen Worte für Freude fast überschwänglich: <em>echarēsan charan megalēn sphodra</em> – wörtlich: „Sie freuten sich eine überaus große Freude!“ Und im Haus tun sie das, was kein stolzer Gelehrter vor einem einfachen Handwerkerkind tun würde: <span class="greek-term" onclick="openGreek('proskynesai')">proskynēsai</span> – sie werfen sich in Anbetung nieder.</em>`,
+                            fathers: `<em>Schon im 2. Jahrhundert deutete <span class="father-link" onclick="openFather('irenaeus')">Irenäus von Lyon</span> die drei Gaben <span class="greek-term" onclick="openGreek('libanosSmyrna')">Gold, Weihrauch und Myrrhe</span> als dreifaches Glaubensbekenntnis: <strong>Gold</strong> für den ewigen König, <strong>Weihrauch</strong> für den wahren Gott und <strong>Myrrhe</strong> (das Salbharz für Tote) für den Erlöser, der für uns sterben wird. <span class="father-link" onclick="openFather('gregor')">Gregor der Große</span> fügt hinzu: „Wenn wir Christus im Glauben erkennen, schenken wir ihm Gold durch unsere Weisheit, Weihrauch durch unser Gebet und Myrrhe durch die Abtötung unserer Selbstsucht.“</em>`
+                        }
+                    }
+                ]
+            },
+            {
+                id: "perikope-2",
+                sectionTitle: "II. Die Flucht nach Ägypten und das Weinen Rahels in Betlehem",
+                sectionRange: "Matthäus 2,13–18",
+                sectionIntro: "Unmittelbar auf die Anbetung der Völker folgt die tödliche Bedrohung: Der Sohn Gottes teilt schon als Kleinkind das Schicksal der Verfolgten und Flüchtlinge.",
+                blocks: [
+                    {
+                        verses: "13–15",
+                        bibleText: `<span class="verse-num">13</span>Als sie aber hingezogen waren, siehe, da erscheint ein Engel des Herrn dem Josef <span class="greek-term" onclick="openGreek('katOnar')">im Traum</span> und spricht: Steh auf, nimm das Kind und seine Mutter zu dir und flieh nach Ägypten, und bleib dort, bis ich es dir sage; denn Herodes wird das Kind suchen, um es umzubringen. <span class="verse-num">14</span>Er aber stand auf, nahm das Kind und seine Mutter des Nachts zu sich und zog hin nach Ägypten; <span class="verse-num">15</span>und er war dort bis zum Tod des Herodes, damit erfüllt würde, was von dem Herrn geredet ist durch den Propheten, der spricht: „Aus Ägypten habe ich meinen Sohn gerufen.“`,
+                        commentary: {
+                            history: `<em><strong>Warum ausgerechnet Ägypten?</strong> Erstens lag die ägyptische Grenze nur wenige Tagesreisen südwestlich von Betlehem und entzog die Familie sofort dem Machtbereich des Herodes (Ägypten war direkte kaiserliche Provinz Roms). Zweitens lebte in Ägypten – besonders in Alexandria – die größte jüdische Diaspora der Welt (hunderttausende Juden mit eigenen Synagogen und Handwerkervierteln), sodass Josef dort als Zimmermann sofort Arbeit und Gemeinschaft finden konnte. Zudem diente das Gold der Weisen als göttliche Reisekasse für das Exil!</em>`,
+                            greek: `<em>Beachte Josefs sofortigen Gehorsam: „Er stand auf … <strong>des Nachts</strong> (nyktos)“. Kein Zögern bis zum Morgen, keine Rückfragen. Mit dem Zitat aus Hosea 11,1 („Aus Ägypten habe ich meinen Sohn gerufen“) zeigt Matthäus: Jesus durchlebt den Auszug Israels (den Exodus) noch einmal neu – als der treue Sohn Gottes, der das Werk Israels vollendet.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('chrysostomus')">Johannes Chrysostomus</span> bewundert die stille Weisheit der Vorsehung: Gott hätte Herodes mit einem Blitz vernichten oder das Kind unsichtbar machen können – stattdessen wählt er den schlichten Weg einer nächtlichen Flucht, damit schon früh deutlich wird, dass der Erlöser ein wirklicher Mensch mit echter Verwundbarkeit geworden ist.</em>`
+                        }
+                    },
+                    {
+                        verses: "16–18",
+                        bibleText: `<span class="verse-num">16</span>Als Herodes nun sah, dass er von den Weisen <span class="greek-term" onclick="openGreek('enepaichthe')">hintergangen</span> worden war, wurde er sehr zornig; und er sandte hin und ließ alle Knaben töten, die in Bethlehem und in allen seinen Grenzen waren, von zwei Jahren und darunter, nach der Zeit, die er von den Weisen genau erforscht hatte. <span class="verse-num">17</span>Da wurde erfüllt, was durch Jeremia, den Propheten, geredet ist, der spricht: <span class="verse-num">18</span>„Eine Stimme ist in Rama gehört worden, Weinen und viel Wehklagen; Rahel beweint ihre Kinder und will sich nicht trösten lassen, weil sie nicht mehr sind.“`,
+                        commentary: {
+                            history: `<em><strong>Historische Plausibilität des Kindermords:</strong> Betlehem war damals ein kleines Dorf mit geschätzt 300 bis 1.000 Einwohnern. Statistisch lebten dort und in den umliegenden Gehöften etwa 10 bis 20 Jungen unter zwei Jahren. Dass nicht-christliche Geschichtsschreiber wie Flavius Josephus diesen lokalen Vorfall nicht eigens erwähnen, überrascht Historiker nicht: In den letzten Monaten vor Herodes’ Tod (4 v. Chr.) beging der sterbende König weit größere Massaker in Jerusalem (darunter die Verbrennung von Thora-Gelehrten und die Verhaftung der jüdischen Ältesten in Jericho), die alles andere überschatteten.</em>`,
+                            greek: `<em>Das Wort <span class="greek-term" onclick="openGreek('enepaichthe')">enepaichthē</span> („er wurde zum Gespött gemacht“) erklärt den Wutausbruch des Autokraten. Und durch das Zitat aus Jeremia 31,15 ruft Matthäus das Grab der Erzmutter <strong>Rahel</strong> in Erinnerung, das traditionell direkt an der Straße zwischen Jerusalem und Betlehem liegt: Wie Rahel einst um ihre in die Verbannung geführten Söhne weinte, so trauert die Mutter Israels über den unschuldigen Opfern – doch im Kontext von Jeremia 31 folgt auf diese Tränen unmittelbar Gottes Verheißung von Trost und Rückkehr!</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('augustinus')">Augustinus</span> (und sein Schüler Quodvultdeus) feierten die ermordeten Kinder von Betlehem als die ersten Blutzeugen Christi (<em>Flores Martyrum</em> – „Blüten der Märtyrer“): „Noch konnten sie nicht mit Worten für Christus sprechen, und doch starben sie schon für ihn; noch kannten sie den Kampf nicht, und schon empfingen sie die Siegeskrone.“</em>`
+                        }
+                    }
+                ]
+            },
+            {
+                id: "perikope-3",
+                sectionTitle: "III. Die Rückkehr aus Ägypten und die Verborgenheit in Nazaret",
+                sectionRange: "Matthäus 2,19–23",
+                sectionIntro: "Nach dem Tod des Tyrannen führt Gott die Familie nicht in die königliche Hauptstadt Jerusalem, sondern in das unscheinbare galiläische Dorf Nazaret.",
+                blocks: [
+                    {
+                        verses: "19–23",
+                        bibleText: `<span class="verse-num">19</span>Als aber Herodes gestorben war, siehe, da erscheint ein Engel des Herrn dem Josef <span class="greek-term" onclick="openGreek('katOnar')">im Traum</span> in Ägypten <span class="verse-num">20</span>und spricht: Steh auf, nimm das Kind und seine Mutter zu dir und zieh in das Land Israel; denn sie sind gestorben, die dem Kind nach dem Leben trachteten. <span class="verse-num">21</span>Und er stand auf, nahm das Kind und seine Mutter zu sich und kam in das Land Israel. <span class="verse-num">22</span>Als er aber hörte, dass Archelaus über Judäa herrschte anstelle seines Vaters Herodes, fürchtete er sich, dorthin zu gehen; und als er im Traum göttlich angewiesen worden war, zog er hin in die Gebiete von Galiläa <span class="verse-num">23</span>und kam und wohnte in einer Stadt, genannt Nazareth, damit erfüllt würde, was durch die Propheten geredet ist: „Er wird <span class="greek-term" onclick="openGreek('nazoraios')">Nazoräer</span> genannt werden.“`,
+                        commentary: {
+                            history: `<em><strong>Die politische Lage nach Herodes’ Tod (4 v. Chr.):</strong> Kaiser Augustus teilte das Reich des Herodes unter dessen überlebenden Söhnen auf. <strong>Archelaus</strong> erhielt Judäa (samt Jerusalem und Betlehem) – und erwies sich sofort als noch brutaler als sein Vater: Gleich zu seinem ersten Pessachfest ließ er 3.000 Pilger im Tempelhof niedermetzeln, weshalb ihn Augustus schließlich im Jahr 6 n. Chr. absetzte und nach Gallien verbannte! Josefs Furcht (V. 22) war also politisch hochbegründet. Im nördlichen <strong>Galiläa</strong> hingegen regierte sein Bruder Herodes Antipas deutlich ruhiger.</em>`,
+                            greek: `<em>In Vers 20 sagt der Engel wörtlich: „Sie sind gestorben, die dem Kind nach dem Leben trachteten“ – ein bewusstes Echo auf 2. Mose 4,19 (Gottes Wort an Mose in Midian: „Alle Männer sind gestorben, die dir nach dem Leben trachteten“!). Jesus ist der neue, größere Mose. Und der Beiname <span class="greek-term" onclick="openGreek('nazoraios')">Nazōraios</span> verbindet das unscheinbare Dorf Nazaret mit dem messianischen „Spross“ (<em>Nezer</em>) aus Jesaja 11,1.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> erklärt den doppelten Klang des Wortes <span class="greek-term" onclick="openGreek('nazoraios')">Nazoräer</span> aus dem Hebräischen: Zum einen bedeutet es „Heiliger / Gottgeweihter“ (wie bei den Nasiräern im Alten Testament), zum anderen „Spross / Zweig“ (Jesaja 11,1). Und <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> sieht darin eine heilsame Demütigung menschlichen Stolzes: Der König der Welt wächst in einem verachteten Dorf auf, damit seine Jünger lernen, nicht nach irdischem Glanz zu jagen.</em>`
+                        }
+                    }
+                ]
+            }
+        ];
+
+        // ==========================================
+        // ZUSTAND & STEUERUNG
+        // ==========================================
+        const CURRENT_CHAPTER = 2;
+        const TOTAL_CHAPTERS = 28;
+
+        let activeFilters = {
+            greek: true,
+            history: true,
+            fathers: true
+        };
+
+        // Persönliche Notizen aus localStorage laden (kapitelspezifischer Schlüssel: matthaeus_2_notes)
+        let userNotes = JSON.parse(localStorage.getItem('matthaeus_2_notes') || '{}');
+
+        function renderStudy() {
+            const container = document.getElementById('study-container');
+            container.innerHTML = '';
+
+            studySections.forEach(section => {
+                const sectionEl = document.createElement('section');
+                sectionEl.id = section.id;
+                sectionEl.className = 'folio-page rounded-2xl border border-parchment-300 overflow-hidden scroll-mt-28';
+
+                // Perikopen-Kopfbereich
+                let html = `
+                    <div class="bg-parchment-100/90 px-5 sm:px-8 py-5 border-b border-parchment-300">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <h3 class="font-display text-2xl sm:text-3xl font-bold text-burgundy-700">
+                                ${section.sectionTitle}
+                            </h3>
+                            <span class="font-sans text-xs font-semibold tracking-wider uppercase px-2.5 py-1 rounded bg-parchment-200 text-parchment-900 border border-parchment-300">
+                                ${section.sectionRange}
+                            </span>
+                        </div>
+                        <p class="font-serif italic text-stone-700 text-base mt-1.5">
+                            ${section.sectionIntro}
+                        </p>
+                    </div>
+                    <div class="divide-y divide-parchment-200">
+                `;
+
+                section.blocks.forEach((block, idx) => {
+                    const blockKey = `${section.id}-${idx}`;
+                    const savedNote = userNotes[blockKey] || '';
+
+                    // Kommentar-Spalte / Block zusammenbauen
+                    let commentaryParts = [];
+
+                    if (activeFilters.history && block.commentary.history) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-history-700/70">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-history-700 block mb-0.5">Historischer &amp; Jüdischer Kontext</span>
+                                <div class="text-stone-800">${block.commentary.history}</div>
+                            </div>
+                        `);
+                    }
+
+                    if (activeFilters.greek && block.commentary.greek) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-greek-700/70">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-greek-700 block mb-0.5">Griechischer Urtext &amp; Wortbedeutung</span>
+                                <div class="text-stone-800">${block.commentary.greek}</div>
+                            </div>
+                        `);
+                    }
+
+                    if (activeFilters.fathers && block.commentary.fathers) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-burgundy-700/75">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-700 block mb-0.5">Stimmen der Kirchenväter</span>
+                                <div class="text-stone-800">${block.commentary.fathers}</div>
+                            </div>
+                        `);
+                    }
+
+                    const commentaryHtml = commentaryParts.length > 0
+                        ? `<div class="space-y-3.5 font-serif text-[15.5px] sm:text-base leading-relaxed">${commentaryParts.join('')}</div>`
+                        : `<div class="font-sans text-xs text-stone-400 italic">Alle Kommentar-Ebenen sind derzeit ausgeblendet. Aktiviere oben mindestens eine Ebene.</div>`;
+
+                    // TALMUD-STIL: Links Bibeltext, Rechts parallel der kursive Kommentar
+                    html += `
+                        <div class="grid grid-cols-1 lg:grid-cols-12">
+                            <!-- Linke Spalte: Bibeltext (5 von 12 Spalten) -->
+                            <div class="lg:col-span-5 p-5 sm:p-7 bg-parchment-50 lg:border-r border-parchment-300/80 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-600">
+                                            Mt 2,${block.verses}
+                                        </span>
+                                        <button onclick="toggleNoteBox('${blockKey}')" title="Eigene Studiennotiz hinzufügen" class="text-xs font-sans text-stone-400 hover:text-burgundy-700 flex items-center gap-1 transition no-print">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                            ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                        </button>
+                                    </div>
+                                    <p class="font-serif text-lg sm:text-[19px] leading-[1.75] text-parchment-900 font-normal">
+                                        ${block.bibleText}
+                                    </p>
+                                </div>
+                                ${renderNoteArea(blockKey, savedNote)}
+                            </div>
+
+                            <!-- Rechte Spalte: Paralleler Kommentar (7 von 12 Spalten) -->
+                            <div class="lg:col-span-7 p-5 sm:p-7 bg-parchment-100/50">
+                                ${commentaryHtml}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                sectionEl.innerHTML = html;
+                container.appendChild(sectionEl);
+            });
+        }
+
+        function renderNoteArea(blockKey, savedNote) {
+            const isHidden = savedNote ? '' : 'hidden';
+            return `
+                <div id="note-box-${blockKey}" class="${isHidden} mt-4 pt-3 border-t border-parchment-200 no-print">
+                    <label class="block font-sans text-[11px] font-medium text-stone-500 mb-1">Eigene Studiennotiz:</label>
+                    <textarea 
+                        onchange="saveNote('${blockKey}', this.value)"
+                        onkeyup="saveNote('${blockKey}', this.value)"
+                        rows="2" 
+                        placeholder="Deine Gedanken zu diesem Abschnitt..."
+                        class="w-full rounded-lg bg-white border border-parchment-300 p-2 text-xs font-sans text-parchment-900 focus:outline-none focus:border-gold-600"
+                    >${savedNote}</textarea>
+                </div>
+            `;
+        }
+
+        function toggleNoteBox(blockKey) {
+            const box = document.getElementById(`note-box-${blockKey}`);
+            if (box) {
+                box.classList.toggle('hidden');
+                if (!box.classList.contains('hidden')) {
+                    box.querySelector('textarea').focus();
+                }
+            }
+        }
+
+        function saveNote(blockKey, text) {
+            if (text.trim() === '') {
+                delete userNotes[blockKey];
+            } else {
+                userNotes[blockKey] = text;
+            }
+            localStorage.setItem('matthaeus_2_notes', JSON.stringify(userNotes));
+        }
+
+        function toggleFilter(type) {
+            activeFilters[type] = !activeFilters[type];
+            const btn = document.getElementById(`filter-${type}`);
+            if (activeFilters[type]) {
+                btn.classList.remove('opacity-45', 'line-through');
+            } else {
+                btn.classList.add('opacity-45', 'line-through');
+            }
+            renderStudy();
+        }
+
+        // ==========================================
+        // MODALS: GRIECHISCH, KIRCHENVÄTER & GLOSSAR
+        // ==========================================
+        function openGreek(key) {
+            const item = greekLexicon[key];
+            if (!item) return;
+
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Griechisches Original (Koine)';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-greek-700/10 text-greek-800 border border-greek-700/30';
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <div class="text-3xl font-serif font-bold text-greek-800">${item.greek}</div>
+                    <div class="text-sm font-sans text-stone-500 mt-0.5">Umschrift: <span class="italic font-medium text-stone-700">${item.translit}</span> · Grundbedeutung: <span class="font-medium text-stone-700">${item.literal}</span></div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Historische &amp; Sprachliche Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${item.meaning}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-700 mb-1">Theologische Tiefe</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${item.theology}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openFather(key) {
+            const father = churchFathers[key];
+            if (!father) return;
+
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Kirchenvater · Patristik';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-burgundy-700/10 text-burgundy-800 border border-burgundy-700/30';
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <h3 class="text-2xl font-display font-bold text-burgundy-700">${father.name}</h3>
+                    <div class="text-xs font-sans text-stone-600 mt-0.5">${father.dates} · ${father.role}</div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Leben &amp; Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${father.bio}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-gold-600 mb-1">Schwerpunkt in Matthäus 2</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${father.focusInMt2}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openGlossaryModal() {
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Gesamtübersicht · Lexikon & Väter';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-amber-900/10 text-amber-900 border border-amber-800/30';
+
+            let greekList = Object.entries(greekLexicon).map(([k, v]) => `
+                <button onclick="openGreek('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-sky-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-serif font-bold text-greek-800 text-base">${v.greek}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${v.translit} – ${v.literal}</span>
+                </button>
+            `).join('');
+
+            let fathersList = Object.entries(churchFathers).map(([k, f]) => `
+                <button onclick="openFather('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-amber-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-display font-bold text-burgundy-700 text-base">${f.name}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${f.dates}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('modal-body').innerHTML = `
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-greek-800 mb-2">Griechische Schlüsselbegriffe in Mt 2</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${greekList}</div>
+                </div>
+                <div class="pt-3 border-t border-parchment-200">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-700 mb-2">Zitierte Kirchenväter</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${fathersList}</div>
+                </div>
+            `;
+            showModal();
+        }
+
+        function showModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeModalOnBackdrop(e) {
+            if (e.target.id === 'detail-modal') {
+                closeModal();
+            }
+        }
+
+        // Dynamische Absicherung der Kapitel-Navigation (Kapitel 1 & Kapitel 28 Ausnahmen)
+        function initChapterNavigation() {
+            const prevBtn = document.getElementById('nav-prev-chapter');
+            const nextBtn = document.getElementById('nav-next-chapter');
+
+            if (CURRENT_CHAPTER <= 1) {
+                prevBtn.removeAttribute('href');
+                prevBtn.classList.add('unsichtbar');
+            } else {
+                prevBtn.setAttribute('href', `matthaeus-${CURRENT_CHAPTER - 1}.html`);
+                prevBtn.classList.remove('unsichtbar');
+            }
+
+            if (CURRENT_CHAPTER >= TOTAL_CHAPTERS) {
+                nextBtn.removeAttribute('href');
+                nextBtn.classList.add('unsichtbar');
+            } else {
+                nextBtn.setAttribute('href', `matthaeus-${CURRENT_CHAPTER + 1}.html`);
+                nextBtn.classList.remove('unsichtbar');
+            }
+        }
+
+        // Initiales Rendern beim Laden
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudy();
+            initChapterNavigation();
+        });
+    </script>
+
+    <!-- Kapitel-Pfeil-Navigation (Matthäus-Projekt: Kapitel 2) -->
+    <nav aria-label="Kapitel-Navigation" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 no-print">
+        <div class="folio-page rounded-2xl border border-parchment-300 px-4 sm:px-8 py-4 flex items-center justify-between gap-3">
+            <!-- Linker Pfeil: Vorheriges Kapitel (Kapitel 1) -->
+            <a id="nav-prev-chapter" href="matthaeus-1.html" class="group inline-flex items-center gap-2 px-3.5 sm:px-5 py-2.5 rounded-xl bg-parchment-100 hover:bg-parchment-200 text-parchment-900 border border-parchment-300 transition-all shadow-xs">
+                <svg class="w-4 h-4 text-burgundy-700 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                <span class="font-serif font-semibold text-sm sm:text-base">Kapitel 1</span>
+            </a>
+
+            <!-- Mittlerer Button: Übersicht -->
+            <a href="index.html" class="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl bg-burgundy-700 hover:bg-burgundy-800 text-parchment-50 border border-gold-600/40 transition-all shadow-sm">
+                <svg class="w-4 h-4 text-amber-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+                <span class="font-sans text-xs sm:text-sm font-medium tracking-wide uppercase">Übersicht</span>
+            </a>
+
+            <!-- Rechter Pfeil: Nächstes Kapitel (Kapitel 3) -->
+            <a id="nav-next-chapter" href="matthaeus-3.html" class="group inline-flex items-center gap-2 px-3.5 sm:px-5 py-2.5 rounded-xl bg-parchment-100 hover:bg-parchment-200 text-parchment-900 border border-parchment-300 transition-all shadow-xs">
+                <span class="font-serif font-semibold text-sm sm:text-base">Kapitel 3</span>
+                <svg class="w-4 h-4 text-burgundy-700 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+        </div>
+    </nav>
+</body>
+</html>

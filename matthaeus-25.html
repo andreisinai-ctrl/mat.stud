@@ -1,0 +1,796 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matthäus 25 – Interaktive Studienausgabe (Griechisch, Historie & Kirchenväter)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        parchment: {
+                            50: '#FCFBF7',
+                            100: '#F7F3E8',
+                            200: '#EFE7D4',
+                            300: '#DFD2B5',
+                            800: '#3D3529',
+                            900: '#262018',
+                        },
+                        burgundy: {
+                            700: '#7C2D12',
+                            800: '#652214',
+                            900: '#4A160D',
+                        },
+                        gold: {
+                            600: '#B48327',
+                            700: '#8F6519',
+                        },
+                        greek: {
+                            50: '#F0F5F9',
+                            700: '#1E4E79',
+                            800: '#15395B',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F7F3E8;
+            color: #262018;
+            background-image: radial-gradient(#DFD2B5 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+
+        /* Buch-Schatten & Papier-Textur */
+        .folio-page {
+            background-color: #FCFBF7;
+            box-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+        }
+
+        /* Griechisches Highlight im Text */
+        .greek-term {
+            border-bottom: 1.5px dotted #1E4E79;
+            color: #15395B;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .greek-term:hover {
+            background-color: #E2ECF5;
+            border-bottom-style: solid;
+        }
+
+        /* Kirchenvater Badge */
+        .father-link {
+            color: #7C2D12;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px dashed #7C2D12;
+            transition: color 0.15s ease;
+        }
+        .father-link:hover {
+            color: #B48327;
+            border-bottom-color: #B48327;
+        }
+
+        /* Versnummern im Stil klassischer Bibelausgaben */
+        .verse-num {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #8F6519;
+            vertical-align: super;
+            margin-right: 2px;
+            user-select: none;
+        }
+
+        /* Sanfte Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F3E8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C3A3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B48327;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .folio-page { box-shadow: none; }
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-amber-200/60">
+
+    <!-- Kopfbereich / Navigationsleiste -->
+    <header class="sticky top-0 z-30 bg-parchment-100/95 backdrop-blur-md border-b border-parchment-300 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <!-- Titel -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-burgundy-800 text-parchment-50 flex items-center justify-center font-display text-xl font-bold shadow-inner border border-gold-600/40">
+                        Μθ
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-display text-xl sm:text-2xl font-bold text-parchment-900 tracking-tight">
+                                Evangelium nach Matthäus · Kapitel 25
+                            </h1>
+                            <span class="hidden sm:inline-block text-xs font-sans uppercase tracking-wider px-2 py-0.5 rounded bg-parchment-200 text-parchment-800 border border-parchment-300">
+                                Glossierte Studienausgabe
+                            </span>
+                        </div>
+                        <p class="text-xs font-sans text-stone-600">
+                            Bibeltext im Zentrum · Griechische Urtext-Analyse · Antiker Kontext · Kirchenväter
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Ansichts- & Filter-Steuerung -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Layout-Umschalter -->
+                    <div class="inline-flex rounded-lg bg-parchment-200 p-1 border border-parchment-300" role="group">
+                        <button id="btn-parallel" onclick="setLayout('parallel')" class="px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all bg-burgundy-800 text-white shadow-sm">
+                            Parallel (Talmud-Stil)
+                        </button>
+                        <button id="btn-inline" onclick="setLayout('inline')" class="px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all text-parchment-800 hover:bg-parchment-100">
+                            Fließtext (Verse + Kursiv)
+                        </button>
+                    </div>
+
+                    <!-- Glossar Button -->
+                    <button onclick="openGlossaryModal()" class="px-3 py-1.5 text-xs font-sans font-medium rounded-lg bg-parchment-50 hover:bg-parchment-200 text-parchment-900 border border-parchment-300 transition-colors flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-3.5 h-3.5 text-gold-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                        Lexikon & Kirchenväter
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ebenen-Filter & Kapitel-Sprungmarken -->
+            <div class="mt-3 pt-2.5 border-t border-parchment-300/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <!-- Filter Chips -->
+                <div class="flex flex-wrap items-center gap-1.5 text-xs font-sans">
+                    <span class="text-stone-500 mr-1 font-medium">Ebenen:</span>
+                    <button onclick="toggleFilter('greek')" id="filter-greek" class="filter-chip active px-2.5 py-1 rounded-full border border-sky-800/30 bg-sky-900/10 text-sky-900 font-medium flex items-center gap-1 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-sky-700"></span> Griechisch (Urtext)
+                    </button>
+                    <button onclick="toggleFilter('history')" id="filter-history" class="filter-chip active px-2.5 py-1 rounded-full border border-amber-800/30 bg-amber-900/10 text-amber-900 font-medium flex items-center gap-1 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-amber-700"></span> Historischer Kontext
+                    </button>
+                    <button onclick="toggleFilter('fathers')" id="filter-fathers" class="filter-chip active px-2.5 py-1 rounded-full border border-red-900/30 bg-red-900/10 text-red-950 font-medium flex items-center gap-1 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-burgundy-800"></span> Kirchenväter
+                    </button>
+                </div>
+
+                <!-- Perikopen-Navigation -->
+                <div class="flex items-center gap-2 text-xs font-sans overflow-x-auto pb-1 sm:pb-0">
+                    <a href="#perikope-1" class="whitespace-nowrap px-2.5 py-1 rounded bg-parchment-200/80 hover:bg-parchment-300 text-parchment-900 transition">I. Zehn Jungfrauen (1–13)</a>
+                    <a href="#perikope-2" class="whitespace-nowrap px-2.5 py-1 rounded bg-parchment-200/80 hover:bg-parchment-300 text-parchment-900 transition">II. Die Talente (14–30)</a>
+                    <a href="#perikope-3" class="whitespace-nowrap px-2.5 py-1 rounded bg-parchment-200/80 hover:bg-parchment-300 text-parchment-900 transition">III. Weltgericht (31–46)</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Haupt-Container (Buchseite / Folio) -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+        
+        <!-- Einführungskasten im Stil einer Folio-Vorrede -->
+        <div class="folio-page rounded-xl p-5 sm:p-7 mb-8 border border-parchment-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-parchment-200 pb-4 mb-4">
+                <div>
+                    <span class="text-xs font-sans uppercase tracking-widest text-gold-700 font-semibold">Die Ölbergrede · Letzter Teil (Mt 24–25)</span>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-parchment-900 mt-0.5">
+                        Wachsamkeit, Treue und Barmherzigkeit vor der Wiederkunft
+                    </h2>
+                </div>
+                <div class="text-xs font-sans text-stone-600 bg-parchment-100 px-3.5 py-2 rounded-lg border border-parchment-300">
+                    <strong class="text-parchment-900">Tipp zur Nutzung:</strong> Klicke auf <span class="greek-term">blau unterstrichene Begriffe</span> für die griechische Wortanalyse oder auf <span class="father-link">Kirchenväter-Namen</span> für ihre Biografie.
+                </div>
+            </div>
+            <p class="font-serif text-base sm:text-lg text-stone-700 leading-relaxed">
+                In der jüdischen Tradition (wie der <em>Mikraot Gedolot</em>) steht der heilige Text nie isoliert: Er wird umrahmt von den Stimmen der Ausleger, sprachlichen Feinheiten und dem historischen Sitz im Leben. Matthäus 25 bildet den dramatischen Abschluss der letzten großen Rede Jesu vor seiner Passion – drei Bilder dafür, was es heißt, auf den Herrn zu warten: <strong>inneres Öl</strong> (Gleichnis der Jungfrauen), <strong>mutiges Wirtschaften</strong> (Gleichnis der Talente) und <strong>tätige Liebe am Geringsten</strong> (Gericht der Völker).
+            </p>
+        </div>
+
+        <!-- Dynamisch gerenderte Bibelabschnitte -->
+        <div id="study-container" class="space-y-10">
+            <!-- Inhalte werden über JavaScript sauber aufgebaut -->
+        </div>
+
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12 border-t border-parchment-300 text-center text-xs font-sans text-stone-600">
+        <p class="font-serif italic text-sm text-parchment-800 mb-1">
+            „Himmel und Erde werden vergehen; aber meine Worte werden nicht vergehen.“ (Matthäus 24,35)
+        </p>
+        <p>Interaktive Studienbibel · Griechischer Grundtext (Nestle-Aland), historische Realienkunde & Patristik (1.–6. Jh. n. Chr.).</p>
+    </footer>
+
+    <!-- Modal / Detail-Karte für Griechisch & Kirchenväter -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/60 backdrop-blur-xs p-4" onclick="closeModalOnBackdrop(event)">
+        <div class="bg-parchment-50 border border-parchment-300 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden transform transition-all">
+            <div id="modal-header" class="px-6 py-4 bg-parchment-100 border-b border-parchment-300 flex items-center justify-between">
+                <span id="modal-badge" class="text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded"></span>
+                <button onclick="closeModal()" class="text-stone-500 hover:text-stone-900 p-1 rounded-lg hover:bg-parchment-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 font-serif text-parchment-900 space-y-4 max-h-[75vh] overflow-y-auto">
+                <!-- Dynamischer Inhalt -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // DATENBANK: GRIECHISCHE SCHLÜSSELWÖRTER
+        // ==========================================
+        const greekLexicon = {
+            parthenoi: {
+                greek: "παρθένοι",
+                translit: "parthenoi",
+                literal: "Jungfrauen / unverheiratete Mädchen",
+                meaning: "In der Antike waren Brautjungfern meist junge Mädchen im Alter von etwa 12 bis 16 Jahren aus der Familie oder Nachbarschaft der Braut. Ihre Aufgabe war es, die Braut im Elternhaus zu schmücken und dem Bräutigam bei seiner nächtlichen Ankunft mit Lichtern einen festlichen Empfangszug zu bereiten.",
+                theology: "Die Kirchenväter sahen in der Zahl Zehn die Gesamtheit der sichtbaren Kirche – sowohl derer, die äußerlich dazugehören, als auch derer, die innerlich bereitet sind."
+            },
+            phronimoi: {
+                greek: "φρόνιμοι (vs. μωραί)",
+                translit: "phronimoi vs. mōrai",
+                literal: "umsichtig, lebensklug (gegenüber: töricht, stumpf)",
+                meaning: "Phronimos meint im Griechischen keine bloße Intelligenz oder Gelehrsamkeit, sondern praktische Weitsicht: das Handeln im Blick auf das kommende Ende (wie der kluge Hausbauer auf Fels in Mt 7,24). Das Gegenwort mōrai (woher unser Wort ‚Moron‘ stammt) beschreibt jemanden, der gedankenlos nur im Augenblick lebt.",
+                theology: "Klugheit im Evangelium ist geistliche Voraussicht auf die Ewigkeit."
+            },
+            lampades: {
+                greek: "λαμπάδες & ἀγγεῖα",
+                translit: "lampades & angeia",
+                literal: "Fackeln / Stablampen & Vorratsgefäße",
+                meaning: "Wichtig für das Verständnis: Lampades sind hier meist keine kleinen Tonlämpchen für drinnen, sondern Hochzeitsfackeln – ein Holzstab, an dessen Spitze ölgetränkte Leinenlappen umwickelt waren. Solche Fackeln brennen hell und spektakulär, verbrauchen aber sehr schnell Öl! Nach 15–20 Minuten müssen sie aus einem separaten Ölfläschchen (angeion) nachgetränkt werden, sonst verglimmen sie.",
+                theology: "Ohne das verborgene Vorratsgefäß (das innere Leben, Gebet und Barmherzigkeit) erlischt das nach außen sichtbare Leuchten."
+            },
+            enystaxan: {
+                greek: "ἐνύσταξαν καὶ ἐκάθευδον",
+                translit: "enystaxan kai ekatheudon",
+                literal: "sie nickten ein und schliefen",
+                meaning: "Zwei verschiedene Verben beschreiben das langsame Übermanntwerden von der Müdigkeit: nystazō bedeutet ‚mit dem Kopf nicken, einnicken‘, katheudō beschreibt den tiefen Schlaf. Entscheidend: Alle zehn schlafen ein – nicht der Schlaf wird getadelt, sondern die fehlende Vorsorge vor dem Einschlafen.",
+                theology: "Hieronymus und Augustinus deuten den Schlaf als den leiblichen Tod aller Menschen vor der Auferstehung: Im Tod ruhen Kluge wie Törichte, doch beim Weckruf zählt, was man vorher gesammelt hat."
+            },
+            oukOida: {
+                greek: "οὐκ οἶδα ὑμᾶς",
+                translit: "ouk oida hymas",
+                literal: "Ich kenne euch nicht",
+                meaning: "Im biblisch-semitischen Sprachgebrauch bedeutet ‚kennen‘ (hebr. jada) weit mehr als bloßes Wissen über jemanden – es meint persönliche Gemeinschaft, Vertrautheit und Bundestreue. Das Perfekt oida drückt einen endgültigen Zustand aus: Es besteht keine lebendige Beziehung.",
+                theology: "Chrysostomus betont: Der Bräutigam sagt nicht ‚Ich hasse euch‘, sondern ‚Ich kenne euch nicht‘ – ihr seid mir fremd geblieben."
+            },
+            talanton: {
+                greek: "τάλαντον",
+                translit: "talanton",
+                literal: "Waage / Gewichtseinheit (ca. 34 kg Silber)",
+                meaning: "Unser deutsches Wort ‚Talent‘ (Begabung) stammt genau aus diesem Gleichnis! Im 1. Jahrhundert war ein Talent jedoch keine Fähigkeit, sondern die größte antike Geldeinheit: 1 Talent = 6.000 Denare. Da 1 Denar der Tageslohn eines Arbeiters war, entsprach 1 Talent dem Lohn von rund 20 Jahren harter Arbeit! Fünf Talente waren also ein gewaltiges Vermögen (ca. 100 Jahreslöhne).",
+                theology: "Christus vertraut seinen Dienern keine Kleinigkeiten an, sondern unermessliche Güter seiner Gnade, seines Wortes und seiner Möglichkeiten."
+            },
+            kataDynamin: {
+                greek: "κατὰ τὴν ἰδίαν δύναμιν",
+                translit: "kata tēn idian dynamin",
+                literal: "entsprechend seiner eigenen Kraft / Leistungsfähigkeit",
+                meaning: "Der Herr handelt nicht willkürlich und überfordert niemanden. Dynamis bezeichnet die innere Kraft und Kapazität eines Menschen. Der Knecht mit einem Talent wird nicht dafür verurteilt, dass er keine fünf erwirtschaftet hat – sondern dafür, dass er gar nichts gewagt hat.",
+                theology: "Gregor der Große: Niemand in der Kirche ist ganz ohne Gabe; selbst ein einziges Talent ist ein königliches Vermögen."
+            },
+            trapezitai: {
+                greek: "τραπεζῖται",
+                translit: "trapezitai",
+                literal: "Tischler / Geldwechsler & Bankiers (von trapeza = Tisch)",
+                meaning: "Geldwechsler saßen an ihren Tischen (trapezai) auf den Marktplätzen und im Tempelvorhof. Im Römischen Reich nahmen sie Gelder entgegen, verliehen sie gegen Zinsen (tokos = wörtlich ‚Geborenes / Ertrag‘) weiter und zahlten Einlegern einen sicheren Zins. Obwohl das mosaische Gesetz Zinsen unter Israeliten verbot (5. Mose 23,20), waren Bankgeschäfte mit Nichtjuden und im hellenistischen Handel üblich.",
+                theology: "Der Herr argumentiert mit der eigenen Logik des faulen Knechts: Wenn du mich schon für so streng hieltest, hättest du wenigstens das Minimum tun müssen."
+            },
+            euge: {
+                greek: "εὖγε, δοῦλε ἀγαθὲ καὶ πιστέ",
+                translit: "euge, doule agathe kai piste",
+                literal: "Bravo / Vortrefflich, du guter und treuer Sklave!",
+                meaning: "Euge ist ein herzlicher Ausruf der Bewunderung und Freude (‚Großartig!‘, ‚Wohlgetan!‘). Bemerkenswert: Der Knecht mit zwei Talenten erhält exakt dasselbe Lob und dieselbe Belohnung wie der mit fünf Talenten. Entscheidend ist nicht die absolute Summe, sondern die prozentuale Treue (100 % Einsatz).",
+                theology: "‚Geh ein in die Freude deines Herrn‘ – in der Antike feierte der Hausherr ein Festmahl; der Sklave wird vom Diener zum Tischgenossen erhoben."
+            },
+            ethne: {
+                greek: "πάντα τὰ ἔθνη",
+                translit: "panta ta ethnē",
+                literal: "alle Nationen / Völker",
+                meaning: "Ethnē bezeichnet im Griechischen alle Völker und Nationen der Erde (manchmal im Gegensatz zu Israel als ‚die Heiden‘, hier aber im umfassenden Sinn der gesamten Menschheit, wie auch in Mt 28,19). Niemand steht außerhalb dieses Maßstabs.",
+                theology: "Hieronymus und Chrysostomus diskutieren intensiv, ob hier alle Menschen überhaupt oder speziell die christlichen Völker gemeint sind – die Maßstäbe der Barmherzigkeit gelten universal."
+            },
+            elachistoi: {
+                greek: "τῶν ἀδελφῶν μου τῶν ἐλαχίστων",
+                translit: "tōn adelphōn mou tōn elachistōn",
+                literal: "meiner allergeringsten Brüder (Superlativ von mikros = klein)",
+                meaning: "Elachistos ist der Superlativ: ‚der Allerkleinste, Unscheinbarste, Machtloseste‘. Jesus setzt sich hier nicht nur moralisch für die Armen ein, sondern vollzieht eine mystische Identifikation: ‚Was ihr ihnen getan habt, habt ihr mir getan‘ (ep’ emoi epoiēsate).",
+                theology: "Bei den Kirchenvätern gibt es zwei große Auslegungslinien: (1) Alle Notleidenden, weil Christus die menschliche Natur angenommen hat (Chrysostomus); (2) besonders die verfolgten Boten des Evangeliums und bedürftigen Glaubensgeschwister (Hieronymus)."
+            },
+            aionios: {
+                greek: "κόλασιν αἰώνιον vs. ζωὴν αἰώνιον",
+                translit: "kolasin aiōnion vs. zōēn aiōnion",
+                literal: "ewige Strafe / Zurechtweisung vs. ewiges Leben",
+                meaning: "Matthäus stellt beide Ausgänge bewusst mit demselben Adjektiv aiōnios (ewig, der kommenden Weltzeit angehörend) parallel gegenüber. Das Wort kolasis bezeichnet ursprünglich das Beschneiden von Bäumen zur Korrektur und dann die gerechte Strafe.",
+                theology: "Augustinus weist im ‚Gottesstaat‘ (De civitate Dei XXI) ausdrücklich auf diese sprachliche Parallele hin: Beide Zustände tragen dasselbe Gewicht der Endgültigkeit."
+            }
+        };
+
+        // ==========================================
+        // DATENBANK: KIRCHENVÄTER
+        // ==========================================
+        const churchFathers = {
+            chrysostomus: {
+                name: "Johannes Chrysostomus",
+                dates: "ca. 349 – 407 n. Chr.",
+                role: "Erzbischof von Konstantinopel · ‚Goldmund‘",
+                bio: "Einer der größten Prediger der Alten Kirche. Seine 90 Homilien zum Matthäusevangelium (gehalten um 390 in Antiochia) verbinden scharfe sprachliche Beobachtung mit leidenschaftlicher sozialer Gerechtigkeit und Seelsorge.",
+                focusInMt25: "Betont unermüdlich, dass das ‚Öl‘ der Jungfrauen die tätige Nächstenliebe (Almosen und Barmherzigkeit) ist und dass Christus selbst im Bettler vor der Kirchentür steht."
+            },
+            augustinus: {
+                name: "Augustinus von Hippo",
+                dates: "354 – 430 n. Chr.",
+                role: "Bischof von Hippo Regius (Nordafrika) · Kirchenlehrer",
+                bio: "Prägte die westliche Theologie wie kein anderer. In seinen Predigten (Sermones) und im Werk ‚De civitate Dei‘ (Vom Gottesstaat) legt er Matthäus 25 tief psychologisch und heilsgeschichtlich aus.",
+                focusInMt25: "Deutet die ‚Gefäße‘ der klugen Jungfrauen als das menschliche Herz und Gewissen: Wer Gutes nur tut, um von Menschen gesehen zu werden, trägt sein Öl nur in der äußeren Lampe, nicht im inneren Gefäß."
+            },
+            hieronymus: {
+                name: "Hieronymus von Stridon",
+                dates: "ca. 347 – 420 n. Chr.",
+                role: "Bibelübersetzer (Vulgata) · Gelehrter in Bethlehem",
+                bio: "Lebte viele Jahre in Bethlehem, lernte Hebräisch von jüdischen Rabbinen und kannte die Geografie, Sitten und Natur Palästinas aus eigener Anschauung.",
+                focusInMt25: "Liefert wertvolle historische Beobachtungen zum palästinensischen Alltag (etwa zu Schafen und Böcken) und verfasst im Jahr 398 in nur zwei Wochen einen kompakten, gelehrten Matthäus-Kommentar."
+            },
+            gregor: {
+                name: "Gregor der Große",
+                dates: "ca. 540 – 604 n. Chr.",
+                role: "Papst und Kirchenlehrer · Pastor der Übergangszeit",
+                bio: "In seinen ‚Homilien zu den Evangelien‘ (Homiliae in Evangelia) verbindet er tiefe Demut mit praktischer Verantwortung für die Leitung der Gemeinde.",
+                focusInMt25: "Legt das Gleichnis der Talente meisterhaft aus: Jeder Mensch hat ein Talent empfangen – der eine Verstand, der andere Besitz, der dritte das Wort oder einfach ein gütiges Herz, mit dem er den Nächsten trösten kann."
+            },
+            origenes: {
+                name: "Origines von Alexandria",
+                dates: "ca. 185 – 254 n. Chr.",
+                role: "Bibelphilologe & Theologe in Alexandria und Cäsarea",
+                bio: "Begründer der wissenschaftlichen Bibeltextkritik (Hexapla) und Pionier der allegorischen Schriftauslegung, der hinter jedem Detail des Textes eine geistliche Tiefendimension suchte.",
+                focusInMt25: "Sieht in den fünf Sinnen die fünf Lampen der Seele, die erst durch das Öl der göttlichen Weisheit erleuchtet werden."
+            }
+        };
+
+        // ==========================================
+        // INHALT: MATTHÄUS 25 IN SINNABSCHNITTEN
+        // ==========================================
+        const studySections = [
+            {
+                id: "perikope-1",
+                sectionTitle: "I. Das Gleichnis von den zehn Jungfrauen",
+                sectionRange: "Matthäus 25,1–13",
+                sectionIntro: "Nach den Warnungen vor der plötzlichen Wiederkunft des Menschensohnes (Mt 24) wendet sich Jesus an die innere Bereitschaft seiner Gemeinde.",
+                blocks: [
+                    {
+                        verses: "1–4",
+                        bibleText: `<span class="verse-num">1</span>Dann wird das Reich der Himmel zehn <span class="greek-term" onclick="openGreek('parthenoi')">Jungfrauen</span> gleichen, die ihre <span class="greek-term" onclick="openGreek('lampades')">Lampen</span> nahmen und hinausgingen, dem Bräutigam entgegen. <span class="verse-num">2</span>Fünf aber von ihnen waren töricht und fünf <span class="greek-term" onclick="openGreek('phronimoi')">klug</span>. <span class="verse-num">3</span>Denn die törichten nahmen zwar ihre Lampen, nahmen aber kein Öl mit sich; <span class="verse-num">4</span>die klugen aber nahmen Öl in ihren Gefäßen mitsamt ihren Lampen.`,
+                        commentary: {
+                            history: `<em>Eine antike galiläische Hochzeit lief völlig anders ab als heutige Trauungen: Nachdem der Brautpreis ausgehandelt war, zog der Bräutigam am späten Abend mit seinen Freunden vom eigenen Elternhaus zum Haus der Braut, um sie heimzuholen. Die <span class="greek-term" onclick="openGreek('parthenoi')">Brautjungfern</span> warteten dort, um den Festzug bei Nacht mit brennenden <span class="greek-term" onclick="openGreek('lampades')">Fackeln</span> zu begleiten. Da Hochzeitsfackeln aus ölgetränkten Tüchern an einem Holzstab bestanden, brannten sie nur rund 15 bis 20 Minuten – ohne ein zusätzliches Ölfläschchen (<em>angeion</em>) war man bei Verzögerungen hilflos.</em>`,
+                            greek: `<em>Beachte den Kontrast zwischen <span class="greek-term" onclick="openGreek('phronimoi')">phronimoi</span> (klug, weitsichtig) und <em>mōrai</em> (töricht, kurzsichtig). Beide Gruppen haben brennende Fackeln – äußerlich sind sie zunächst nicht zu unterscheiden! Der einzige Unterschied liegt im Verborgenen: dem mitgeführten Vorratsgefäß.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('augustinus')">Augustinus</span> deutet diese Gefäße tief psychologisch auf das menschliche Herz: „Die Lampen sind die guten Werke, die vor den Menschen leuchten; die Gefäße aber sind das Gewissen, in dem man den Ruhm nicht bei Menschen, sondern vor Gott sucht.“ <span class="father-link" onclick="openFather('chrysostomus')">Johannes Chrysostomus</span> sieht im Öl vor allem die tätige Barmherzigkeit und Nächstenliebe.</em>`
+                        }
+                    },
+                    {
+                        verses: "5–9",
+                        bibleText: `<span class="verse-num">5</span>Als aber der Bräutigam auf sich warten ließ, <span class="greek-term" onclick="openGreek('enystaxan')">nickten alle ein und schliefen</span>. <span class="verse-num">6</span>Um Mitternacht aber entstand ein Geschrei: Siehe, der Bräutigam! Geht hinaus, ihm entgegen! <span class="verse-num">7</span>Da standen alle jene Jungfrauen auf und schmückten ihre Lampen. <span class="verse-num">8</span>Die törichten aber sprachen zu den klugen: Gebt uns von eurem Öl, denn unsere Lampen verlöschen! <span class="verse-num">9</span>Die klugen aber antworteten und sprachen: Nein, es könnte sonst nicht reichen für uns und für euch; geht vielmehr hin zu den Verkäufern und kauft für euch selbst!`,
+                        commentary: {
+                            history: `<em>Warum verzögerte sich der Bräutigam bis Mitternacht? Im Orient zogen sich Verhandlungen über die Mitgift und Geschenke zwischen den Familien oft über Stunden hin, während die Brautjungfern im Haus der Braut warteten. Das „Schmücken“ der Lampen (v. 7) meint das Abschneiden der verkohlten Dochtspitzen und das Nachtränken mit frischem Olivenöl.</em>`,
+                            greek: `<em>In Vers 5 verwendet Matthäus zwei fein abgestufte Verben: <span class="greek-term" onclick="openGreek('enystaxan')">enystaxan</span> (sie nickten ein) im Aorist für den Moment des Einschlafens, und <em>ekatheudon</em> (sie schliefen) im Imperfekt für den anhaltenden Schlaf. Alle zehn schlafen!</em>`,
+                            fathers: `<em>Die Weigerung der klugen Jungfrauen klingt auf den ersten Blick hartherzig, doch <span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> und <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> erklären den geistlichen Sinn: Charaktereigenschaften, Glaube und gelebte Liebe sind nicht übertragbar wie ein Kleidungsstück. Am Tag des Gerichts kann niemand mehr von der Frömmigkeit eines anderen zehren – jeder steht mit seinem eigenen Leben vor Gott.</em>`
+                        }
+                    },
+                    {
+                        verses: "10–13",
+                        bibleText: `<span class="verse-num">10</span>Während sie aber hingingen, um zu kaufen, kam der Bräutigam; und die bereit waren, gingen mit ihm hinein zur Hochzeit, und die Tür wurde verschlossen. <span class="verse-num">11</span>Später aber kommen auch die übrigen Jungfrauen und sagen: Herr, Herr, tu uns auf! <span class="verse-num">12</span>Er aber antwortete und sprach: Wahrlich, ich sage euch, <span class="greek-term" onclick="openGreek('oukOida')">ich kenne euch nicht</span>. <span class="verse-num">13</span>Darum wacht! Denn ihr wisst weder den Tag noch die Stunde.`,
+                        commentary: {
+                            history: `<em>Sobald der Festzug das Haus des Bräutigams betreten hatte, wurde die schwere Haustür aus Sicherheitsgründen und um ungebetene Gäste fernzuhalten von innen verriegelt. Das Fest dauerte oft sieben Tage, doch wer den Einzug verpasste, blieb draußen in der Nacht.</em>`,
+                            greek: `<em>Das erschütternde <span class="greek-term" onclick="openGreek('oukOida')">ouk oida hymas</span> („Ich kenne euch nicht“) steht im griechischen Perfekt – es bezeichnet keine Informationslücke des Allwissenden, sondern das Fehlen einer gelebten Vertrautheit. Man hatte zwar das richtige Bekenntnis auf den Lippen („Herr, Herr“), aber keine Beziehung zum Bräutigam gepflegt.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('augustinus')">Augustinus</span> bemerkt scharfsinnig, dass die törichten Jungfrauen schließlich doch noch Öl bekamen (sie klopfen ja wieder an), aber zu spät: „Was nützt es, sich erst dann um Barmherzigkeit zu bemühen, wenn die Zeit des Säens vorbei ist und die Zeit des Erntens begonnen hat?“</em>`
+                        }
+                    }
+                ]
+            },
+            {
+                id: "perikope-2",
+                sectionTitle: "II. Das Gleichnis von den anvertrauten Talenten",
+                sectionRange: "Matthäus 25,14–30",
+                sectionIntro: "Während die zehn Jungfrauen für die innere Wachsamkeit stehen, zeigt das zweite Gleichnis die aktive Verantwortung im Warten: Wachen heißt nicht untätig sitzen, sondern mutig arbeiten.",
+                blocks: [
+                    {
+                        verses: "14–18",
+                        bibleText: `<span class="verse-num">14</span>Denn es ist wie bei einem Menschen, der außer Landes reiste, seine eigenen Knechte rief und ihnen seine Habe übergab. <span class="verse-num">15</span>Und dem einen gab er fünf <span class="greek-term" onclick="openGreek('talanton')">Talente</span>, dem anderen zwei, dem dritten eins, einem jeden <span class="greek-term" onclick="openGreek('kataDynamin')">nach seiner eigenen Kraft</span>; und er reiste sogleich außer Landes. <span class="verse-num">16</span>Da ging der hin, der die fünf Talente empfangen hatte, handelte mit ihnen und gewann andere fünf hinzu. <span class="verse-num">17</span>Ebenso gewann auch der mit den zwei Talenten andere zwei hinzu. <span class="verse-num">18</span>Der aber das eine empfangen hatte, ging hin, grub ein Loch in die Erde und verbarg das Geld seines Herrn.`,
+                        commentary: {
+                            history: `<em>Ein antiker Großgrundbesitzer (oft ein römischer oder herodianischer Aristokrat), der für Monate oder Jahre nach Rom oder Alexandria reiste, setzte qualifizierte Sklaven als Verwalter (<em>oikonomoi</em>) ein. Ein <span class="greek-term" onclick="openGreek('talanton')">Talent</span> war keine kleine Münze, sondern rund 34 kg Silber (6.000 Denare = ca. 20 Jahreslöhne eines Tagelöhners!). Selbst der dritte Knecht erhielt also ein Vermögen im Gegenwert eines ganzen Arbeitslebens. Und warum vergrub er es? Nach rabbinischem Recht (Mischna, Bava Metzia 3,10) galt das Vergraben in der Erde als die einzige Methode, bei der ein Verwahrer im Fall eines Diebstahls von persönlicher Haftung befreit war!</em>`,
+                            greek: `<em>Die Wendung <span class="greek-term" onclick="openGreek('kataDynamin')">kata tēn idian dynamin</span> („nach seiner eigenen Kraft/Fähigkeit“) zeigt die Gerechtigkeit des Herrn: Er misst jedem so viel zu, wie dieser tragen kann, ohne zerbrochen zu werden.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('gregor')">Gregor der Große</span> mahnt: „Niemand soll sagen: ‚Ich habe kein Talent empfangen, ich kann nichts für Gott tun.‘ Selbst wer kein Gelehrter ist, hat das Talent der Liebe empfangen – wenn du es im Acker deines Herzens vergräbst und nur für dich behältst, wirst du dafür Rechenschaft ablegen.“</em>`
+                        }
+                    },
+                    {
+                        verses: "19–23",
+                        bibleText: `<span class="verse-num">19</span>Nach langer Zeit aber kommt der Herr jener Knechte und hält Abrechnung mit ihnen. <span class="verse-num">20</span>Und es trat herzu, der die fünf Talente empfangen hatte, brachte andere fünf Talente und sprach: Herr, fünf Talente hast du mir übergeben; siehe, ich habe andere fünf Talente hinzugewonnen. <span class="verse-num">21</span>Sein Herr sprach zu ihm: <span class="greek-term" onclick="openGreek('euge')">Wohlan, du guter und treuer Knecht</span>! Über wenig bist du treu gewesen, über vieles will ich dich setzen; geh ein in die Freude deines Herrn! <span class="verse-num">22</span>Es trat aber auch herzu, der die zwei Talente empfangen hatte, und sprach: Herr, zwei Talente hast du mir übergeben; siehe, ich habe andere zwei Talente hinzugewonnen. <span class="verse-num">23</span>Sein Herr sprach zu ihm: Wohlan, du guter und treuer Knecht! Über wenig bist du treu gewesen, über vieles will ich dich setzen; geh ein in die Freude deines Herrn!`,
+                        commentary: {
+                            history: `<em>Der Ausdruck „Geh ein in die Freude (<em>chara</em>) deines Herrn“ verweist im antiken Sprachgebrauch konkret auf das Festmahl des Hausherrn nach glücklicher Heimkehr. Dass ein Sklave nicht nur gelobt, sondern in die Festfreude seines Herrn eingeladen wird, bedeutet praktisch seine Freilassung und Erhebung in den Rang eines Freundes.</em>`,
+                            greek: `<em>Das griechische <span class="greek-term" onclick="openGreek('euge')">euge</span> („Bravo! Vortrefflich!“) ist ein begeisterter Beifallsruf. Entscheidend ist die wörtliche Wiederholung zwischen Vers 21 und Vers 23: Der Knecht mit zwei Talenten bekommt exakt dasselbe Lob wie der mit fünf! Gott misst nicht nach absoluter Größe, sondern nach Treue im anvertrauten Maß.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> hebt hervor, dass die beiden treuen Knechte ihre Talente nicht für sich behalten, sondern sofort zum Herrn zurückbringen: „Sie sagen nicht ‚Ich habe gewonnen‘, sondern ‚Du hast mir übergeben, und ich habe damit gewonnen‘ – sie erkennen die Gnade als Quelle ihres Erfolgs an.“</em>`
+                        }
+                    },
+                    {
+                        verses: "24–30",
+                        bibleText: `<span class="verse-num">24</span>Es trat aber auch herzu, der das eine Talent empfangen hatte, und sprach: Herr, ich kannte dich, dass du ein harter Mensch bist; du erntest, wo du nicht gesät hast, und sammelst, wo du nicht ausgestreut hast; <span class="verse-num">25</span>und ich fürchtete mich, ging hin und verbarg dein Talent in der Erde; siehe, da hast du das Deine! <span class="verse-num">26</span>Sein Herr aber antwortete und sprach zu ihm: Du böser und fauler Knecht! Du wusstest, dass ich ernte, wo ich nicht gesät habe, und sammle, wo ich nicht ausgestreut habe? <span class="verse-num">27</span>Dann hättest du mein Geld den <span class="greek-term" onclick="openGreek('trapezitai')">Wechslern</span> bringen sollen, und bei meinem Kommen hätte ich das Meine mit Zinsen zurückerhalten. <span class="verse-num">28</span>Nehmt nun das Talent von ihm weg und gebt es dem, der die zehn Talente hat! <span class="verse-num">29</span>Denn jedem, der hat, wird gegeben werden, und er wird Überfluss haben; von dem aber, der nicht hat, wird auch das genommen werden, was er hat. <span class="verse-num">30</span>Und den unnützen Knecht werft hinaus in die äußerste Finsternis; da wird das Weinen und das Zähneknirschen sein.`,
+                        commentary: {
+                            history: `<em>Die <span class="greek-term" onclick="openGreek('trapezitai')">trapezitai</span> (wörtlich „Tischler“, weil sie an Wechslertischen auf den Märkten saßen) waren die antiken Bankiers. Sie nahmen Kapital entgegen und verliehen es im Fernhandel weiter. Wer selbst kein Risiko eingehen wollte, konnte sein Silber dort gegen sicheren Zins (<em>tokos</em>) anlegen.</em>`,
+                            greek: `<em>Man beachte die Psychologie des dritten Knechts: Er beginnt seine Verteidigung mit einem verzerrten Gottesbild („Ich kannte dich, dass du ein harter – <em>sklēros</em> – Mensch bist“). Aus falscher Angst vor Fehlern entsteht Lähmung (<em>oknēros</em> = träge, zögerlich). Vers 29 formuliert das berühmte „Matthäus-Prinzip“: Geistliche Gaben wachsen durch Gebrauch und verkümmern durch Nichtgebrauch.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('origenes')">Origines</span> und <span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> sehen in den „Wechslern“, denen man das Wort anvertrauen soll, die Lehrer und Mitmenschen der Gemeinde: Wer selbst nicht groß predigen oder wirken kann, soll das Empfangene wenigstens im Gespräch mit anderen teilen, damit es Zinsen trägt.</em>`
+                        }
+                    }
+                ]
+            },
+            {
+                id: "perikope-3",
+                sectionTitle: "III. Das Weltgericht: Schafe und Böcke",
+                sectionRange: "Matthäus 25,31–46",
+                sectionIntro: "Das letzte Bild verlässt die Gleichnisform (‚es gleicht‘) und öffnet den Blick direkt auf die Thronbesteigung des Menschensohnes am Ende der Geschichte.",
+                blocks: [
+                    {
+                        verses: "31–33",
+                        bibleText: `<span class="verse-num">31</span>Wenn aber der Sohn des Menschen kommen wird in seiner Herrlichkeit und alle Engel mit ihm, dann wird er auf dem Thron seiner Herrlichkeit sitzen; <span class="verse-num">32</span>und vor ihm werden versammelt werden <span class="greek-term" onclick="openGreek('ethne')">alle Nationen</span>, und er wird sie voneinander scheiden, wie der Hirte die Schafe von den Böcken scheidet; <span class="verse-num">33</span>und er wird die Schafe zu seiner Rechten stellen, die Böcke aber zur Linken.`,
+                        commentary: {
+                            history: `<em>Ein realer Einblick in das palästinensische Hirtenleben (wie schon <span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> vor Ort beobachtete): In Judäa weideten Hirten tagsüber Schafe und Ziegen/Böcke gemeinsam in einer gemischten Herde. Abends aber trennte der Hirte sie! Warum? Ziegen und Böcke haben ein dünneres Fell, frieren nachts leicht und brauchen einen geschützten Stall oder Wärmeschutz, während die dicht bewollten Schafe lieber an der kühlen Nachtluft lagern. Zudem sind Ziegen unruhiger und stören die Schafe im Schlaf.</em>`,
+                            greek: `<em><span class="greek-term" onclick="openGreek('ethne')">Panta ta ethnē</span> („alle Völker/Nationen“) umfasst die gesamte Menschheit. In der biblischen Symbolik ist die rechte Seite (<em>dexia</em>) der Platz der Ehre, des Segens und der Gunst (Ps 110,1).</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> weist darauf hin, wie still und unspektakulär die Trennung geschieht: Wie ein Hirte seine Tiere kennt, ohne lange befragen zu müssen, so kennt Christus die Taten jedes einzelnen Menschen.</em>`
+                        }
+                    },
+                    {
+                        verses: "34–40",
+                        bibleText: `<span class="verse-num">34</span>Dann wird der König zu denen zu seiner Rechten sagen: Kommt her, Gesegnete meines Vaters, erbt das Reich, das euch bereitet ist von Grundlegung der Welt an! <span class="verse-num">35</span>Denn ich war hungrig, und ihr habt mir zu essen gegeben; ich war durstig, und ihr habt mir zu trinken gegeben; ich war Fremdling, und ihr habt mich aufgenommen; <span class="verse-num">36</span>nackt, und ihr habt mich bekleidet; ich war krank, und ihr habt mich besucht; ich war im Gefängnis, und ihr seid zu mir gekommen. <span class="verse-num">37</span>Dann werden ihm die Gerechten antworten und sagen: Herr, wann sahen wir dich hungrig und speisten dich? Oder durstig und gaben dir zu trinken? <span class="verse-num">38</span>Wann aber sahen wir dich als Fremdling und nahmen dich auf? Oder nackt und bekleideten dich? <span class="verse-num">39</span>Wann aber sahen wir dich krank oder im Gefängnis und kamen zu dir? <span class="verse-num">40</span>Und der König wird antworten und zu ihnen sagen: Wahrlich, ich sage euch, was ihr einem dieser <span class="greek-term" onclick="openGreek('elachistoi')">meiner geringsten Brüder</span> getan habt, das habt ihr mir getan.`,
+                        commentary: {
+                            history: `<em>Die sechs genannten Taten entsprechen genau den klassischen jüdischen Werken der Barmherzigkeit (<em>Gemilut Chasadim</em>), mit einer dramatischen Zuspitzung beim Gefängnisbesuch: Antike römische Gefängnisse kannten keine staatliche Vollverpflegung! Gefangene waren völlig darauf angewiesen, dass Freunde oder Gläubige Nahrung, Wasser und Kleidung brachten – wobei sich die Besucher oft selbst der Gefahr der Verdächtigung aussetzten.</em>`,
+                            greek: `<em>Das Wort <span class="greek-term" onclick="openGreek('elachistoi')">elachistoi</span> ist der Superlativ: „meine allergeringsten, unscheinbarsten Brüder“. Und das Überraschende: Selbst die Gerechten sind verblüfft („Herr, wann sahen wir dich?“). Echte Liebe rechnet nicht mit Punkten, sondern hilft aus reinem Herzen.</em>`,
+                            fathers: `<em>In der Alten Kirche gab es zwei große Deutungen von „meinen geringsten Brüdern“: <span class="father-link" onclick="openFather('chrysostomus')">Johannes Chrysostomus</span> bezog es auf jeden leidenden Menschen überhaupt („Wenn du einen Armen siehst, denke nicht, du sähest einen gewöhnlichen Menschen – du siehst Christus selbst“). <span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> betonte daneben, dass Jesus damit besonders seine bedürftigen Jünger und Missionare meint, die ohne Besitz in die Welt gesandt wurden.</em>`
+                        }
+                    },
+                    {
+                        verses: "41–46",
+                        bibleText: `<span class="verse-num">41</span>Dann wird er auch zu denen zur Linken sagen: Geht weg von mir, Verfluchte, in das ewige Feuer, das bereitet ist dem Teufel und seinen Engeln! <span class="verse-num">42</span>Denn ich war hungrig, und ihr habt mir nicht zu essen gegeben; ich war durstig, und ihr habt mir nicht zu trinken gegeben; <span class="verse-num">43</span>ich war Fremdling, und ihr habt mich nicht aufgenommen; nackt, und ihr habt mich nicht bekleidet; krank und im Gefängnis, und ihr habt mich nicht besucht. <span class="verse-num">44</span>Dann werden auch sie antworten und sagen: Herr, wann sahen wir dich hungrig oder durstig oder als Fremdling oder nackt oder krank oder im Gefängnis und haben dir nicht gedient? <span class="verse-num">45</span>Dann wird er ihnen antworten und sagen: Wahrlich, ich sage euch, was ihr einem dieser Geringsten nicht getan habt, das habt ihr auch mir nicht getan. <span class="verse-num">46</span>Und diese werden hingehen in die <span class="greek-term" onclick="openGreek('aionios')">ewige Strafe</span>, die Gerechten aber in das <span class="greek-term" onclick="openGreek('aionios')">ewige Leben</span>.`,
+                        commentary: {
+                            history: `<em>Beachte den feinen, aber theologisch gewaltigen Unterschied zwischen Vers 34 und Vers 41: Das Reich ist für die Menschen „bereitet von Grundlegung der Welt an“ – das ewige Feuer hingegen ist ursprünglich nicht für Menschen, sondern „dem Teufel und seinen Engeln“ bereitet! Der Mensch gerät nur hinein, wenn er sich der Liebe verweigert.</em>`,
+                            greek: `<em>In Vers 46 stehen <span class="greek-term" onclick="openGreek('aionios')">kolasis aiōnios</span> (ewige Strafe) und <em>zōē aiōnios</em> (ewiges Leben) in exakter grammatikalischer Symmetrie. Bemerkenswert ist auch, dass die Verurteilten nicht wegen schwerer Verbrechen (Mord, Raub) angeklagt werden, sondern wegen unterlassener Liebe – sie haben einfach weggesehen.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('augustinus')">Augustinus</span> kommentiert in seinem Werk ‚Vom Gottesstaat‘ (XXI, 23): „Beide Seiten fragen verwundert: ‚Wann sahen wir dich?‘ Denn weder wussten die Guten, dass Christus ihnen einmal so lohnen würde, noch glaubten die Bösen, dass der arme Mensch vor ihrer Tür der König der Welt war.“ Und <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> schließt seine Auslegung mit dem Appell: „Hier ist der Ort, Christus zu begegnen – nicht erst in den Wolken des Himmels, sondern heute in den Straßen der Stadt.“</em>`
+                        }
+                    }
+                ]
+            }
+        ];
+
+        // ==========================================
+        // ZUSTAND & STEUERUNG
+        // ==========================================
+        let currentLayout = 'parallel'; // 'parallel' oder 'inline'
+        let activeFilters = {
+            greek: true,
+            history: true,
+            fathers: true
+        };
+
+        // Lesezeichen / Persönliche Notizen aus localStorage laden
+        let userNotes = JSON.parse(localStorage.getItem('mt25_notes') || '{}');
+
+        function renderStudy() {
+            const container = document.getElementById('study-container');
+            container.innerHTML = '';
+
+            studySections.forEach(section => {
+                const sectionEl = document.createElement('section');
+                sectionEl.id = section.id;
+                sectionEl.className = 'folio-page rounded-2xl border border-parchment-300 overflow-hidden scroll-mt-28';
+
+                // Perikopen-Kopfbereich
+                let html = `
+                    <div class="bg-parchment-100/90 px-5 sm:px-8 py-5 border-b border-parchment-300">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <h3 class="font-display text-2xl sm:text-3xl font-bold text-burgundy-900">
+                                ${section.sectionTitle}
+                            </h3>
+                            <span class="font-sans text-xs font-semibold tracking-wider uppercase px-2.5 py-1 rounded bg-parchment-200 text-parchment-900 border border-parchment-300">
+                                ${section.sectionRange}
+                            </span>
+                        </div>
+                        <p class="font-serif italic text-stone-700 text-base mt-1.5">
+                            ${section.sectionIntro}
+                        </p>
+                    </div>
+                    <div class="divide-y divide-parchment-200">
+                `;
+
+                section.blocks.forEach((block, idx) => {
+                    const blockKey = `${section.id}-${idx}`;
+                    const savedNote = userNotes[blockKey] || '';
+
+                    // Kommentar-Spalte / Block zusammenbauen
+                    let commentaryParts = [];
+
+                    if (activeFilters.history && block.commentary.history) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-amber-700/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-amber-800 block mb-0.5">Historischer & Jüdischer Kontext</span>
+                                <div class="text-stone-800">${block.commentary.history}</div>
+                            </div>
+                        `);
+                    }
+
+                    if (activeFilters.greek && block.commentary.greek) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-sky-800/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-sky-900 block mb-0.5">Griechischer Urtext & Wortbedeutung</span>
+                                <div class="text-stone-800">${block.commentary.greek}</div>
+                            </div>
+                        `);
+                    }
+
+                    if (activeFilters.fathers && block.commentary.fathers) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-burgundy-800/70">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-800 block mb-0.5">Stimmen der Kirchenväter</span>
+                                <div class="text-stone-800">${block.commentary.fathers}</div>
+                            </div>
+                        `);
+                    }
+
+                    const commentaryHtml = commentaryParts.length > 0
+                        ? `<div class="space-y-3.5 font-serif text-[15.5px] sm:text-base leading-relaxed">${commentaryParts.join('')}</div>`
+                        : `<div class="font-sans text-xs text-stone-400 italic">Alle Kommentar-Ebenen sind derzeit ausgeblendet. Aktiviere oben mindestens eine Ebene.</div>`;
+
+                    if (currentLayout === 'parallel') {
+                        // TALMUD-STIL: Links Bibeltext, Rechts parallel der kursive Kommentar
+                        html += `
+                            <div class="grid grid-cols-1 lg:grid-cols-12">
+                                <!-- Linke Spalte: Bibeltext (5 von 12 Spalten) -->
+                                <div class="lg:col-span-5 p-5 sm:p-7 bg-parchment-50 lg:border-r border-parchment-300/80 flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-700">
+                                                Mt 25,${block.verses}
+                                            </span>
+                                            <button onclick="toggleNoteBox('${blockKey}')" title="Eigene Studiennotiz hinzufügen" class="text-xs font-sans text-stone-400 hover:text-burgundy-800 flex items-center gap-1 transition no-print">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                            </button>
+                                        </div>
+                                        <p class="font-serif text-lg sm:text-[19px] leading-[1.75] text-parchment-900 font-normal">
+                                            ${block.bibleText}
+                                        </p>
+                                    </div>
+                                    ${renderNoteArea(blockKey, savedNote)}
+                                </div>
+
+                                <!-- Rechte Spalte: Paralleler Kommentar (7 von 12 Spalten) -->
+                                <div class="lg:col-span-7 p-5 sm:p-7 bg-parchment-100/45">
+                                    ${commentaryHtml}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // FLIESSTEXT-ANSICHT: Bibelverse oben, kursiver Kommentar direkt darunter
+                        html += `
+                            <div class="p-5 sm:p-8 bg-parchment-50 max-w-4xl mx-auto">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-700">
+                                        Matthäus 25,${block.verses}
+                                    </span>
+                                    <button onclick="toggleNoteBox('${blockKey}')" class="text-xs font-sans text-stone-400 hover:text-burgundy-800 flex items-center gap-1 transition no-print">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                    </button>
+                                </div>
+                                <p class="font-serif text-xl sm:text-[21px] leading-[1.8] text-parchment-900 mb-5">
+                                    ${block.bibleText}
+                                </p>
+                                <div class="bg-parchment-100/80 rounded-xl p-4 sm:p-5 border border-parchment-300/80">
+                                    ${commentaryHtml}
+                                </div>
+                                ${renderNoteArea(blockKey, savedNote)}
+                            </div>
+                        `;
+                    }
+                });
+
+                html += `</div>`;
+                sectionEl.innerHTML = html;
+                container.appendChild(sectionEl);
+            });
+        }
+
+        function renderNoteArea(blockKey, savedNote) {
+            const isHidden = savedNote ? '' : 'hidden';
+            return `
+                <div id="note-box-${blockKey}" class="${isHidden} mt-4 pt-3 border-t border-parchment-200 no-print">
+                    <label class="block font-sans text-[11px] font-medium text-stone-500 mb-1">Eigene Studiennotiz:</label>
+                    <textarea 
+                        onchange="saveNote('${blockKey}', this.value)"
+                        onkeyup="saveNote('${blockKey}', this.value)"
+                        rows="2" 
+                        placeholder="Deine Gedanken zu diesem Abschnitt..."
+                        class="w-full rounded-lg bg-white border border-parchment-300 p-2 text-xs font-sans text-parchment-900 focus:outline-none focus:border-gold-600"
+                    >${savedNote}</textarea>
+                </div>
+            `;
+        }
+
+        function toggleNoteBox(blockKey) {
+            const box = document.getElementById(`note-box-${blockKey}`);
+            if (box) {
+                box.classList.toggle('hidden');
+                if (!box.classList.contains('hidden')) {
+                    box.querySelector('textarea').focus();
+                }
+            }
+        }
+
+        function saveNote(blockKey, text) {
+            if (text.trim() === '') {
+                delete userNotes[blockKey];
+            } else {
+                userNotes[blockKey] = text;
+            }
+            localStorage.setItem('mt25_notes', JSON.stringify(userNotes));
+        }
+
+        function setLayout(mode) {
+            currentLayout = mode;
+            const btnParallel = document.getElementById('btn-parallel');
+            const btnInline = document.getElementById('btn-inline');
+
+            if (mode === 'parallel') {
+                btnParallel.className = 'px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all bg-burgundy-800 text-white shadow-sm';
+                btnInline.className = 'px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all text-parchment-800 hover:bg-parchment-100';
+            } else {
+                btnInline.className = 'px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all bg-burgundy-800 text-white shadow-sm';
+                btnParallel.className = 'px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all text-parchment-800 hover:bg-parchment-100';
+            }
+            renderStudy();
+        }
+
+        function toggleFilter(type) {
+            activeFilters[type] = !activeFilters[type];
+            const btn = document.getElementById(`filter-${type}`);
+            if (activeFilters[type]) {
+                btn.classList.remove('opacity-45', 'line-through');
+            } else {
+                btn.classList.add('opacity-45', 'line-through');
+            }
+            renderStudy();
+        }
+
+        // ==========================================
+        // MODALS: GRIECHISCH, KIRCHENVÄTER & GLOSSAR
+        // ==========================================
+        function openGreek(key) {
+            const item = greekLexicon[key];
+            if (!item) return;
+
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Griechisches Original (Koine)';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-sky-900/10 text-sky-900 border border-sky-800/30';
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <div class="text-3xl font-serif font-bold text-greek-800">${item.greek}</div>
+                    <div class="text-sm font-sans text-stone-500 mt-0.5">Umschrift: <span class="italic font-medium text-stone-700">${item.translit}</span> · Wörtlich: <span class="font-medium text-stone-700">${item.literal}</span></div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Historische & Sprachliche Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${item.meaning}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Theologische Tiefe</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${item.theology}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openFather(key) {
+            const father = churchFathers[key];
+            if (!father) return;
+
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Kirchenvater · Patristik';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-red-900/10 text-burgundy-900 border border-red-900/30';
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <h3 class="text-2xl font-display font-bold text-burgundy-900">${father.name}</h3>
+                    <div class="text-xs font-sans text-stone-600 mt-0.5">${father.dates} · ${father.role}</div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Leben & Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${father.bio}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-gold-700 mb-1">Schwerpunkt in Matthäus 25</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${father.focusInMt25}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openGlossaryModal() {
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Gesamtübersicht · Lexikon & Väter';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-amber-900/10 text-amber-900 border border-amber-800/30';
+
+            let greekList = Object.entries(greekLexicon).map(([k, v]) => `
+                <button onclick="openGreek('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-sky-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-serif font-bold text-greek-800 text-base">${v.greek}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${v.translit} – ${v.literal}</span>
+                </button>
+            `).join('');
+
+            let fathersList = Object.entries(churchFathers).map(([k, f]) => `
+                <button onclick="openFather('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-amber-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-display font-bold text-burgundy-900 text-base">${f.name}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${f.dates}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('modal-body').innerHTML = `
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-sky-900 mb-2">Griechische Schlüsselbegriffe in Mt 25</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${greekList}</div>
+                </div>
+                <div class="pt-3 border-t border-parchment-200">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-2">Zitierte Kirchenväter</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${fathersList}</div>
+                </div>
+            `;
+            showModal();
+        }
+
+        function showModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeModalOnBackdrop(e) {
+            if (e.target.id === 'detail-modal') {
+                closeModal();
+            }
+        }
+
+        // Initiales Rendern beim Laden
+        document.addEventListener('DOMContentLoaded', renderStudy);
+    </script>
+</body>
+</html>
