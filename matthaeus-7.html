@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matthäus 7 – Interaktive Studienausgabe (Griechisch, Historie & Kirchenväter)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        parchment: {
+                            50: '#FCFBF7',
+                            100: '#F7F3E8',
+                            200: '#EFE7D4',
+                            300: '#DFD2B5',
+                            800: '#3D3529',
+                            900: '#262018',
+                        },
+                        burgundy: {
+                            700: '#7C2D12',
+                            800: '#652214',
+                            900: '#4A160D',
+                        },
+                        gold: {
+                            600: '#B48327',
+                            700: '#8F6519',
+                        },
+                        greek: {
+                            50: '#F0F5F9',
+                            700: '#1E4E79',
+                            800: '#15395B',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F7F3E8;
+            color: #262018;
+            background-image: radial-gradient(#DFD2B5 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+
+        /* Buch-Schatten & Papier-Textur */
+        .folio-page {
+            background-color: #FCFBF7;
+            box-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+        }
+
+        /* Griechisches Highlight im Text */
+        .greek-term {
+            border-bottom: 1.5px dotted #1E4E79;
+            color: #15395B;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .greek-term:hover {
+            background-color: #E2ECF5;
+            border-bottom-style: solid;
+        }
+
+        /* Kirchenvater Badge */
+        .father-link {
+            color: #7C2D12;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px dashed #7C2D12;
+            transition: color 0.15s ease;
+        }
+        .father-link:hover {
+            color: #B48327;
+            border-bottom-color: #B48327;
+        }
+
+        /* Versnummern im Stil klassischer Bibelausgaben */
+        .verse-num {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #8F6519;
+            vertical-align: super;
+            margin-right: 2px;
+            user-select: none;
+        }
+
+        /* Sanfte Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F3E8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C3A3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B48327;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .folio-page { box-shadow: none; }
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-amber-200/60">
+
+    <!-- Kopfbereich / Navigationsleiste -->
+    <header class="sticky top-0 z-30 bg-parchment-100/95 backdrop-blur-md border-b border-parchment-300 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <!-- Titel -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-burgundy-800 text-parchment-50 flex items-center justify-center font-display text-xl font-bold shadow-inner border border-gold-600/40">
+                        Μθ
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-display text-xl sm:text-2xl font-bold text-parchment-900 tracking-tight">
+                                Evangelium nach Matthäus · Kapitel 7
+                            </h1>
+                            <span class="hidden sm:inline-block text-xs font-sans uppercase tracking-wider px-2 py-0.5 rounded bg-parchment-200 text-parchment-800 border border-parchment-300">
+                                Glossierte Studienausgabe
+                            </span>
+                        </div>
+                        <p class="text-xs font-sans text-stone-600">
+                            Bibeltext im Zentrum · Griechische Urtext-Analyse · Antiker Kontext · Kirchenväter
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Ansichts- & Filter-Steuerung -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Layout-Umschalter -->
+                    <div class="inline-flex rounded-lg bg-parchment-200 p-1 border border-parchment-300" role="group">
+                        <button id="btn-parallel" onclick="setLayout('parallel')" class="px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all bg-burgundy-800 text-white shadow-sm">
+                            Parallel (Talmud-Stil)
+                        </button>
+                        <button id="btn-inline" onclick="setLayout('inline')" class="px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all text-parchment-800 hover:bg-parchment-100">
+                            Fließtext (Verse + Kursiv)
+                        </button>
+                    </div>
+
+                    <!-- Glossar Button -->
+                    <button onclick="openGlossaryModal()" class="px-3 py-1.5 text-xs font-sans font-medium rounded-lg bg-parchment-50 hover:bg-parchment-200 text-parchment-900 border border-parchment-300 transition-colors flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-3.5 h-3.5 text-gold-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                        Lexikon & Kirchenväter
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ebenen-Filter & Kapitel-Sprungmarken -->
+            <div class="mt-3 pt-2.5 border-t border-parchment-300/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <!-- Filter Chips -->
+                <div class="flex flex-wrap items-center gap-1.5 text-xs font-sans">
+                    <span class="text-stone-500 mr-1 font-medium">Ebenen:</span>
+                    <button onclick="toggleFilter('greek')" id="filter-greek" class="filter-chip active px-2.5 py-1 rounded-full border border-sky-800/30 bg-sky-900/10 text-sky-900 font-medium flex items-center gap-1 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-sky-700"></span> Griechisch (Urtext)
+                    </button>
+                    <button onclick="toggleFilter('history')" id="filter-history" class="filter-chip active px-2.5 py-1 rounded-full border border-amber-800/30 bg-amber-900/10 text-amber-900 font-medium flex items-center gap-1 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-amber-700"></span> Historischer Kontext
+                    </button>
+                    <button onclick="toggleFilter('fathers')" id="filter-fathers" class="filter-chip active px-2.5 py-1 rounded-full border border-red-900/30 bg-red-900/10 text-red-950 font-medium flex items-center gap-1 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-burgundy-800"></span> Kirchenväter
+                    </button>
+                </div>
+
+                <!-- Perikopen-Navigation -->
+                <div class="flex items-center gap-2 text-xs font-sans overflow-x-auto pb-1 sm:pb-0">
+                    <a href="#perikope-1" class="whitespace-nowrap px-2.5 py-1 rounded bg-parchment-200/80 hover:bg-parchment-300 text-parchment-900 transition">I. Richten & Perlen (1–6)</a>
+                    <a href="#perikope-2" class="whitespace-nowrap px-2.5 py-1 rounded bg-parchment-200/80 hover:bg-parchment-300 text-parchment-900 transition">II. Bitten & Goldene Regel (7–14)</a>
+                    <a href="#perikope-3" class="whitespace-nowrap px-2.5 py-1 rounded bg-parchment-200/80 hover:bg-parchment-300 text-parchment-900 transition">III. Falsche Propheten (15–23)</a>
+                    <a href="#perikope-4" class="whitespace-nowrap px-2.5 py-1 rounded bg-parchment-200/80 hover:bg-parchment-300 text-parchment-900 transition">IV. Hausbau auf Fels (24–29)</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Haupt-Container (Buchseite / Folio) -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+        
+        <!-- Einführungskasten im Stil einer Folio-Vorrede -->
+        <div class="folio-page rounded-xl p-5 sm:p-7 mb-8 border border-parchment-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-parchment-200 pb-4 mb-4">
+                <div>
+                    <span class="text-xs font-sans uppercase tracking-widest text-gold-700 font-semibold">Die Bergpredigt · Abschluss & Entscheidung (Mt 5–7)</span>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-parchment-900 mt-0.5">
+                        Barmherziges Urteil, vertrauensvolles Bitten und das Fundament auf dem Fels
+                    </h2>
+                </div>
+                <div class="text-xs font-sans text-stone-600 bg-parchment-100 px-3.5 py-2 rounded-lg border border-parchment-300">
+                    <strong class="text-parchment-900">Tipp zur Nutzung:</strong> Klicke auf <span class="greek-term">blau unterstrichene Begriffe</span> für die griechische Wortanalyse oder auf <span class="father-link">Kirchenväter-Namen</span> für ihre Biografie.
+                </div>
+            </div>
+            <p class="font-serif text-base sm:text-lg text-stone-700 leading-relaxed">
+                Im Schlusskapitel der Bergpredigt führt Jesus seine Hörer an die Schwelle der persönlichen Entscheidung: Wie gehen wir mit den Fehlern der anderen um (<strong>Splitter und Balken</strong>)? Wie vertrauen wir dem Vater im Himmel (<strong>Bittet, so wird euch gegeben</strong>)? Und woran erkennt man echtes Leben im Reich Gottes? Mit drei eindringlichen Warnungen – <strong>enger Weg</strong>, <strong>faule Früchte</strong> und <strong>Hausbau auf Sand</strong> – zeigt Jesus, dass nicht fromme Worte („Herr, Herr“), sondern das Tun des väterlichen Willens über Bestehen oder Einsturz entscheidet.
+            </p>
+        </div>
+
+        <!-- Dynamisch gerenderte Bibelabschnitte -->
+        <div id="study-container" class="space-y-10">
+            <!-- Inhalte werden über JavaScript sauber aufgebaut -->
+        </div>
+
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12 border-t border-parchment-300 text-center text-xs font-sans text-stone-600">
+        <p class="font-serif italic text-sm text-parchment-800 mb-1">
+            „Darum, wer diese meine Worte hört und tut sie, den vergleiche ich einem klugen Mann, der sein Haus auf den Felsen baute.“ (Matthäus 7,24)
+        </p>
+        <p>Interaktive Studienbibel · Griechischer Grundtext (Nestle-Aland), historische Realienkunde & Patristik (1.–6. Jh. n. Chr.).</p>
+    </footer>
+
+    <!-- Modal / Detail-Karte für Griechisch & Kirchenväter -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/60 backdrop-blur-xs p-4" onclick="closeModalOnBackdrop(event)">
+        <div class="bg-parchment-50 border border-parchment-300 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden transform transition-all">
+            <div id="modal-header" class="px-6 py-4 bg-parchment-100 border-b border-parchment-300 flex items-center justify-between">
+                <span id="modal-badge" class="text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded"></span>
+                <button onclick="closeModal()" class="text-stone-500 hover:text-stone-900 p-1 rounded-lg hover:bg-parchment-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 font-serif text-parchment-900 space-y-4 max-h-[75vh] overflow-y-auto">
+                <!-- Dynamischer Inhalt -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // DATENBANK: GRIECHISCHE SCHLÜSSELWÖRTER
+        // ==========================================
+        const greekLexicon = {
+            krinete: {
+                greek: "μὴ κρίνετε, ἵνα μὴ κριθῆτε",
+                translit: "mē krinete, hina mē krithēte",
+                literal: "Richtet / verurteilt nicht, damit ihr nicht gerichtet werdet",
+                meaning: "Krinō bedeutet im Griechischen zunächst ‚scheiden, unterscheiden‘, im gerichtlichen Sinn aber ‚über jemanden den Stab brechen, verurteilen‘. Jesus verbietet nicht die nüchterne Unterscheidung von Wahrheit und Lüge (die er in V. 15–20 sogar ausdrücklich fordert!), sondern das lieblose, selbstgerechte Aburteilen des Nächsten, mit dem wir uns an Gottes Richterplatz setzen.",
+                theology: "Das Passiv ‚damit ihr nicht gerichtet werdet‘ (krithēte) ist ein Passivum divinum: Gott selbst wird mit demselben Maßstab messen, den wir an andere anlegen."
+            },
+            karphosDokos: {
+                greek: "κάρφος vs. δοκός",
+                translit: "karphos vs. dokos",
+                literal: "winziger Holzspan / Strohhalm vs. schwerer Dachbalken",
+                meaning: "Ein herrlicher humorvoller Kontrast aus der Zimmermannswerkstatt von Nazareth! Karphos ist ein winziger trockener Holzsplitter oder ein Staubkorn, das ins Auge weht; dokos hingegen ist der massive Haupttragbalken eines Hauses aus Zedern- oder Eichenholz. Jesus karikiert jemanden, der mit einem ganzen Dachbalken im eigenen Auge Augenoperationen beim Nachbarn durchführen will.",
+                theology: "Wer die eigenen großen Sünden nicht sieht, ist geistlich blind und völlig ungeeignet, einem Bruder zu helfen."
+            },
+            diablepo: {
+                greek: "διαβλέψεις ἐκβαλεῖν",
+                translit: "diablepseis ekbalein",
+                literal: "du wirst klar hindurchsehen, um herauszuziehen",
+                meaning: "Diablepō (wörtlich ‚klar hindurchblicken, scharf sehen‘) kommt im Neuen Testament nur dreimal vor (Mt 7,5; Lk 6,42; Mk 8,25 bei der Blindenheilung). Erst nach der eigenen Buße wird der Blick klar und behutsam genug, um dem Bruder tatsächlich zu helfen.",
+                theology: "Christliche Korrektur ist kein Angriff, sondern ein vorsichtiger chirurgischer Eingriff nach eigener Reinigung."
+            },
+            margaritai: {
+                greek: "τὸ ἅγιον & τοὺς μαργαρίτας",
+                translit: "to hagion & tous margaritas",
+                literal: "das Heilige (Opferfleisch) & die Perlen",
+                meaning: "Im Tempel zu Jerusalem galt strenges Gesetz (2. Mose 22,30): Geweihtes Opferfleisch (to hagion) durfte niemals an die halbwilden Straßenhunde geworfen werden. Und Perlen (margaritai – im 1. Jh. aus dem Roten Meer oder Persischen Golf importiert und kostbarer als Gold!) sehen für Schweine auf den ersten Blick aus wie Eicheln oder Erbsen; wenn sie merken, dass man sie nicht fressen kann, trampeln sie wütend darauf herum.",
+                theology: "Die Kirchenväter sahen darin die Ehrfurcht vor den Sakramenten und dem Geheimnis des Evangeliums: Man soll das Heilige nicht dem Zynismus und Spott preisgeben."
+            },
+            aiteite: {
+                greek: "αἰτεῖτε · ζητεῖτε · κρούετε",
+                translit: "aiteite · zēteite · krouete",
+                literal: "Bittet · Sucht · Klopft an (fortdauerndes Präsens)",
+                meaning: "Alle drei Imperative stehen im griechischen Präsens (Durativ): ‚Bittet beharrlich, sucht weiter, klopft immer wieder an!‘ Es ist eine Steigerung der Intensität: vom schlichten Bitten mit Worten über das aktive Suchen bis zum entschlossenen Anklopfen an der verschlossenen Tür.",
+                theology: "Gott lässt uns anklopfen, nicht weil er unwillig wäre zu geben, sondern damit unser Verlangen geweckt und unser Herz geweitet wird (Augustinus)."
+            },
+            poneroi: {
+                greek: "πονηροὶ ὄντες",
+                translit: "ponēroi ontes",
+                literal: "obwohl ihr böse / von der Sünde gezeichnet seid",
+                meaning: "Jesus spricht hier mit seinen eigenen Jüngern (‚ihr‘) und setzt wie selbstverständlich voraus, dass selbst wohlmeinende menschliche Eltern vom Bösen (ponēroi) gezeichnet sind. Wenn schon unvollkommene menschliche Väter ihren Kindern kein ungenießbares Steinbrot oder giftige Skorpione geben – um wie viel mehr gibt der vollkommen gute Vater im Himmel ‚Gutes‘ (agatha)!",
+                theology: "Das Vertrauen im Gebet gründet nicht in unserer eigenen Güte, sondern im Vaterherzen Gottes."
+            },
+            stenePyle: {
+                greek: "ἡ στενὴ πύλη & ἡ τεθλιμμένη ὁδός",
+                translit: "hē stenē pylē & hē tethlimmenē hodos",
+                literal: "das enge Tor & der eingeengte / bedrängte Weg",
+                meaning: "In der antiken Weisheitsliteratur (Ps 1; Spr 4; auch in der Didache als Lehre von den ‚Zwei Wegen‘) steht der Mensch vor einer Weggabelung. Das Partizip tethlimmenē kommt von thlibō (‚drücken, einengen, bedrängen‘ – davon thlipsis = Drangsal): Der Weg ins Leben verlangt Verzicht auf Ballast, Selbstsucht und breite Bequemlichkeit.",
+                theology: "Der breite Weg ist bequem, weil man alles mitnehmen darf (Stolz, Gier, Zorn); durch das enge Tor passt nur, wer sich klein macht."
+            },
+            pseudoprophetai: {
+                greek: "ψευδοπροφῆται ἐν ἐνδύμασιν προβάτων",
+                translit: "pseudoprophetai en endymasin probatōn",
+                literal: "Lügenpropheten in Schafskleidern (Hirtenmänteln aus Schaffell)",
+                meaning: "Endymata probatōn meint nicht nur ein Tierfell, sondern auch die typische grobe Wollkleidung der Hirten und Propheten (vgl. Sach 13,4). Von außen wirken falsche Lehrer sanft, fromm und beschützend wie Hirten oder harmlose Schafe – im Inneren aber sind sie reißende Wölfe (lykoi harpages), die die Herde für eigenen Gewinn ausbeuten.",
+                theology: "Nicht das fromme Gewand oder die glatte Rede entlarvt den falschen Propheten, sondern die Frucht seines Charakters und Lebens."
+            },
+            anomian: {
+                greek: "οἱ ἐργαζόμενοι τὴν ἀνομίαν",
+                translit: "hoi ergazomenoi tēn anomian",
+                literal: "ihr Täter der Gesetzlosigkeit (Zitat aus Psalm 6,9)",
+                meaning: "Anomia (wörtlich ‚Gesetzlosigkeit‘) bezeichnet bei Matthäus nicht bloße Unkenntnis des Gesetzes, sondern die bewusste Missachtung von Gottes Willen und der Liebe – selbst dann, wenn jemand spektakuläre charismatische Wunder und Dämonenaustreibungen im Namen Jesu vollbringt! Das ‚Ich habe euch nie gekannt‘ (oudepote egnōn hymas) verweist auf die fehlende persönliche Liebesbeziehung.",
+                theology: "Charismatische Begabung und äußere Erfolge ersetzen niemals die persönliche Nachfolge und den Gehorsam des Herzens."
+            },
+            phronimosMoros: {
+                greek: "ἀνδρὶ φρονίμῳ vs. ἀνδρὶ μωρῷ",
+                translit: "andri phronimō vs. andri mōrō",
+                literal: "einem umsichtigen, weitsichtigen Mann vs. einem törichten Mann",
+                meaning: "Hier begegnet dasselbe Begriffspaar wie bei den zehn Jungfrauen (Mt 25,2): Phronimos ist der Praktiker, der an die kommenden Winterstürme denkt; mōros ist der Leichtsinnige, der nur das schnelle, mühelose Bauen im Sommer sieht. In Galiläa verwandeln sich ausgetrocknete Flussbetten (Wadis) im Winter nach Wolkenbrüchen binnen Minuten in reißende Sturzfluten!",
+                theology: "Der Sturm (Regen, Ströme, Winde) trifft beide Häuser gleichermaßen – Glaube bewahrt nicht vor Stürmen, aber das Fundament entscheidet über das Überleben."
+            },
+            exousia: {
+                greek: "ὡς ἐξουσίαν ἔχων",
+                translit: "hōs exousian echōn",
+                literal: "wie einer, der göttliche Vollmacht besitzt",
+                meaning: "Exousia bezeichnet nicht bloß äußere Macht (dynamis), sondern legitime, von Gott verliehene Autorität und Ursprünglichkeit. Jüdische Schriftgelehrte (grammateis) lehrten stets durch Zitate anerkannter Autoritäten („Rabbi X sagt im Namen von Rabbi Y …“). Jesus hingegen spricht in eigener Vollmacht: „Ich aber sage euch!“",
+                theology: "Die Zuhörer sind ‚außer sich vor Staunen‘ (exeplēssonto), weil ihnen in Jesus nicht ein weiterer Ausleger des Gesetzes, sondern der Gesetzgeber selbst begegnet."
+            }
+        };
+
+        // ==========================================
+        // DATENBANK: KIRCHENVÄTER
+        // ==========================================
+        const churchFathers = {
+            chrysostomus: {
+                name: "Johannes Chrysostomus",
+                dates: "ca. 349 – 407 n. Chr.",
+                role: "Erzbischof von Konstantinopel · ‚Goldmund‘",
+                bio: "Einer der größten Prediger der Alten Kirche. In seinen Homilien zum Matthäusevangelium (ca. 390) verbindet er tiefes Verständnis für die menschliche Seele mit scharfer Beobachtung des griechischen Textes.",
+                focusInMt7: "Erklärt eindringlich das Verhältnis zwischen dem Verbot des Richtens (V. 1) und der Warnung vor falschen Propheten (V. 15): Wir sollen weder blind noch lieblos sein."
+            },
+            augustinus: {
+                name: "Augustinus von Hippo",
+                dates: "354 – 430 n. Chr.",
+                role: "Bischof von Hippo Regius (Nordafrika) · Kirchenlehrer",
+                bio: "Verfasste um 393/394 den klassischen Kommentar ‚De sermone Domini in monte‘ (Über die Bergpredigt des Herrn), in dem er die gesamten Kapitel 5 bis 7 Vers für Vers auslegt.",
+                focusInMt7: "Legt die Goldene Regel (V. 12) als Maßstab der Nächstenliebe aus und deutet Bitten, Suchen und Anklopfen als den geistlichen Weg der Seele zu Gott."
+            },
+            hieronymus: {
+                name: "Hieronymus von Stridon",
+                dates: "ca. 347 – 420 n. Chr.",
+                role: "Bibelübersetzer (Vulgata) · Gelehrter in Bethlehem",
+                bio: "Lebte jahrzehntelang in Bethlehem, kannte die Geografie und Wetterverhältnisse Palästinas aus eigener Anschauung und verfasste einen gelehrten Matthäus-Kommentar.",
+                focusInMt7: "Deutet das ‚Heilige‘ und die ‚Perlen‘ auf die Geheimnisse des Glaubens und betont, dass das Fundament des Felsens (V. 24) Christus selbst ist, auf dem die Kirche erbaut wird."
+            },
+            hilarius: {
+                name: "Hilarius von Poitiers",
+                dates: "ca. 315 – 367 n. Chr.",
+                role: "Bischof von Poitiers · ‚Athanasius des Westens‘",
+                bio: "Verfasste den ältesten vollständig erhaltenen lateinischen Kommentar zum Matthäusevangelium (Commentarius in Matthaeum, um 353/355) und verteidigte die Gottheit Christi.",
+                focusInMt7: "Sieht im Fels des Hausbaus das feste Bekenntnis zu Christus und in den Stürmen und Fluten die Anfechtungen des Teufels und der Irrlehren."
+            },
+            chromatius: {
+                name: "Chromatius von Aquileia",
+                dates: "ca. 345 – 407 n. Chr.",
+                role: "Bischof von Aquileia · Freund von Hieronymus & Ambrosius",
+                bio: "Sein einfühlsamer, seelsorgerlicher Matthäus-Kommentar (Tractatus in Matthaeum) gehört zu den Schätzen der spätantiken Predigtkunst.",
+                focusInMt7: "Vergleicht die ‚guten Gaben‘ des Vaters (V. 11) mit der Parallelstelle bei Lukas (Lk 11,13: ‚den Heiligen Geist‘) und zeigt, dass der Geist Gottes die höchste aller guten Gaben ist."
+            }
+        };
+
+        // ==========================================
+        // INHALT: MATTHÄUS 7 IN SINNABSCHNITTEN
+        // ==========================================
+        const studySections = [
+            {
+                id: "perikope-1",
+                sectionTitle: "I. Vom Richten, dem Balken im Auge und den Perlen",
+                sectionRange: "Matthäus 7,1–6",
+                sectionIntro: "Nachdem Jesus die Sorge um das eigene Leben gelöst hat (Mt 6,25–34), wendet er den Blick auf den Umgang mit dem Nächsten: Wir brauchen Demut gegenüber unseren eigenen Fehlern und zugleich geistliche Weisheit.",
+                blocks: [
+                    {
+                        verses: "1–5",
+                        bibleText: `<span class="verse-num">1</span><span class="greek-term" onclick="openGreek('krinete')">Richtet nicht, damit ihr nicht gerichtet werdet</span>! <span class="verse-num">2</span>Denn mit welchem Gericht ihr richtet, werdet ihr gerichtet werden, und mit welchem Maß ihr messt, wird euch zugemessen werden. <span class="verse-num">3</span>Was aber siehst du den <span class="greek-term" onclick="openGreek('karphosDokos')">Splitter</span>, der in deines Bruders Auge ist, den <span class="greek-term" onclick="openGreek('karphosDokos')">Balken</span> aber in deinem Auge nimmst du nicht wahr? <span class="verse-num">4</span>Oder wie wirst du zu deinem Bruder sagen: Erlaube, ich will den Splitter aus deinem Auge ziehen! – und siehe, der Balken ist in deinem Auge? <span class="verse-num">5</span>Du Heuchler, zieh zuerst den Balken aus deinem Auge, und dann wirst du <span class="greek-term" onclick="openGreek('diablepo')">klar sehen</span>, um den Splitter aus deines Bruders Auge zu ziehen!`,
+                        commentary: {
+                            history: `<em>Im rabbinischen Judentum war das Sprichwort vom Splitter und Balken bereits geläufig, um gegenseitige Kritik ohne Selbstprüfung zu tadeln (vgl. Talmud, Arakhin 16b: „Spricht einer: ‚Nimm den Splitter aus deinem Auge‘, antwortet der andere: ‚Nimm den Balken aus deinem Auge!‘“). Jesus – selbst Handwerker (<em>tektōn</em>) aus Nazareth – schärft dieses Bild noch weiter zu, indem er den Kritiker einen „Heuchler“ (<em>hypokritēs</em>) nennt.</em>`,
+                            greek: `<em><span class="greek-term" onclick="openGreek('krinete')">Mē krinete</span> verbietet das lieblose Aburteilen, während <span class="greek-term" onclick="openGreek('karphosDokos')">karphos</span> (winziger Holzspan) und <em>dokos</em> (massiver Dachbalken) die Maßlosigkeit menschlicher Selbstgerechtigkeit entlarven. Wichtig ist Vers 5: Jesus sagt nicht, dass der Splitter im Auge des Bruders egal sei! Vielmehr gilt: Erst nach eigener Umkehr wirst du <span class="greek-term" onclick="openGreek('diablepo')">klar sehen</span> (<em>diablepseis</em>), um dem Bruder behutsam zu helfen.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('augustinus')">Augustinus</span> gibt eine goldene Seelsorgeregel zu diesen Versen: „Wenn wir genötigt sind, jemanden zurechtzuweisen, lasst uns zuerst prüfen, ob wir denselben Fehler selbst haben – und wenn nicht, lasst uns bedenken, dass auch wir schwache Menschen sind, die gestern sündigten oder morgen fallen können.“</em>`
+                        }
+                    },
+                    {
+                        verses: "6",
+                        bibleText: `<span class="verse-num">6</span>Gebt nicht das Heilige den Hunden, werft auch eure <span class="greek-term" onclick="openGreek('margaritai')">Perlen</span> nicht vor die Schweine, damit sie dieselben nicht etwa mit ihren Füßen zertreten und sich umwenden und euch zerreißen!`,
+                        commentary: {
+                            history: `<em>In der jüdischen Alltagswelt galten sowohl frei laufende Straßenhunde (als Aasfresser) als auch Schweine (als kultisch unreine Tiere, vgl. 3. Mose 11,7) als Sinnbild für Unreinheit und Aggression. Geweihtes Opferfleisch aus dem Tempel (<span class="greek-term" onclick="openGreek('margaritai')">to hagion</span>) an Hunde zu verfüttern, wäre ein schwerer Frevel gewesen.</em>`,
+                            greek: `<em>Nach der Warnung vor lieblosem Richten (V. 1–5) bildet Vers 6 das notwendige Gegengewicht: Liebe bedeutet nicht Naivität. Wer kostbare geistliche Wahrheiten (<span class="greek-term" onclick="openGreek('margaritai')">margaritai</span> = Perlen) Menschen aufdrängt, die sie nur verhöhnen wollen, schadet beiden Seiten.</em>`,
+                            fathers: `<em>In der Alten Kirche wurde Vers 6 zur Grundlage der sogenannten <em>Arkandisziplin</em>: <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> und <span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> betonen, dass man die Geheimnisse des Glaubens und der Eucharistie nicht spöttischen Verächtern preisgeben soll, sondern zuerst den Boden des Herzens vorbereiten muss.</em>`
+                        }
+                    }
+                ]
+            },
+            {
+                id: "perikope-2",
+                sectionTitle: "II. Bitten, Suchen, Anklopfen & Die Goldene Regel",
+                sectionRange: "Matthäus 7,7–14",
+                sectionIntro: "Wie soll ein Jünger die hohen Maßstäbe der Bergpredigt überhaupt leben können? Indem er sich als Kind an die Großzügigkeit des himmlischen Vaters wendet – und dann mutig das enge Tor wählt.",
+                blocks: [
+                    {
+                        verses: "7–11",
+                        bibleText: `<span class="verse-num">7</span><span class="greek-term" onclick="openGreek('aiteite')">Bittet, so wird euch gegeben; sucht, so werdet ihr finden; klopft an, so wird euch aufgetan</span>! <span class="verse-num">8</span>Denn jeder, der bittet, empfängt; und wer sucht, findet; und wer anklopft, dem wird aufgetan. <span class="verse-num">9</span>Oder welcher Mensch ist unter euch, der, wenn sein Sohn ihn um ein Brot bittet, ihm einen Stein gäbe? <span class="verse-num">10</span>Und wenn er um einen Fisch bittet, ihm eine Schlange gäbe? <span class="verse-num">11</span>Wenn nun ihr, <span class="greek-term" onclick="openGreek('poneroi')">die ihr böse seid</span>, euren Kindern gute Gaben zu geben versteht, wie viel mehr wird euer Vater, der in den Himmeln ist, Gutes geben denen, die ihn bitten!`,
+                        commentary: {
+                            history: `<em>Die Bildpaare in Vers 9–10 stammen unmittelbar aus dem Alltag am See Genezareth: Ein runder, flacher Gerstenbrotlaib sah einem glatten Kalkstein zum Verwechseln ähnlich, und ein schuppenloser Aal oder Wels aus dem See Genezareth glich äußerlich einer Wasserschlange. Kein galiläischer Vater würde je die Arglosigkeit seines hungrigen Kindes mit einem grausamen Scherz täuschen.</em>`,
+                            greek: `<em>Die drei Imperative <span class="greek-term" onclick="openGreek('aiteite')">aiteite, zēteite, krouete</span> stehen im dauernden Präsens („Bittet weiter, sucht beharrlich, klopft unentwegt an!“). Und in Vers 11 schließt Jesus wieder <em>a minore ad maius</em> (vom Kleineren auf das Größere): Wenn schon Menschen, die von der Sünde gezeichnet sind (<span class="greek-term" onclick="openGreek('poneroi')">ponēroi ontes</span>), ihren Kindern Gutes tun, um wie viel verlässlicher handelt der Vater im Himmel!</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('chromatius')">Chromatius von Aquileia</span> vergleicht unsere Stelle mit Lukas 11,13, wo es statt „Gutes“ heißt „den Heiligen Geist“: „Daraus erkennen wir, dass der Heilige Geist das höchste Gut selbst ist, in dem alle anderen guten Gaben des Vaters eingeschlossen sind.“ <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> ergänzt: „Wenn Gott mit der Gabe zögert, will er nicht verweigern, sondern unsere Sehnsucht weiten, damit wir mehr fassen können.“</em>`
+                        }
+                    },
+                    {
+                        verses: "12–14",
+                        bibleText: `<span class="verse-num">12</span>Alles nun, was ihr wollt, dass euch die Menschen tun sollen, das tut auch ihr ihnen ebenso! Denn das ist das Gesetz und die Propheten. <span class="verse-num">13</span>Geht ein durch <span class="greek-term" onclick="openGreek('stenePyle')">die enge Pforte</span>! Denn weit ist die Pforte und breit der Weg, der ins Verderben führt, und viele sind es, die durch sie eingehen. <span class="verse-num">14</span>Denn eng ist die Pforte und <span class="greek-term" onclick="openGreek('stenePyle')">schmal der Weg</span>, der zum Leben führt, und wenige sind es, die ihn finden.`,
+                        commentary: {
+                            history: `<em>Die „Goldene Regel“ (V. 12) war in der Antike meist negativ formuliert – so auch bei dem berühmten Rabbi Hillel (ca. 30 v. Chr.): „Was dir verhasst ist, das tu deinem Nächsten nicht an; das ist die ganze Tora, alles andere ist Auslegung.“ Jesus wendet diese Regel ins <strong>Positive</strong>: Nicht nur Schaden vermeiden, sondern aktiv das Gute tun, das man selbst erhofft! Damit schließt er den großen Bogen zurück zu Mt 5,17 („das Gesetz und die Propheten“).</em>`,
+                            greek: `<em>In Vers 13–14 kontrastiert Jesus <span class="greek-term" onclick="openGreek('stenePyle')">stenē pylē</span> (das enge Tor) und <em>tethlimmenē hodos</em> (der eingeengte, bedrängte Weg) mit dem breiten Weg (<em>eurychōros hodos</em>). Beachte das kleine Wörtchen „Denn“ (<em>oun</em>) in Vers 12: Weil Gott euch so reich beschenkt (V. 7–11), könnt ihr nun auch großzügig am Nächsten handeln!</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('chrysostomus')">Johannes Chrysostomus</span> bemerkt zur positiven Goldenen Regel: „Sieh, wie kurz der Weg zum Himmel ist! Du brauchst keine langen Bücher zu wälzen – mache einfach deinen eigenen Wunsch nach Liebe und Gerechtigkeit zum Maßstab für dein Handeln am Bruder.“</em>`
+                        }
+                    }
+                ]
+            },
+            {
+                id: "perikope-3",
+                sectionTitle: "III. Warnung vor falschen Propheten & bloßen Lippenbekenntnissen",
+                sectionRange: "Matthäus 7,15–23",
+                sectionIntro: "Auf dem engen Weg lauern Verführer, die fromm reden, aber eigennützig handeln. Jesus gibt ein untrügliches Prüfmerkmal: Nicht schöne Worte oder Wunder zählen, sondern bleibende Frucht.",
+                blocks: [
+                    {
+                        verses: "15–20",
+                        bibleText: `<span class="verse-num">15</span>Hütet euch aber vor den <span class="greek-term" onclick="openGreek('pseudoprophetai')">falschen Propheten</span>, die in Schafskleidern zu euch kommen, inwendig aber sind sie reißende Wölfe! <span class="verse-num">16</span>An ihren Früchten werdet ihr sie erkennen. Liest man etwa von Dornen Trauben oder von Disteln Feigen? <span class="verse-num">17</span>So bringt jeder gute Baum gute Früchte, aber der faule Baum bringt schlechte Früchte. <span class="verse-num">18</span>Ein guter Baum kann nicht schlechte Früchte bringen, noch ein fauler Baum gute Früchte bringen. <span class="verse-num">19</span>Jeder Baum, der nicht gute Frucht bringt, wird abgehauen und ins Feuer geworfen. <span class="verse-num">20</span>Darum werdet ihr sie an ihren Früchten erkennen.`,
+                        commentary: {
+                            history: `<em>In der palästinensischen Landschaft wuchsen zwischen den Weinbergen und Feigengärten oft dichte Dornenhecken (<em>akanthai</em>) und violette Disteln (<em>triboloi</em>), deren kleine dunkle Beeren aus der Ferne Trauben ähnelten, aber ungenießbar waren. Ebenso trugen wandernde Propheten traditionell grobe Mäntel aus Schaffell (<span class="greek-term" onclick="openGreek('pseudoprophetai')">endymata probatōn</span>), sodass ein Betrüger leicht das äußere Erscheinungsbild eines Gottesmannes nachahmen konnte.</em>`,
+                            greek: `<em>In Vers 17 steht dem edlen, gesunden Baum (<em>kalon dendron</em>) der morsche, verdorbene Baum (<em>sapron dendron</em> – wörtlich ‚verfault, unbrauchbar‘) gegenüber. Eine Frucht braucht Zeit zum Reifen: Man erkennt einen Lehrer nicht an seinem ersten Eindruck, sondern an der dauerhaften Wirkung seines Lebens (Sanftmut, Wahrhaftigkeit, Selbstlosigkeit).</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> warnt davor, sich von asketischer Strenge oder gelehrter Rede blenden zu lassen: „Die Schafskleider sind die äußeren Bekenntnisse und die zur Schau gestellte Frömmigkeit; die Früchte aber sind die Werke der Liebe, an denen man prüft, ob der Geist Gottes in einem Menschen wohnt.“</em>`
+                        }
+                    },
+                    {
+                        verses: "21–23",
+                        bibleText: `<span class="verse-num">21</span>Nicht jeder, der zu mir sagt: Herr, Herr!, wird in das Reich der Himmel eingehen, sondern wer den Willen meines Vaters im Himmel tut. <span class="verse-num">22</span>Viele werden an jenem Tag zu mir sagen: Herr, Herr, haben wir nicht in deinem Namen geweissagt und in deinem Namen Dämonen ausgetrieben und in deinem Namen viele Wunderwerke getan? <span class="verse-num">23</span>Und dann werde ich ihnen bekennen: Ich habe euch nie gekannt; weicht von mir, <span class="greek-term" onclick="openGreek('anomian')">ihr Übeltäter</span>!`,
+                        commentary: {
+                            history: `<em>Man beachte die ungeheure Hoheit, mit der Jesus hier spricht: Er tritt selbst als der Weltenrichter „an jenem Tag“ (dem Tag des Jüngsten Gerichts!) auf, vor dem Menschen Rechenschaft ablegen. In der Antike – wie auch in der frühen Kirche – gab es Wundertäter und Exorzisten, die den Namen Jesu wie eine mächtige Formel gebrauchten, ohne jedoch Jesus nachzufolgen (vgl. Apg 19,13–16).</em>`,
+                            greek: `<em>Das erschütternde Schlusswort „Weicht von mir, <span class="greek-term" onclick="openGreek('anomian')">ihr Täter der Gesetzlosigkeit</span>“ (<em>hoi ergazomenoi tēn anomian</em>) ist ein wörtliches Zitat aus Psalm 6,9 (LXX). Selbst spektakuläre Geistesgaben (Prophetie, Exorzismus, Wunder) wiegen vor Gott nichts, wenn im Alltag die <em>anomia</em> (Lieblosigkeit und Ungehorsam gegen Gottes Willen) herrscht.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> legt den Finger auf diese ernste Warnung: „Wunder sind eine Gabe der Gnade Gottes, die manchmal sogar durch Unwürdige geschieht (wie durch Judas oder Bileam); ein reines Leben aber ist die Frucht der Liebe und des Gehorsams – und nur daran erkennt Christus die Seinen.“</em>`
+                        }
+                    }
+                ]
+            },
+            {
+                id: "perikope-4",
+                sectionTitle: "IV. Der Hausbau auf Fels oder Sand & Die Vollmacht Jesu",
+                sectionRange: "Matthäus 7,24–29",
+                sectionIntro: "Mit einem unvergesslichen Doppelgleichnis schließt Jesus die Bergpredigt: Hören allein genügt nicht – erst das Tun verankert das Lebenshaus tief im Felsgestein.",
+                blocks: [
+                    {
+                        verses: "24–27",
+                        bibleText: `<span class="verse-num">24</span>Darum, wer diese meine Worte hört und tut sie, den vergleiche ich einem <span class="greek-term" onclick="openGreek('phronimosMoros')">klugen Mann</span>, der sein Haus auf den Felsen baute. <span class="verse-num">25</span>Als nun der Platzregen fiel und die Ströme kamen und die Winde wehten und an jenes Haus stießen, fiel es nicht; denn es war auf den Felsen gegründet. <span class="verse-num">26</span>Und jeder, der diese meine Worte hört und tut sie nicht, wird einem <span class="greek-term" onclick="openGreek('phronimosMoros')">törichten Mann</span> gleich sein, der sein Haus auf den Sand baute. <span class="verse-num">27</span>Als nun der Platzregen fiel und die Ströme kamen und die Winde wehten und an jenes Haus stießen, da fiel es, und sein Fall war groß.`,
+                        commentary: {
+                            history: `<em>Eine realistische Szene aus dem galiläischen Bauhandwerk (vgl. Lk 6,48): In Israel liegt unter einer oft dünnen Schicht aus Lehm, Geröll und ausgetrocknetem Flusssand (im Sommer harte Trockentäler/Wadis!) tiefer Kalksteinfels. Im Sommer lässt es sich auf dem flachen Sandboden eines Wadis schnell und billig bauen. Wenn aber im November/Dezember die Winterregen einsetzen, verwandeln sich die Wadis binnen Stunden in reißende Sturzfluten, die jedes Haus ohne tiefes Felsfundament hinwegspülen.</em>`,
+                            greek: `<em>Beide Männer hören exakt dieselben Worte Jesu („wer diese meine Worte hört …“), und über beide Häuser brechen exakt dieselben drei Naturgewalten herein (Platzregen von oben, Ströme von unten, Stürme von den Seiten). Der einzige Unterschied zwischen dem <span class="greek-term" onclick="openGreek('phronimosMoros')">klugen</span> (<em>phronimos</em>) und dem <span class="greek-term" onclick="openGreek('phronimosMoros')">törichten</span> (<em>mōros</em>) Baumeister liegt in der unsichtbaren Tiefe: im Tun des Gehörten!</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('hilarius')">Hilarius von Poitiers</span> und <span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> identifizieren den Felsen (<em>petra</em>) mit Christus selbst (vgl. 1. Kor 10,4): „Wer die Gebote der Bergpredigt in die Tat umsetzt, gräbt sich durch die irdische Oberfläche hindurch bis hinab auf Christus, den unerschütterlichen Fels, den keine Flut der Welt erschüttern kann.“</em>`
+                        }
+                    },
+                    {
+                        verses: "28–29",
+                        bibleText: `<span class="verse-num">28</span>Und es geschah, als Jesus diese Worte beendet hatte, da entsetzten sich die Volksmengen über seine Lehre; <span class="verse-num">29</span>denn er lehrte sie wie einer, der <span class="greek-term" onclick="openGreek('exousia')">Vollmacht</span> hat, und nicht wie ihre Schriftgelehrten.`,
+                        commentary: {
+                            history: `<em>Die Formel „Als Jesus diese Worte beendet hatte“ bildet bei Matthäus jeweils den feierlichen Abschluss der fünf großen Reden Jesu (Mt 7,28; 11,1; 13,53; 19,1; 26,1) – eine bewusste Parallele zu den fünf Büchern Mose (Pentateuch). Und während die Schriftgelehrten ihre Auslegungen stets durch Berufung auf frühere Rabbinen absicherten, trat Jesus auf dem Berg wie ein neuer, größerer Mose auf, der Gottes Willen unmittelbar ausspricht.</em>`,
+                            greek: `<em>Das Verb <em>exeplēssonto</em> („sie waren außer sich vor Staunen / tief betroffen“) drückt eine heilige Erschütterung aus. Der Grund ist seine <span class="greek-term" onclick="openGreek('exousia')">exousia</span> (ursprüngliche Vollmacht): Seine Worte sind keine unverbindlichen philosophischen Ratschläge, sondern schöpferisches Gotteswort, das zum Tun ruft.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('augustinus')">Augustinus</span> schließt seinen großen Kommentar zur Bergpredigt mit dem Gedanken: „Darum staunte das Volk über seine Vollmacht: weil er nicht als bloßer Bote eines anderen redete, sondern als der Herr selbst, der das Gesetz einst durch Mose gegeben hatte und es nun zur Vollendung führt.“</em>`
+                        }
+                    }
+                ]
+            }
+        ];
+
+        // ==========================================
+        // ZUSTAND & STEUERUNG
+        // ==========================================
+        let currentLayout = 'parallel'; // 'parallel' oder 'inline'
+        let activeFilters = {
+            greek: true,
+            history: true,
+            fathers: true
+        };
+
+        // Lesezeichen / Persönliche Notizen aus localStorage laden
+        let userNotes = JSON.parse(localStorage.getItem('mt7_notes') || '{}');
+
+        function renderStudy() {
+            const container = document.getElementById('study-container');
+            container.innerHTML = '';
+
+            studySections.forEach(section => {
+                const sectionEl = document.createElement('section');
+                sectionEl.id = section.id;
+                sectionEl.className = 'folio-page rounded-2xl border border-parchment-300 overflow-hidden scroll-mt-28';
+
+                // Perikopen-Kopfbereich
+                let html = `
+                    <div class="bg-parchment-100/90 px-5 sm:px-8 py-5 border-b border-parchment-300">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <h3 class="font-display text-2xl sm:text-3xl font-bold text-burgundy-900">
+                                ${section.sectionTitle}
+                            </h3>
+                            <span class="font-sans text-xs font-semibold tracking-wider uppercase px-2.5 py-1 rounded bg-parchment-200 text-parchment-900 border border-parchment-300">
+                                ${section.sectionRange}
+                            </span>
+                        </div>
+                        <p class="font-serif italic text-stone-700 text-base mt-1.5">
+                            ${section.sectionIntro}
+                        </p>
+                    </div>
+                    <div class="divide-y divide-parchment-200">
+                `;
+
+                section.blocks.forEach((block, idx) => {
+                    const blockKey = `${section.id}-${idx}`;
+                    const savedNote = userNotes[blockKey] || '';
+
+                    // Kommentar-Spalte / Block zusammenbauen
+                    let commentaryParts = [];
+
+                    if (activeFilters.history && block.commentary.history) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-amber-700/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-amber-800 block mb-0.5">Historischer & Jüdischer Kontext</span>
+                                <div class="text-stone-800">${block.commentary.history}</div>
+                            </div>
+                        `);
+                    }
+
+                    if (activeFilters.greek && block.commentary.greek) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-sky-800/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-sky-900 block mb-0.5">Griechischer Urtext & Wortbedeutung</span>
+                                <div class="text-stone-800">${block.commentary.greek}</div>
+                            </div>
+                        `);
+                    }
+
+                    if (activeFilters.fathers && block.commentary.fathers) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-burgundy-800/70">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-800 block mb-0.5">Stimmen der Kirchenväter</span>
+                                <div class="text-stone-800">${block.commentary.fathers}</div>
+                            </div>
+                        `);
+                    }
+
+                    const commentaryHtml = commentaryParts.length > 0
+                        ? `<div class="space-y-3.5 font-serif text-[15.5px] sm:text-base leading-relaxed">${commentaryParts.join('')}</div>`
+                        : `<div class="font-sans text-xs text-stone-400 italic">Alle Kommentar-Ebenen sind derzeit ausgeblendet. Aktiviere oben mindestens eine Ebene.</div>`;
+
+                    if (currentLayout === 'parallel') {
+                        // TALMUD-STIL: Links Bibeltext, Rechts parallel der kursive Kommentar
+                        html += `
+                            <div class="grid grid-cols-1 lg:grid-cols-12">
+                                <!-- Linke Spalte: Bibeltext (5 von 12 Spalten) -->
+                                <div class="lg:col-span-5 p-5 sm:p-7 bg-parchment-50 lg:border-r border-parchment-300/80 flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-700">
+                                                Mt 7,${block.verses}
+                                            </span>
+                                            <button onclick="toggleNoteBox('${blockKey}')" title="Eigene Studiennotiz hinzufügen" class="text-xs font-sans text-stone-400 hover:text-burgundy-800 flex items-center gap-1 transition no-print">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                            </button>
+                                        </div>
+                                        <p class="font-serif text-lg sm:text-[19px] leading-[1.75] text-parchment-900 font-normal">
+                                            ${block.bibleText}
+                                        </p>
+                                    </div>
+                                    ${renderNoteArea(blockKey, savedNote)}
+                                </div>
+
+                                <!-- Rechte Spalte: Paralleler Kommentar (7 von 12 Spalten) -->
+                                <div class="lg:col-span-7 p-5 sm:p-7 bg-parchment-100/45">
+                                    ${commentaryHtml}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // FLIESSTEXT-ANSICHT: Bibelverse oben, kursiver Kommentar direkt darunter
+                        html += `
+                            <div class="p-5 sm:p-8 bg-parchment-50 max-w-4xl mx-auto">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-700">
+                                        Matthäus 7,${block.verses}
+                                    </span>
+                                    <button onclick="toggleNoteBox('${blockKey}')" class="text-xs font-sans text-stone-400 hover:text-burgundy-800 flex items-center gap-1 transition no-print">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                    </button>
+                                </div>
+                                <p class="font-serif text-xl sm:text-[21px] leading-[1.8] text-parchment-900 mb-5">
+                                    ${block.bibleText}
+                                </p>
+                                <div class="bg-parchment-100/80 rounded-xl p-4 sm:p-5 border border-parchment-300/80">
+                                    ${commentaryHtml}
+                                </div>
+                                ${renderNoteArea(blockKey, savedNote)}
+                            </div>
+                        `;
+                    }
+                });
+
+                html += `</div>`;
+                sectionEl.innerHTML = html;
+                container.appendChild(sectionEl);
+            });
+        }
+
+        function renderNoteArea(blockKey, savedNote) {
+            const isHidden = savedNote ? '' : 'hidden';
+            return `
+                <div id="note-box-${blockKey}" class="${isHidden} mt-4 pt-3 border-t border-parchment-200 no-print">
+                    <label class="block font-sans text-[11px] font-medium text-stone-500 mb-1">Eigene Studiennotiz:</label>
+                    <textarea 
+                        onchange="saveNote('${blockKey}', this.value)"
+                        onkeyup="saveNote('${blockKey}', this.value)"
+                        rows="2" 
+                        placeholder="Deine Gedanken zu diesem Abschnitt..."
+                        class="w-full rounded-lg bg-white border border-parchment-300 p-2 text-xs font-sans text-parchment-900 focus:outline-none focus:border-gold-600"
+                    >${savedNote}</textarea>
+                </div>
+            `;
+        }
+
+        function toggleNoteBox(blockKey) {
+            const box = document.getElementById(`note-box-${blockKey}`);
+            if (box) {
+                box.classList.toggle('hidden');
+                if (!box.classList.contains('hidden')) {
+                    box.querySelector('textarea').focus();
+                }
+            }
+        }
+
+        function saveNote(blockKey, text) {
+            if (text.trim() === '') {
+                delete userNotes[blockKey];
+            } else {
+                userNotes[blockKey] = text;
+            }
+            localStorage.setItem('mt7_notes', JSON.stringify(userNotes));
+        }
+
+        function setLayout(mode) {
+            currentLayout = mode;
+            const btnParallel = document.getElementById('btn-parallel');
+            const btnInline = document.getElementById('btn-inline');
+
+            if (mode === 'parallel') {
+                btnParallel.className = 'px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all bg-burgundy-800 text-white shadow-sm';
+                btnInline.className = 'px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all text-parchment-800 hover:bg-parchment-100';
+            } else {
+                btnInline.className = 'px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all bg-burgundy-800 text-white shadow-sm';
+                btnParallel.className = 'px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all text-parchment-800 hover:bg-parchment-100';
+            }
+            renderStudy();
+        }
+
+        function toggleFilter(type) {
+            activeFilters[type] = !activeFilters[type];
+            const btn = document.getElementById(`filter-${type}`);
+            if (activeFilters[type]) {
+                btn.classList.remove('opacity-45', 'line-through');
+            } else {
+                btn.classList.add('opacity-45', 'line-through');
+            }
+            renderStudy();
+        }
+
+        // ==========================================
+        // MODALS: GRIECHISCH, KIRCHENVÄTER & GLOSSAR
+        // ==========================================
+        function openGreek(key) {
+            const item = greekLexicon[key];
+            if (!item) return;
+
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Griechisches Original (Koine)';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-sky-900/10 text-sky-900 border border-sky-800/30';
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <div class="text-3xl font-serif font-bold text-greek-800">${item.greek}</div>
+                    <div class="text-sm font-sans text-stone-500 mt-0.5">Umschrift: <span class="italic font-medium text-stone-700">${item.translit}</span> · Wörtlich: <span class="font-medium text-stone-700">${item.literal}</span></div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Historische & Sprachliche Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${item.meaning}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Theologische Tiefe</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${item.theology}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openFather(key) {
+            const father = churchFathers[key];
+            if (!father) return;
+
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Kirchenvater · Patristik';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-red-900/10 text-burgundy-900 border border-red-900/30';
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <h3 class="text-2xl font-display font-bold text-burgundy-900">${father.name}</h3>
+                    <div class="text-xs font-sans text-stone-600 mt-0.5">${father.dates} · ${father.role}</div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Leben & Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${father.bio}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-gold-700 mb-1">Schwerpunkt in Matthäus 7</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${father.focusInMt7}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openGlossaryModal() {
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Gesamtübersicht · Lexikon & Väter';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-amber-900/10 text-amber-900 border border-amber-800/30';
+
+            let greekList = Object.entries(greekLexicon).map(([k, v]) => `
+                <button onclick="openGreek('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-sky-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-serif font-bold text-greek-800 text-base">${v.greek}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${v.translit} – ${v.literal}</span>
+                </button>
+            `).join('');
+
+            let fathersList = Object.entries(churchFathers).map(([k, f]) => `
+                <button onclick="openFather('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-amber-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-display font-bold text-burgundy-900 text-base">${f.name}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${f.dates}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('modal-body').innerHTML = `
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-sky-900 mb-2">Griechische Schlüsselbegriffe in Mt 7</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${greekList}</div>
+                </div>
+                <div class="pt-3 border-t border-parchment-200">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-2">Zitierte Kirchenväter</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${fathersList}</div>
+                </div>
+            `;
+            showModal();
+        }
+
+        function showModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeModalOnBackdrop(e) {
+            if (e.target.id === 'detail-modal') {
+                closeModal();
+            }
+        }
+
+        // Initiales Rendern beim Laden
+        document.addEventListener('DOMContentLoaded', renderStudy);
+    </script>
+</body>
+</html>
