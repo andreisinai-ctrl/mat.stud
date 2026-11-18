@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matthäus 8 – Interaktive Studienausgabe (Griechisch, Historie & Kirchenväter)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        parchment: {
+                            50: '#FCFBF7',
+                            100: '#F7F3E8',
+                            200: '#EFE7D4',
+                            300: '#DFD2B5',
+                            800: '#3D3529',
+                            900: '#262018',
+                        },
+                        burgundy: {
+                            700: '#7C2D12',
+                            800: '#652214',
+                            900: '#4A160D',
+                        },
+                        gold: {
+                            600: '#B48327',
+                            700: '#8F6519',
+                        },
+                        greek: {
+                            50: '#F0F5F9',
+                            700: '#1E4E79',
+                            800: '#15395B',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F7F3E8;
+            color: #262018;
+            background-image: radial-gradient(#DFD2B5 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+
+        /* Buch-Schatten & Papier-Textur */
+        .folio-page {
+            background-color: #FCFBF7;
+            box-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+        }
+
+        /* Griechisches Highlight im Text */
+        .greek-term {
+            border-bottom: 1.5px dotted #1E4E79;
+            color: #15395B;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .greek-term:hover {
+            background-color: #E2ECF5;
+            border-bottom-style: solid;
+        }
+
+        /* Kirchenvater Badge */
+        .father-link {
+            color: #7C2D12;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px dashed #7C2D12;
+            transition: color 0.15s ease;
+        }
+        .father-link:hover {
+            color: #B48327;
+            border-bottom-color: #B48327;
+        }
+
+        /* Versnummern im Stil klassischer Bibelausgaben */
+        .verse-num {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #8F6519;
+            vertical-align: super;
+            margin-right: 2px;
+            user-select: none;
+        }
+
+        /* Sanfte Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F3E8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C3A3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B48327;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .folio-page { box-shadow: none; }
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-amber-200/60">
+
+    <!-- Kopfbereich / Navigationsleiste -->
+    <header class="sticky top-0 z-30 bg-parchment-100/95 backdrop-blur-md border-b border-parchment-300 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <!-- Titel -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-burgundy-800 text-parchment-50 flex items-center justify-center font-display text-xl font-bold shadow-inner border border-gold-600/40">
+                        Μθ
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-display text-xl sm:text-2xl font-bold text-parchment-900 tracking-tight">
+                                Evangelium nach Matthäus · Kapitel 8
+                            </h1>
+                            <span class="hidden sm:inline-block text-xs font-sans uppercase tracking-wider px-2 py-0.5 rounded bg-parchment-200 text-parchment-800 border border-parchment-300">
+                                Glossierte Studienausgabe
+                            </span>
+                        </div>
+                        <p class="text-xs font-sans text-stone-600">
+                            Bibeltext im Zentrum · Griechische Urtext-Analyse · Antiker Kontext · Kirchenväter
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Ansichts- & Filter-Steuerung -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Layout-Umschalter -->
+                    <div class="inline-flex rounded-lg bg-parchment-200 p-1 border border-parchment-300" role="group">
+                        <button id="btn-parallel" onclick="setLayout('parallel')" class="px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all bg-burgundy-800 text-white shadow-sm">
+                            Parallel (Talmud-Stil)
+                        </button>
+                        <button id="btn-inline" onclick="setLayout('inline')" class="px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all text-parchment-800 hover:bg-parchment-100">
+                            Fließtext (Verse + Kursiv)
+                        </button>
+                    </div>
+
+                    <!-- Glossar Button -->
+                    <button onclick="openGlossaryModal()" class="px-3 py-1.5 text-xs font-sans font-medium rounded-lg bg-parchment-50 hover:bg-parchment-200 text-parchment-900 border border-parchment-300 transition-colors flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-3.5 h-3.5 text-gold-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                        Lexikon & Kirchenväter
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ebenen-Filter & Kapitel-Sprungmarken -->
+            <div class="mt-3 pt-2.5 border-t border-parchment-300/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <!-- Filter Chips -->
+                <div class="flex flex-wrap items-center gap-1.5 text-xs font-sans">
+                    <span class="text-stone-500 mr-1 font-medium">Ebenen:</span>
+                    <button onclick="toggleFilter('greek')" id="filter-greek" class="filter-chip active px-2.5 py-1 rounded-full border border-sky-800/30 bg-sky-900/10 text-sky-900 font-medium flex items-center gap-1 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-sky-700"></span> Griechisch (Urtext)
+                    </button>
+                    <button onclick="toggleFilter('history')" id="filter-history" class="filter-chip active px-2.5 py-1 rounded-full border border-amber-800/30 bg-amber-900/10 text-amber-900 font-medium flex items-center gap-1 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-amber-700"></span> Historischer Kontext
+                    </button>
+                    <button onclick="toggleFilter('fathers')" id="filter-fathers" class="filter-chip active px-2.5 py-1 rounded-full border border-red-900/30 bg-red-900/10 text-red-950 font-medium flex items-center gap-1 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-burgundy-800"></span> Kirchenväter
+                    </button>
+                </div>
+
+                <!-- Perikopen-Navigation -->
+                <div class="flex items-center gap-2 text-xs font-sans overflow-x-auto pb-1 sm:pb-0">
+                    <a href="#perikope-1" class="whitespace-nowrap px-2.5 py-1 rounded bg-parchment-200/80 hover:bg-parchment-300 text-parchment-900 transition">I. Aussätziger & Hauptmann (1–13)</a>
+                    <a href="#perikope-2" class="whitespace-nowrap px-2.5 py-1 rounded bg-parchment-200/80 hover:bg-parchment-300 text-parchment-900 transition">II. Petrus' Schwiegermutter & Kranke (14–17)</a>
+                    <a href="#perikope-3" class="whitespace-nowrap px-2.5 py-1 rounded bg-parchment-200/80 hover:bg-parchment-300 text-parchment-900 transition">III. Nachfolge-Kosten & Sturm (18–27)</a>
+                    <a href="#perikope-4" class="whitespace-nowrap px-2.5 py-1 rounded bg-parchment-200/80 hover:bg-parchment-300 text-parchment-900 transition">IV. Besessene in Gadara (28–34)</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Haupt-Container (Buchseite / Folio) -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+        
+        <!-- Einführungskasten im Stil einer Folio-Vorrede -->
+        <div class="folio-page rounded-xl p-5 sm:p-7 mb-8 border border-parchment-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-parchment-200 pb-4 mb-4">
+                <div>
+                    <span class="text-xs font-sans uppercase tracking-widest text-gold-700 font-semibold">Taten des Reiches Gottes · Taten nach der Bergpredigt (Mt 8–9)</span>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-parchment-900 mt-0.5">
+                        Heilungen, Autorität über Naturgewalten und Dämonen
+                    </h2>
+                </div>
+                <div class="text-xs font-sans text-stone-600 bg-parchment-100 px-3.5 py-2 rounded-lg border border-parchment-300">
+                    <strong class="text-parchment-900">Tipp zur Nutzung:</strong> Klicke auf <span class="greek-term">blau unterstrichene Begriffe</span> für die griechische Wortanalyse oder auf <span class="father-link">Kirchenväter-Namen</span> für ihre Biografie.
+                </div>
+            </div>
+            <p class="font-serif text-base sm:text-lg text-stone-700 leading-relaxed">
+                Nachdem Jesus in der Bergpredigt (Mt 5–7) mit göttlicher Vollmacht gesprochen hat, lässt Matthäus in den Kapiteln 8 und 9 eine dichte Komposition aus zehn Wundertaten folgen, die seine Taten unterstreichen. Kapitel 8 bricht konsequent tabuisierte Grenzen auf: Jesus berührt den unreinen <strong>Aussätzigen</strong>, lobt den heidnischen Glauben des <strong>römischen Hauptmanns</strong>, betritt das Haus einer Frau, stillt den tosenden <strong>Sturm auf dem See</strong> und begegnet den zerstörerischen Mächten in der Fremde von <strong>Gadara</strong>.
+            </p>
+        </div>
+
+        <!-- Dynamisch gerenderte Bibelabschnitte -->
+        <div id="study-container" class="space-y-10">
+            <!-- Inhalte werden über JavaScript sauber aufgebaut -->
+        </div>
+
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12 border-t border-parchment-300 text-center text-xs font-sans text-stone-600">
+        <p class="font-serif italic text-sm text-parchment-800 mb-1">
+            „Er hat unsere Schwachheiten getragen und unsere Krankheiten gekrönt / getragen.“ (Matthäus 8,17)
+        </p>
+        <p>Interaktive Studienbibel · Griechischer Grundtext (Nestle-Aland), historische Realienkunde & Patristik (1.–6. Jh. n. Chr.).</p>
+    </footer>
+
+    <!-- Modal / Detail-Karte für Griechisch & Kirchenväter -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/60 backdrop-blur-xs p-4" onclick="closeModalOnBackdrop(event)">
+        <div class="bg-parchment-50 border border-parchment-300 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden transform transition-all">
+            <div id="modal-header" class="px-6 py-4 bg-parchment-100 border-b border-parchment-300 flex items-center justify-between">
+                <span id="modal-badge" class="text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded"></span>
+                <button onclick="closeModal()" class="text-stone-500 hover:text-stone-900 p-1 rounded-lg hover:bg-parchment-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 font-serif text-parchment-900 space-y-4 max-h-[75vh] overflow-y-auto">
+                <!-- Dynamischer Inhalt -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // DATENBANK: GRIECHISCHE SCHLÜSSELWÖRTER
+        // ==========================================
+        const greekLexicon = {
+            lepros: {
+                greek: "λεπρός & ἐktēinas tēn cheira hēpsato",
+                translit: "lepros & ekteinas tēn cheira hēpsato",
+                literal: "Aussätziger & er streckte die Hand aus und berührte ihn",
+                meaning: "Im mosaischen Gesetz (3. Mose 13–14) machte der Kontakt mit Aussätzigem (lepra – ein Sammelbegriff für verschiedene schwere Hautkrankheiten) rituell unrein. Wer einen Aussätzigen anfasste, wurde selbst unrein. Jesus bricht dieses Tabu radikal: Er weicht nicht zurück, sondern streckt die Hand aus und berührt ihn zuerst, bevor das Wort der Heilung spricht.",
+                theology: "Christus nimmt die Unreinheit des Menschen auf sich, um ihn rein zu machen – eine Vorwegnahme des Kreuzes."
+            },
+            exousiaCenturio: {
+                greek: "ὑπὸ ἐξουσίαν ... δοῦλοσ / παῖς",
+                translit: "hypo exousian ... doulos / pais",
+                literal: "unter Befehlsgewalt stehend ... Sklave / geliebter Diener",
+                meaning: "Der heidnische Hauptmann (Hundertmeister einer römischen Hilfskohorte in Kafarnaum) versteht das Prinzip der göttlichen Vollmacht (exousia) besser als ganz Israel. Als Militär weiß er: Ein Wort genügt, und Befehle werden ausgeführt, weil kaiserliche Autorität dahintersteht.",
+                theology: "Der Glaube des Heiden übertrifft den Glauben in Israel; er erkennt in Jesus den Herrn über Raum, Krankheit und Distanz."
+            },
+            astheneias: {
+                greek: "τὰ ἀσθενείας ἡμῶν ἔλαβεν",
+                translit: "ta astheneias hēmōn elaben",
+                literal: "er nahm unsere Schwachheiten / Krankheiten weg",
+                meaning: "Matthäus zitiert das vierte Gottesknechtslied aus Jesaja 53,4 in eigener Übersetzung vom hebräischen Text weg hin zu den körperlichen Krankheiten. Die alten Kirchenväter sahen darin die tiefe Verbindung zwischen physischem Leiden und der Erlösung von der Sünde.",
+                theology: "Jesus leidet mit den Menschen mit und trägt die Lasten der Schöpfung in seinem menschlichen Körper."
+            },
+            thelo: {
+                greek: "θέλω, καθαρίσθητι",
+                translit: "thelō, katharistēti",
+                literal: "Ich will, werde rein!",
+                meaning: "Das souveräne ‚Ich will‘ (thelō) drückt göttlichen Willen und barmherziges Wohlwollen aus. Jesus ist nicht zögernd oder unsicher, sondern spricht mit schöpferischer Autorität.",
+                theology: "Gottes Wille ist primär auf Heilung, Rettung und Reinigung des Menschen gerichtet."
+            },
+            anatolon: {
+                greek: "ἀπὸ ἀνατολῶν καὶ δυσμῶν",
+                translit: "apo anatolōn kai dysmōn",
+                literal: "vom Aufgang (Osten) und Niedergang (Westen) der Sonne",
+                meaning: "Ein prophetischer Ausblick auf die weltweite Ausbreitung des Reiches Gottes: Menschen aus allen Völkern werden mit den Erzvätern Abraham, Isaak und Jakob zu Tisch sitzen, während die ‚Söhne des Reiches‘ (die leiblichen Nachkommen, die den Glauben verweigern) hinausgestoßen werden.",
+                theology: "Das Endgericht und das messianische Mahl sprengen alle nationalen und ethnischen Grenzen."
+            },
+            seismos: {
+                greek: "σεισμός μέγας ἐν τῇ θάλασσῃ",
+                translit: "seismos megas en tē thalassē",
+                literal: "ein großes Beben / Erschüttern auf dem See",
+                meaning: "Das griechische Wort seismos (sonst meist für Erdbeben gebraucht) beschreibt einen plötzlichen, heftigen Sturm auf dem See Genezareth. Der See liegt tief im Jordangraben (200m unter dem Meeresspiegel), umgeben von Bergen, durch deren Schluchten kalte Fallwinde mit ungeheurer Wucht auf das warme Wasser prallen.",
+                theology: "Die Jünger im schwankenden Boot versinnbildlichen die Kirche in den Stürmen der Welt; die schlafende Ruhe Jesu zeigt sein absolutes Gottessvertrauen."
+            },
+            oligopistoi: {
+                greek: "τί δειλοί ἐστε, ὀλιγόπιστοι;",
+                translit: "ti deiloi este, oligopistoi?",
+                literal: "Warum seid ihr so furchtsam, ihr Kleingläubigen?",
+                meaning: "Deilos bezeichnet feige, verzagte Furcht vor der Gefahr. Kleinglaube (oligopistia) bedeutet nicht völliger Unglaube, sondern ein Glaube, der in Panik gerät, weil er die sichtbare Bedrohung größer einschätzt als die unsichtbare Gegenwart Jesu im Boot.",
+                theology: "Glaube ist das Überwinden von Angst durch das Erkennen von Jesu wahrer Identität."
+            },
+            daimonizomenoi: {
+                greek: "δαιμονιζόμενοι χαλεpoi lian",
+                translit: "daimonizomenoi chalepoi lian",
+                literal: "Besessene, die sehr gefährlich / gewalttätig waren",
+                meaning: "Chalepos bedeutet ‚schwer, gewalttätig, unerträglich gefährlich‘. Die beiden Männer hausten in den felsigen Grabhöhlen (mnēmeia) an den Steilhängen von Gadara/Gerasa, unkontrollierbar für jede menschliche Gesellschaft.",
+                theology: "Dämonische Mächte zerstören die Gottesebenbildlichkeit des Menschen, treiben ihn in die Isolation und rauben ihm den Frieden."
+            }
+        };
+
+        // ==========================================
+        // DATENBANK: KIRCHENVÄTER
+        // ==========================================
+        const churchFathers = {
+            chrysostomus: {
+                name: "Johannes Chrysostomus",
+                dates: "ca. 349 – 407 n. Chr.",
+                role: "Erzbischof von Konstantinopel · ‚Goldmund‘",
+                bio: "Der große alexandrinisch-antiochische Prediger legt in seinen Matthäus-Homilien die Wunder Jesu als machtvolle Zeichen des anbrechenden Himmelreichs aus.",
+                focusInMt8: "Bewundert die Demut des römischen Hauptmanns und vergleicht sie mit dem Kleinglauben der Jünger im Sturm: Der Heide erkannte Jesu göttliche Vollmacht schneller als die engsten Vertrauten."
+            },
+            augustinus: {
+                name: "Augustinus von Hippo",
+                dates: "354 – 430 n. Chr.",
+                role: "Bischof von Hippo Regius (Nordafrika) · Kirchenlehrer",
+                bio: "Prägte die allegorische Auslegung der Evangelien im Westen, insbesondere im Blick auf die Kirche als das schiffende Boot im Sturm.",
+                focusInMt8: "Deutet das schlafende Boot Jesu als Sinnbild dafür, dass Christus im scheinbaren Schweigen während der Verfolgungen in den Herzen der Gläubigen ‚schläft‘, bis der Weckruf des Gebets ihn ruft."
+            },
+            hieronymus: {
+                name: "Hieronymus von Stridon",
+                dates: "ca. 347 – 420 n. Chr.",
+                role: "Bibelübersetzer (Vulgata) · Gelehrter in Bethlehem",
+                bio: "Kannte die Geografie Palästinas genau und liefert im Kommentar zu Matthäus wertvolle ortsbezogene und heilsgeschichtliche Hinweise.",
+                focusInMt8: "Erklärt die Heilung des Aussätzigen als Überwindung des Gesetzes durch die Gnade: Jesus berührt den Unreinen, wird aber nicht unrein, sondern macht den Aussätzigen rein."
+            },
+            ambrosius: {
+                name: "Ambrosius von Mailand",
+                dates: "ca. 339 – 397 n. Chr.",
+                role: "Bischof von Mailand · Kirchenlehrer",
+                bio: "Verfasste einen der tiefsinnigsten lateinischen Kommentare zum Lukasevangelium (der viele Parallelen zu Matthäus 8 enthält) und prägte die Abendland-Theologie.",
+                focusInMt8: "Sieht im Hauptmann ein Vorbild für die Kirche aus den Völkern (Heidenkirche), die sich ihres eigenen Unwürdigseins bewusst ist und darum die Rettung allein von Jesu Wort empfängt."
+            },
+            origenes: {
+                name: "Origines von Alexandria",
+                dates: "ca. 185 – 254 n. Chr.",
+                role: "Bibelphilologe & Theologe",
+                bio: "Pionier der allegorischen Schriftauslegung, der hinter jedem physischen Wunder eine tiefere geistliche Heilung der Seele sah.",
+                focusInMt8: "Deutet die Schweineherde in Gadara als Bild für unreine, von niederen Leidenschaften getriebene Menschen, in die die bösen Geister einfuhren."
+            }
+        };
+
+        // ==========================================
+        // INHALT: MATTHÄUS 8 IN SINNABSCHNITTEN
+        // ==========================================
+        const studySections = [
+            {
+                id: "perikope-1",
+                sectionTitle: "I. Der Aussätzige und der Hauptmann von Kafarnaum",
+                sectionRange: "Matthäus 8,1–13",
+                sectionIntro: "Nach der Bergpredigt steigt Jesus vom Berg herab. Sofort durchbricht er zwei große Schranken der rituellen und nationalen Reinheit: Er berührt einen Aussätzigen und heilt den Knecht eines heidnischen Offiziers.",
+                blocks: [
+                    {
+                        verses: "1–4",
+                        bibleText: `<span class="verse-num">1</span>Als er aber vom Berg herabstieg, folgten ihm große Volksmengen nach. <span class="verse-num">2</span>Und siehe, ein <span class="greek-term" onclick="openGreek('lepros')">Aussätziger</span> kam herzu, warf sich vor ihm nieder und sprach: Herr, wenn du willst, kannst du mich reinigen. <span class="verse-num">3</span>Und Jesus <span class="greek-term" onclick="openGreek('lepros')">streckte die Hand aus, rührte ihn an</span> und sprach: <span class="greek-term" onclick="openGreek('thelo')">Ich will, werde rein!</span> Und sogleich wurde sein Aussatz gereinigt. <span class="verse-num">4</span>Und Jesus sprach zu ihm: Siehe zu, sag es niemandem, sondern geh hin, zeige dich dem Priester und opfere die Gabe, die Moses vorgeschrieben hat, ihnen zum Zeugnis.`,
+                        commentary: {
+                            history: `<em>Nach 3. Mose 13 war der Aussätzige gesetzlich dazu verunreinigt, „Unrein! Unrein!“ zu rufen und isoliert außerhalb der Dörfer zu leben. Eine Berührung bedeutete sofortige rituelle Unreinheit. Dass Jesus seine Hand ausstreckt und den Kranken anfasst, bevor er spricht, ist eine sensationelle Geste der Liebe, die alle Reinheitsgesetze transzendiert.</em>`,
+                            greek: `<em>Das souveräne <span class="greek-term" onclick="openGreek('thelo')">„Thelō, katharistēti“</span> („Ich will, werde rein!“) zeigt die göttliche Vollmacht. Die Aufforderung, sich dem Priester zu zeigen und das mosaische Opfer darzubringen (3. Mose 14), diente dem Zeugnis für die religiösen Behörden in Jerusalem.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> bemerkt dazu: „Nach dem Gesetz macht die Berührung eines Aussätzigen den Gesunden unrein; bei Jesus aber verwandelt sich durch die Berührung die Unreinheit in Reinheit. Seine Hand siegt über das Gesetz des Todes.“</em>`
+                        }
+                    },
+                    {
+                        verses: "5–13",
+                        bibleText: `<span class="verse-num">5</span>Als aber Jesus nach Kafarnaum hineinging, trat ein Hauptmann zu ihm, bat ihn <span class="verse-num">6</span>und sprach: Herr, mein Knecht liegt gelähmt zu Hause und leidet schwere Qualen. <span class="verse-num">7</span>Jesus spricht zu ihm: Ich will kommen und ihn heilen. <span class="verse-num">8</span>Der Hauptmann antwortete und sprach: Herr, ich bin nicht wert, dass du unter mein Dach triffst; sondern sprich nur ein Wort, so wird mein Knecht gesund! <span class="verse-num">9</span>Denn auch ich bin ein Mensch unter <span class="greek-term" onclick="openGreek('exousiaCenturio')">Befehlsgewalt</span> und habe Soldaten unter mir; und sage ich zu diesem: Geh!, so geht er; und zu einem anderen: Komm!, so kommt er; und zu meinem Sklaven: Tu das!, so tut er es. <span class="verse-num">10</span>Als Jesus das hörte, verwunderte er sich und sprach zu denen, die nachfolgten: Wahrlich, ich sage euch, solchen Glauben habe ich in Israel nicht gefunden! <span class="verse-num">11</span>Ich sage euch aber, dass viele <span class="greek-term" onclick="openGreek('anatolon')">vom Aufgang und Niedergang</span> kommen und mit Abraham, Isaak und Jakob zu Tisch sitzen werden im Reich der Himmels; <span class="verse-num">12</span>die Söhne des Reiches aber werden hinausgestoßen werden in die äußere Finsternis; da wird das Weinen und das Zähneknirschen sein. <span class="verse-num">13</span>Und Jesus sprach zu dem Hauptmann: Geh hin, und wie du geglaubt hast, so geschehe dir! Und sein Knecht wurde gesund in derselben Stunde.`,
+                        commentary: {
+                            history: `<em>Kafarnaum war ein wichtiger Zoll- und Militärposten an der Grenze von Galiläa, besetzt mit römischen oder von Herodes Antipas gedienten Hilfstruppen. Ein Hauptmann (Centurio) war ein erfahrener Berufsoffizier. Dass ein heidnischer Offizier so demütig um die Heilung seines Sklaven (<em>pais</em> / <em>doulos</em>) bittet, zeigt eine außergewöhnliche menschliche Größe.</em>`,
+                            greek: `<em>Der Offizier versteht das geistliche Prinzip der <span class="greek-term" onclick="openGreek('exousiaCenturio')">exousia</span> (Vollmacht): So wie seine Befehle durch kaiserliche Autorität sofort ausgeführt werden, so gehorchen Krankheit und Natur dem bloßen Wort Jesu über jede Distanz hinweg.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> hebt hervor, wie Jesus sich über den Glauben des Heiden wundert: „Der Schöpfer selbst wundert sich über das Werk seines eigenen Glaubens im Herzen eines Römers – eine Vorankündigung, dass die Kirche aus allen Völkern der Welt gesammelt wird.“</em>`
+                        }
+                    }
+                ]
+            },
+            {
+                id: "perikope-2",
+                sectionTitle: "II. Petrus' Schwiegermutter und das Tragen von Krankheiten",
+                sectionRange: "Matthäus 8,14–17",
+                sectionIntro: "Im Haus von Petrus berührt Jesus eine fiebernde Frau, heilt eine Menge Besessener bei einbrechender Dämmerung und erfüllt damit das prophetische Wort des Gottesknechts.",
+                blocks: [
+                    {
+                        verses: "14–17",
+                        bibleText: `<span class="verse-num">14</span>Und als Jesus in das Haus des Petrus kam, sah er dessen Schwiegermutter liegen, die das Fieber hatte. <span class="verse-num">15</span>Und er rührte ihre Hand an, und das Fieber verließ sie; und sie stand auf und diente ihm. <span class="verse-num">16</span>Als es aber Abend geworden war, brachten sie viele Besessene zu ihm; und er trieb die Geister aus mit einem Wort und heilte alle Kranken, <span class="verse-num">17</span>damit erfüllt würde, was durch den Propheten Jesaja gesagt ist, der da spricht: <span class="greek-term" onclick="openGreek('astheneias')">Er hat unsere Schwachheiten weggeboxt / getragen und unsere Krankheiten getragen</span>.`,
+                        commentary: {
+                            history: `<em>In der Antike galt heftiges Malaria- oder Sumpffieber (in der sumpfigen Gegend um den See Genezareth verbreitet) als lebensgefährlich. Die sofortige Genesung erlaubte es der Frau, den Gästen unmittelbar aufzuwarten (<em>diekonei</em> – der biblische Ausdruck für gastlichen Dienst).</em>`,
+                            greek: `<em>Das Zitat aus Jesaja 53,4 (<span class="greek-term" onclick="openGreek('astheneias')">ta astheneias hēmōn elaben</span>) deutet Matthäus messianisch: Jesus übernimmt die Leiden der Menschen nicht nur durch Mitgefühl, sondern trägt sie in seinem eigenen sterblichen Leib an das Kreuz.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('ambrosius')">Ambrosius</span> bemerkt zur geheilten Schwiegermutter: „Wer von Jesus geheilt wird, steht sofort auf, um ihm zu dienen. Denn Gesundheit empfängt man nicht für sich selbst, sondern um im Reich Gottes tätig zu sein.“</em>`
+                        }
+                    }
+                ]
+            },
+            {
+                id: "perikope-3",
+                sectionTitle: "III. Die Kosten der Nachfolge und die Stillung des Sturms",
+                sectionRange: "Matthäus 8,18–27",
+                sectionIntro: "Wer Jesus nachfolgen will, muss bereit sein, alle irdische Sicherheit aufzugeben. Auf dem Weg über den stürmischen See erweisen sich die Jünger als Kleingläubige, während Jesus souverän die Naturgewalten bändigt.",
+                blocks: [
+                    {
+                        verses: "18–22",
+                        bibleText: `<span class="verse-num">18</span>Als aber Jesus eine Volksmenge um sich sah, befahl er, an das andere Ufer zu fahren. <span class="verse-num">19</span>Und ein Schriftgelehrter trat herzu und sprach zu ihm: Meister, ich will dir nachfolgen, wohin du auch gehst! <span class="verse-num">20</span>Und Jesus spricht zu ihm: Die Füchse haben Höhlen und die Vögel des Himmels Nester, aber der Sohn des Menschen hat nichts, wo er sein Haupt hinlege. <span class="verse-num">21</span>Und ein anderer von seinen Jüngern sprach zu ihm: Herr, erlaube mir zuvor hinzugehen und meinen Vater zu begraben! <span class="verse-num">22</span>Jesus aber sprach zu ihm: Folge mir nach, und lass die Toten ihre Toten begraben!`,
+                        commentary: {
+                            history: `<em>Der erste Fragesteller ist ein akademisch gebildeter Schriftgelehrter, der Jesus spontan wie einen berühmten Rabbi begleiten will – Jesus enttarnt die Illusion mit der Härte des Wanderlebens. Der zweite Wunsch („meinen Vater begraben“) meint im jüdischen Kontext oft nicht den akuten Sterbefall, sondern das Warten auf das endgültige Einsammeln der Gebeine im Ossuarium nach Jahren; Jesus fordert hier absolute kompromisslose Priorität für das Evangelium.</em>`,
+                            greek: `<em>Die scharfe Formulierung „Lass die Toten ihre Toten begraben“ (wörtlich: die geistlich Toten sollen ihre körperlich Verstorbenen bestatten) zeigt, dass die Bindung an den lebendigen Christus alle irdischen Loyalitäten übersteigt.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> erklärt: „Jesus will keine Halblösten oder Bequemen in seiner Nachfolge. Wer ihm folgt, darf keinen festen Wohnsitz auf Erden suchen, denn seine Heimat ist im Himmel.“</em>`
+                        }
+                    },
+                    {
+                        verses: "23–27",
+                        bibleText: `<span class="verse-num">23</span>Und als er in das Boot stieg, folgten ihm seine Jünger nach. <span class="verse-num">24</span>Und siehe, es entstand <span class="greek-term" onclick="openGreek('seismos')">ein großes Beben / ein heftiger Sturm</span> auf dem See, sodass das Boot von den Wellen bedeckt wurde; er aber schlief. <span class="verse-num">25</span>Und seine Jünger traten herzu, weckten ihn auf und sprachen: Herr, rette uns, wir kommen um! <span class="verse-num">26</span>Und er spricht zu ihnen: Warum seid ihr so furchtsam, <span class="greek-term" onclick="openGreek('oligopistoi')">ihr Kleingläubigen</span>? Dann stand er auf, schroffe die Winde und den See an; da trat eine große Stille ein. <span class="verse-num">27</span>Die Menschen aber verwunderten sich und sprachen: Was für ein Mensch ist dieser, dass auch die Winde und das Meer ihm gehorchen?`,
+                        commentary: {
+                            history: `<em>Der See Genezareth (ca. 21 x 12 km) ist berüchtigt für plötzliche, heftige Fallwinde aus den Golan-Höhen. Wenn Boote damals in Seenot gerieten, drohte im flachen, kabbeligen Wellengang rasch das Kentern.</em>`,
+                            greek: `<em>Das Wort <span class="greek-term" onclick="openGreek('seismos')">seismos</span> beschreibt ein gewaltiges Erschüttern. Jesus schläft erschöpft im Heck auf einem Wurf(kissen) – ein Zeichen wahrer Menschheit –, während sein Wort „Tretet ein / Schweige, verstumme!“ (<em>pephimōso</em>) die Wellen wie ein wildes Tier bändigt. Der Tadel gilt dem <span class="greek-term" onclick="openGreek('oligopistoi')">Kleinglauben</span>.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('augustinus')">Augustinus</span> deutet das Bild allegorisch: „Solange Christus in deinem Herzen schläft, schläft dein Glaube. Wecke ihn durch das Gebet auf, wenn die Stürme der Anfechtung über dich hereinbrechen, und sofort kehrt Frieden ein.“</em>`
+                        }
+                    }
+                ]
+            },
+            {
+                id: "perikope-4",
+                sectionTitle: "IV. Die Besessenen von Gadara",
+                sectionRange: "Matthäus 8,28–34",
+                sectionIntro: "Am östlichen Seeufer in heidnischer Gegend begegnet Jesus zwei extrem gewalttätigen Besessenen. Die Dämonen erkennen seine göttliche Identität, während die Ortsansässigen aus Angst vor wirtschaftlichem Verlust bitten, das Gebiet zu verlassen.",
+                blocks: [
+                    {
+                        verses: "28–34",
+                        bibleText: `<span class="verse-num">28</span>Und als er an das andere Ufer in das Gebiet der Gadarener kam, begegneten ihm zwei <span class="greek-term" onclick="openGreek('daimonizomenoi')">Besessene</span>, die aus den Gräbern hervorkamen, sehr gefährlich, sodass niemand auf diesem Weg vorbeikommen konnte. <span class="verse-num">29</span>Und siehe, sie schrieen und sprachen: Was haben wir mit dir zu schaffen, Jesus, du Sohn Gottes? Bist du hierher gekommen, uns vor der Zeit zu quälen? <span class="verse-num">30</span>Es war aber fern von ihnen eine große Herde Schweine auf der Weide. <span class="verse-num">31</span>Da baten ihn die Dämonen und sprachen: Wenn du uns austreibst, so erlaube uns, in die Herde Schweine zu fahren! <span class="verse-num">32</span>Und er sprach zu ihnen: Geht hin! Da fuhren sie aus und fuhren in die Herde Schweine; und siehe, die ganze Herde stürzte den Abhang hinab in den See und kam in den Wassern um. <span class="verse-num">33</span>Die aber die Herde weideten, flohen und gingen in die Stadt und berichteten alles, auch das von den Besessenen. <span class="verse-num">34</span>Und siehe, die ganze Stadt ging heraus, Jesus entgegen; und als sie ihn sahen, baten sie ihn, aus ihrem Gebiet zu weichen.`,
+                        commentary: {
+                            history: `<em>Gadara (oder Gerasa) lag in der Decapolis – einem hellenisierten, mehrheitlich nichtjüdischen Gebiet, in dem die Schweinezucht (für die römischen Legionen und den heidnischen Markt) eine wichtige wirtschaftliche Rolle spielte. Jüdische Gesetze verboten den Verzehr und Besitz von Schweinen strikt.</em>`,
+                            greek: `<em>Die Besessenen waren <span class="greek-term" onclick="openGreek('daimonizomenoi')">chalepoi lian</span> („äußerst gefährlich“). Die Dämonen erkennen Jesus sofort als „Sohn Gottes“ und fürchten seine endgültige Verurteilung „vor der Zeit“. Der Untergang der Schweineherde zeigt die absolut zerstörerische Natur des Bösen.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('origenes')">Origines</span> und <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> wundern sich über das Verhalten der Bewohner: Aus Angst vor materiellen Verlusten (dem Verlust der Schweine) bitten sie den Herrn des Lebens, ihr Gebiet wieder zu verlassen – sie ziehen irdischen Reichtum der göttlichen Gegenwart vor.</em>`
+                        }
+                    }
+                ]
+            }
+        ];
+
+        // ==========================================
+        // ZUSTAND & STEUERUNG
+        // ==========================================
+        let currentLayout = 'parallel'; // 'parallel' oder 'inline'
+        let activeFilters = {
+            greek: true,
+            history: true,
+            fathers: true
+        };
+
+        // Lesezeichen / Persönliche Notizen aus localStorage laden
+        let userNotes = JSON.parse(localStorage.getItem('mt8_notes') || '{}');
+
+        function renderStudy() {
+            const container = document.getElementById('study-container');
+            container.innerHTML = '';
+
+            studySections.forEach(section => {
+                const sectionEl = document.createElement('section');
+                sectionEl.id = section.id;
+                sectionEl.className = 'folio-page rounded-2xl border border-parchment-300 overflow-hidden scroll-mt-28';
+
+                // Perikopen-Kopfbereich
+                let html = `
+                    <div class="bg-parchment-100/90 px-5 sm:px-8 py-5 border-b border-parchment-300">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <h3 class="font-display text-2xl sm:text-3xl font-bold text-burgundy-900">
+                                ${section.sectionTitle}
+                            </h3>
+                            <span class="font-sans text-xs font-semibold tracking-wider uppercase px-2.5 py-1 rounded bg-parchment-200 text-parchment-900 border border-parchment-300">
+                                ${section.sectionRange}
+                            </span>
+                        </div>
+                        <p class="font-serif italic text-stone-700 text-base mt-1.5">
+                            ${section.sectionIntro}
+                        </p>
+                    </div>
+                    <div class="divide-y divide-parchment-200">
+                `;
+
+                section.blocks.forEach((block, idx) => {
+                    const blockKey = `${section.id}-${idx}`;
+                    const savedNote = userNotes[blockKey] || '';
+
+                    // Kommentar-Spalte / Block zusammenbauen
+                    let commentaryParts = [];
+
+                    if (activeFilters.history && block.commentary.history) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-amber-700/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-amber-800 block mb-0.5">Historischer & Jüdischer Kontext</span>
+                                <div class="text-stone-800">${block.commentary.history}</div>
+                            </div>
+                        `);
+                    }
+
+                    if (activeFilters.greek && block.commentary.greek) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-sky-800/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-sky-900 block mb-0.5">Griechischer Urtext & Wortbedeutung</span>
+                                <div class="text-stone-800">${block.commentary.greek}</div>
+                            </div>
+                        `);
+                    }
+
+                    if (activeFilters.fathers && block.commentary.fathers) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-burgundy-800/70">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-800 block mb-0.5">Stimmen der Kirchenväter</span>
+                                <div class="text-stone-800">${block.commentary.fathers}</div>
+                            </div>
+                        `);
+                    }
+
+                    const commentaryHtml = commentaryParts.length > 0
+                        ? `<div class="space-y-3.5 font-serif text-[15.5px] sm:text-base leading-relaxed">${commentaryParts.join('')}</div>`
+                        : `<div class="font-sans text-xs text-stone-400 italic">Alle Kommentar-Ebenen sind derzeit ausgeblendet. Aktiviere oben mindestens eine Ebene.</div>`;
+
+                    if (currentLayout === 'parallel') {
+                        // TALMUD-STIL: Links Bibeltext, Rechts parallel der kursive Kommentar
+                        html += `
+                            <div class="grid grid-cols-1 lg:grid-cols-12">
+                                <!-- Linke Spalte: Bibeltext (5 von 12 Spalten) -->
+                                <div class="lg:col-span-5 p-5 sm:p-7 bg-parchment-50 lg:border-r border-parchment-300/80 flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-700">
+                                                Mt 8,${block.verses}
+                                            </span>
+                                            <button onclick="toggleNoteBox('${blockKey}')" title="Eigene Studiennotiz hinzufügen" class="text-xs font-sans text-stone-400 hover:text-burgundy-800 flex items-center gap-1 transition no-print">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                            </button>
+                                        </div>
+                                        <p class="font-serif text-lg sm:text-[19px] leading-[1.75] text-parchment-900 font-normal">
+                                            ${block.bibleText}
+                                        </p>
+                                    </div>
+                                    ${renderNoteArea(blockKey, savedNote)}
+                                </div>
+
+                                <!-- Rechte Spalte: Paralleler Kommentar (7 von 12 Spalten) -->
+                                <div class="lg:col-span-7 p-5 sm:p-7 bg-parchment-100/45">
+                                    ${commentaryHtml}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // FLIESSTEXT-ANSICHT: Bibelverse oben, kursiver Kommentar direkt darunter
+                        html += `
+                            <div class="p-5 sm:p-8 bg-parchment-50 max-w-4xl mx-auto">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-700">
+                                        Matthäus 8,${block.verses}
+                                    </span>
+                                    <button onclick="toggleNoteBox('${blockKey}')" class="text-xs font-sans text-stone-400 hover:text-burgundy-800 flex items-center gap-1 transition no-print">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                    </button>
+                                </div>
+                                <p class="font-serif text-xl sm:text-[21px] leading-[1.8] text-parchment-900 mb-5">
+                                    ${block.bibleText}
+                                </p>
+                                <div class="bg-parchment-100/80 rounded-xl p-4 sm:p-5 border border-parchment-300/80">
+                                    ${commentaryHtml}
+                                </div>
+                                ${renderNoteArea(blockKey, savedNote)}
+                            </div>
+                        `;
+                    }
+                });
+
+                html += `</div>`;
+                sectionEl.innerHTML = html;
+                container.appendChild(sectionEl);
+            });
+        }
+
+        function renderNoteArea(blockKey, savedNote) {
+            const isHidden = savedNote ? '' : 'hidden';
+            return `
+                <div id="note-box-${blockKey}" class="${isHidden} mt-4 pt-3 border-t border-parchment-200 no-print">
+                    <label class="block font-sans text-[11px] font-medium text-stone-500 mb-1">Eigene Studiennotiz:</label>
+                    <textarea 
+                        onchange="saveNote('${blockKey}', this.value)"
+                        onkeyup="saveNote('${blockKey}', this.value)"
+                        rows="2" 
+                        placeholder="Deine Gedanken zu diesem Abschnitt..."
+                        class="w-full rounded-lg bg-white border border-parchment-300 p-2 text-xs font-sans text-parchment-900 focus:outline-none focus:border-gold-600"
+                    >${savedNote}</textarea>
+                </div>
+            `;
+        }
+
+        function toggleNoteBox(blockKey) {
+            const box = document.getElementById(`note-box-${blockKey}`);
+            if (box) {
+                box.classList.toggle('hidden');
+                if (!box.classList.contains('hidden')) {
+                    box.querySelector('textarea').focus();
+                }
+            }
+        }
+
+        function saveNote(blockKey, text) {
+            if (text.trim() === '') {
+                delete userNotes[blockKey];
+            } else {
+                userNotes[blockKey] = text;
+            }
+            localStorage.setItem('mt8_notes', JSON.stringify(userNotes));
+        }
+
+        function setLayout(mode) {
+            currentLayout = mode;
+            const btnParallel = document.getElementById('btn-parallel');
+            const btnInline = document.getElementById('btn-inline');
+
+            if (mode === 'parallel') {
+                btnParallel.className = 'px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all bg-burgundy-800 text-white shadow-sm';
+                btnInline.className = 'px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all text-parchment-800 hover:bg-parchment-100';
+            } else {
+                btnInline.className = 'px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all bg-burgundy-800 text-white shadow-sm';
+                btnParallel.className = 'px-3 py-1.5 text-xs font-sans font-medium rounded-md transition-all text-parchment-800 hover:bg-parchment-100';
+            }
+            renderStudy();
+        }
+
+        function toggleFilter(type) {
+            activeFilters[type] = !activeFilters[type];
+            const btn = document.getElementById(`filter-${type}`);
+            if (activeFilters[type]) {
+                btn.classList.remove('opacity-45', 'line-through');
+            } else {
+                btn.classList.add('opacity-45', 'line-through');
+            }
+            renderStudy();
+        }
+
+        // ==========================================
+        // MODALS: GRIECHISCH, KIRCHENVÄTER & GLOSSAR
+        // ==========================================
+        function openGreek(key) {
+            const item = greekLexicon[key];
+            if (!item) return;
+
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Griechisches Original (Koine)';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-sky-900/10 text-sky-900 border border-sky-800/30';
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <div class="text-3xl font-serif font-bold text-greek-800">${item.greek}</div>
+                    <div class="text-sm font-sans text-stone-500 mt-0.5">Umschrift: <span class="italic font-medium text-stone-700">${item.translit}</span> · Wörtlich: <span class="font-medium text-stone-700">${item.literal}</span></div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Historische & Sprachliche Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${item.meaning}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Theologische Tiefe</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${item.theology}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openFather(key) {
+            const father = churchFathers[key];
+            if (!father) return;
+
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Kirchenvater · Patristik';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-red-900/10 text-burgundy-900 border border-red-900/30';
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <h3 class="text-2xl font-display font-bold text-burgundy-900">${father.name}</h3>
+                    <div class="text-xs font-sans text-stone-600 mt-0.5">${father.dates} · ${father.role}</div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Leben & Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${father.bio}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-gold-700 mb-1">Schwerpunkt in Matthäus 8</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${father.focusInMt8}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openGlossaryModal() {
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Gesamtübersicht · Lexikon & Väter';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-amber-900/10 text-amber-900 border border-amber-800/30';
+
+            let greekList = Object.entries(greekLexicon).map(([k, v]) => `
+                <button onclick="openGreek('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-sky-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-serif font-bold text-greek-800 text-base">${v.greek}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${v.translit} – ${v.literal}</span>
+                </button>
+            `).join('');
+
+            let fathersList = Object.entries(churchFathers).map(([k, f]) => `
+                <button onclick="openFather('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-amber-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-display font-bold text-burgundy-900 text-base">${f.name}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${f.dates}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('modal-body').innerHTML = `
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-sky-900 mb-2">Griechische Schlüsselbegriffe in Mt 8</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${greekList}</div>
+                </div>
+                <div class="pt-3 border-t border-parchment-200">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-2">Zitierte Kirchenväter</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${fathersList}</div>
+                </div>
+            `;
+            showModal();
+        }
+
+        function showModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeModalOnBackdrop(e) {
+            if (e.target.id === 'detail-modal') {
+                closeModal();
+            }
+        }
+
+        // Initiales Rendern beim Laden
+        document.addEventListener('DOMContentLoaded', renderStudy);
+    </script>
+</body>
+</html>
