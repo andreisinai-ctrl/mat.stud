@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matthäus 1 – Interaktive Studienausgabe (Griechisch, Historie & Auslegung)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+/* ===== Gemeinsames Theme-Skript für alle Kapitel ===== */
+/* Einbinden direkt NACH dem Tailwind-CDN-Skript im <head>. Ersetzt den alten tailwind.config-Block. */
+
+(function () {
+    // 1) Theme sofort setzen (vor dem ersten Rendern, kein Aufblitzen)
+    try {
+        var t = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (t === 'dark' || (!t && prefersDark)) document.documentElement.classList.add('dark');
+    } catch (e) {}
+
+    // 2) Tailwind-Konfiguration: Farben laufen über CSS-Variablen aus theme.css
+    if (window.tailwind) {
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif']
+                    },
+                    colors: {
+                        parchment: {
+                            50: 'rgb(var(--parchment-50) / <alpha-value>)',
+                            100: 'rgb(var(--parchment-100) / <alpha-value>)',
+                            200: 'rgb(var(--parchment-200) / <alpha-value>)',
+                            300: 'rgb(var(--parchment-300) / <alpha-value>)',
+                            800: 'rgb(var(--parchment-800) / <alpha-value>)',
+                            900: 'rgb(var(--parchment-900) / <alpha-value>)'
+                        },
+                        burgundy: {
+                            700: 'rgb(var(--burgundy-700) / <alpha-value>)',
+                            800: 'rgb(var(--burgundy-800) / <alpha-value>)',
+                            900: 'rgb(var(--burgundy-900) / <alpha-value>)'
+                        },
+                        gold: {
+                            600: 'rgb(var(--gold-600) / <alpha-value>)',
+                            700: 'rgb(var(--gold-700) / <alpha-value>)'
+                        },
+                        greek: {
+                            50: 'rgb(var(--greek-50) / <alpha-value>)',
+                            700: 'rgb(var(--greek-700) / <alpha-value>)',
+                            800: 'rgb(var(--greek-800) / <alpha-value>)'
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    // 3) Umschalten
+    function isDark() {
+        return document.documentElement.classList.contains('dark');
+    }
+    function applyTheme(dark) {
+        document.documentElement.classList.toggle('dark', dark);
+        var btn = document.getElementById('theme-toggle-float');
+        if (btn) btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    }
+    window.toggleTheme = function () {
+        var next = !isDark();
+        applyTheme(next);
+        try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch (e) {}
+    };
+
+    // 4) Systemeinstellung live verfolgen, solange keine manuelle Wahl gespeichert ist
+    if (window.matchMedia) {
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        var onChange = function (e) {
+            var stored = null;
+            try { stored = localStorage.getItem('theme'); } catch (err) {}
+            if (!stored) applyTheme(e.matches);
+        };
+        if (mq.addEventListener) mq.addEventListener('change', onChange);
+        else if (mq.addListener) mq.addListener(onChange);
+    }
+
+    // 5) Schwebenden Umschalt-Button einfügen
+    document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.createElement('button');
+        btn.id = 'theme-toggle-float';
+        btn.type = 'button';
+        btn.className = 'no-print';
+        btn.title = 'Hell/Dunkel umschalten';
+        btn.setAttribute('aria-label', 'Dunkelmodus umschalten');
+        btn.setAttribute('aria-pressed', isDark() ? 'true' : 'false');
+        btn.onclick = window.toggleTheme;
+        btn.innerHTML =
+            '<svg class="icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>' +
+            '<svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>';
+        document.body.appendChild(btn);
+    });
+})();
+
+    </script>
+    <style>
+        body {
+            background-color: #F7F3E8;
+            color: #262018;
+            background-image: radial-gradient(#DFD2B5 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+
+        .folio-page {
+            background-color: #FCFBF7;
+            box-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+        }
+
+        .greek-term {
+            border-bottom: 1.5px dotted #1E4E79;
+            color: #15395B;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .greek-term:hover {
+            background-color: #E2ECF5;
+            border-bottom-style: solid;
+        }
+
+        .father-link {
+            color: #7C2D12;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px dashed #7C2D12;
+            transition: color 0.15s ease;
+        }
+        .father-link:hover {
+            color: #B48327;
+            border-bottom-color: #B48327;
+        }
+
+        .verse-num {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #8F6519;
+            vertical-align: super;
+            margin-right: 2px;
+            user-select: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F3E8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C3A3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B48327;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .folio-page { box-shadow: none; }
+        }
+    </style>
+    <style>
+/* ===== Gemeinsamer Dark Mode für alle Kapitel ===== */
+/* Einbinden NACH dem <style>-Block der Seite, damit diese Regeln die alten Farbwerte überschreiben. */
+
+:root {
+    --parchment-50: 252 251 247;
+    --parchment-100: 247 243 232;
+    --parchment-200: 239 231 212;
+    --parchment-300: 223 210 181;
+    --parchment-800: 61 53 41;
+    --parchment-900: 38 32 24;
+    --burgundy-700: 124 45 18;
+    --burgundy-800: 101 34 20;
+    --burgundy-900: 74 22 13;
+    --gold-600: 180 131 39;
+    --gold-700: 143 101 25;
+    --greek-50: 240 245 249;
+    --greek-700: 30 78 121;
+    --greek-800: 21 57 91;
+
+    --body-bg: #F7F3E8;
+    --body-fg: #262018;
+    --body-dot: #DFD2B5;
+    --folio-bg: #FCFBF7;
+    --folio-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+    --greek-term-fg: #15395B;
+    --greek-term-border: #1E4E79;
+    --greek-term-hover: #E2ECF5;
+    --father-fg: #7C2D12;
+    --father-hover: #B48327;
+    --verse-num: #8F6519;
+    --scroll-track: #F7F3E8;
+    --scroll-thumb: #D4C3A3;
+    --scroll-thumb-hover: #B48327;
+}
+
+:root.dark {
+    color-scheme: dark;
+
+    --parchment-50: 28 24 19;
+    --parchment-100: 36 31 25;
+    --parchment-200: 46 40 32;
+    --parchment-300: 70 60 47;
+    --parchment-800: 217 207 184;
+    --parchment-900: 238 231 214;
+    --burgundy-700: 224 145 122;
+    --burgundy-800: 232 168 146;
+    --burgundy-900: 240 190 170;
+    --gold-600: 212 166 74;
+    --gold-700: 224 184 96;
+    --greek-50: 26 36 48;
+    --greek-700: 127 178 224;
+    --greek-800: 166 203 238;
+
+    --body-bg: #14110D;
+    --body-fg: #E8E0CF;
+    --body-dot: #2A241C;
+    --folio-bg: #1C1813;
+    --folio-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.55), 0 0 1px 1px rgba(212, 166, 74, 0.22);
+    --greek-term-fg: #A6CBEE;
+    --greek-term-border: #7FB2E0;
+    --greek-term-hover: #1F3045;
+    --father-fg: #E8A892;
+    --father-hover: #E0B860;
+    --verse-num: #D4A64A;
+    --scroll-track: #14110D;
+    --scroll-thumb: #4A4132;
+    --scroll-thumb-hover: #D4A64A;
+}
+
+/* Bestehende Klassen auf Variablen umstellen (überschreibt die festen Werte der Seite) */
+body {
+    background-color: var(--body-bg);
+    color: var(--body-fg);
+    background-image: radial-gradient(var(--body-dot) 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+.folio-page { background-color: var(--folio-bg); box-shadow: var(--folio-shadow); }
+.greek-term { border-bottom-color: var(--greek-term-border); color: var(--greek-term-fg); }
+.greek-term:hover { background-color: var(--greek-term-hover); }
+.father-link { color: var(--father-fg); border-bottom-color: var(--father-fg); }
+.father-link:hover { color: var(--father-hover); border-bottom-color: var(--father-hover); }
+.verse-num { color: var(--verse-num); }
+::-webkit-scrollbar-track { background: var(--scroll-track); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+
+/* Overrides für feste Tailwind-Standardfarben */
+.dark ::selection { background: rgba(212, 166, 74, 0.35); color: #fff; }
+
+.dark .bg-burgundy-800 { background-color: #7C2D12; color: #fff; }
+.dark .hover\:bg-burgundy-900:hover { background-color: #933818; }
+
+.dark .text-stone-400 { color: #8F8575; }
+.dark .text-stone-500 { color: #A39A89; }
+.dark .text-stone-600 { color: #B8AF9D; }
+.dark .text-stone-700 { color: #CFC7B5; }
+.dark .text-stone-800 { color: #E3DCCB; }
+.dark .hover\:text-stone-900:hover { color: #FFFFFF; }
+
+.dark .text-sky-900 { color: #9CC6EE; }
+.dark .text-amber-900,
+.dark .text-amber-800 { color: #E6BF78; }
+.dark .text-red-950 { color: #F0B8A8; }
+.dark .border-sky-800\/30 { border-color: rgba(127, 178, 224, 0.4); }
+.dark .border-amber-800\/30 { border-color: rgba(224, 184, 96, 0.4); }
+.dark .border-red-900\/30 { border-color: rgba(232, 168, 146, 0.4); }
+.dark .border-amber-700\/60 { border-color: rgba(224, 184, 96, 0.6); }
+.dark .border-sky-800\/60 { border-color: rgba(127, 178, 224, 0.6); }
+
+.dark .bg-white { background-color: #1A1611; }
+.dark .hover\:bg-sky-50:hover { background-color: #1B2733; }
+.dark .hover\:bg-amber-50:hover { background-color: #2A2214; }
+.dark textarea::placeholder { color: #8F8575; }
+
+/* Schwebender Umschalt-Button (wird von theme.js eingefügt) */
+#theme-toggle-float {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 40;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    cursor: pointer;
+    background-color: rgb(var(--parchment-50));
+    color: rgb(var(--gold-700));
+    border: 1px solid rgb(var(--parchment-300));
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    transition: background-color 0.2s ease;
+}
+#theme-toggle-float:hover { background-color: rgb(var(--parchment-200)); }
+#theme-toggle-float svg { width: 1.2rem; height: 1.2rem; }
+#theme-toggle-float .icon-sun { display: none; }
+.dark #theme-toggle-float .icon-sun { display: block; }
+.dark #theme-toggle-float .icon-moon { display: none; }
+
+@media print {
+    #theme-toggle-float { display: none !important; }
+    body { background: white; color: #262018; background-image: none; }
+    .folio-page { box-shadow: none; }
+}
+
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-amber-200/60">
+    <!-- Schmale Kopfleiste: Titel + Ebenen-Schalter -->
+    <header class="sticky top-0 z-30 bg-parchment-100/95 backdrop-blur-md border-b border-parchment-300 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
+            <h1 class="font-display text-lg sm:text-xl font-bold text-parchment-900 tracking-tight">
+                Matthäus Kapitel 1
+            </h1>
+            <div class="flex flex-wrap items-center gap-1.5 text-xs font-sans">
+                <button onclick="toggleFilter('greek')" id="filter-greek" class="filter-chip active px-2.5 py-1 rounded-full border border-sky-800/30 bg-sky-900/10 text-sky-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-sky-700"></span> Griechisch
+                </button>
+                <button onclick="toggleFilter('history')" id="filter-history" class="filter-chip active px-2.5 py-1 rounded-full border border-amber-800/30 bg-amber-900/10 text-amber-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-amber-700"></span> Historie
+                </button>
+                <button onclick="toggleFilter('fathers')" id="filter-fathers" class="filter-chip active px-2.5 py-1 rounded-full border border-red-900/30 bg-red-900/10 text-red-950 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-burgundy-800"></span> Kirchenväter
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Haupt-Container (Buchseite / Folio) -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+
+        <!-- Obere Kapitel-Navigation direkt über dem Einführungskasten -->
+        <nav aria-label="Obere Kapitel-Navigation" class="mb-6 pb-4 border-b border-parchment-300 flex items-center justify-between no-print">
+            <span class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm invisible" aria-hidden="true"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kapitel 28</span>
+            <a href="index.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Übersicht</a>
+            <a href="matthaeus-2.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 2 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+        
+        <!-- Einführungskasten -->
+        <div class="folio-page rounded-xl p-5 sm:p-7 mb-8 border border-parchment-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-parchment-200 pb-4 mb-4">
+                <div>
+                    <span class="text-xs font-sans uppercase tracking-widest text-gold-700 font-semibold">Auftakt des Neuen Testaments · Mt 1,1–25</span>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-parchment-900 mt-0.5">
+                        Das Buch des Ursprungs Jesu Christi und die Geburt des Immanuel
+                    </h2>
+                </div>
+                <div class="text-xs font-sans text-stone-600 bg-parchment-100 px-3.5 py-2 rounded-lg border border-parchment-300">
+                    <strong class="text-parchment-900">Tipp:</strong> Klicke auf <span class="greek-term">blaue Begriffe</span> für den griechischen Urtext oder auf <span class="father-link">Ausleger-Namen</span> für Kommentare.
+                </div>
+            </div>
+            <p class="font-serif text-base sm:text-lg text-stone-700 leading-relaxed">
+                Was auf den ersten Blick wie eine trockene Namensliste wirkt, ist für einen jüdischen Leser des 1. Jahrhunderts eine hochdramatische Theologie in Namen: Matthäus beginnt mit den exakten Anfangsworten der Schöpfungsgeschichte (<em>Biblos geneseōs</em>), schmuggelt vier ungewöhnliche Frauen voller Brüche in den königlichen Stammbaum, verschlüsselt den Namen <strong>David (14)</strong> dreimal in der Geschichte Israels und zeigt schließlich, wie der Gerechte Josef durch einen Engel in die größte Neuschöpfung Gottes hineingenommen wird.
+            </p>
+        </div>
+
+        <!-- Dynamisch gerenderte Bibelabschnitte -->
+        <div id="study-container" class="space-y-10">
+            <!-- Inhalte werden über JavaScript aufgebaut -->
+        </div>
+
+        <!-- Kapitel-Navigation am Ende -->
+        <nav aria-label="Kapitel-Navigation" class="mt-12 pt-6 border-t border-parchment-300 flex items-center justify-between no-print">
+            <span class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm invisible" aria-hidden="true"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kapitel 28</span>
+            <a href="index.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Übersicht</a>
+            <a href="matthaeus-2.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 2 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12 border-t border-parchment-300 text-center text-xs font-sans text-stone-600">
+        <p class="font-serif italic text-sm text-parchment-800 mb-1">
+            „Siehe, die Jungfrau wird schwanger werden und einen Sohn gebären, und man wird ihm den Namen Immanuel geben – das heißt übersetzt: Gott mit uns.“ (Matthäus 1,23)
+        </p>
+        <p>Interaktive Studienbibel · Griechischer Grundtext (Nestle-Aland), historische Realienkunde & Patristik (1.–5. Jh. n. Chr.).</p>
+    </footer>
+
+    <!-- Modal / Detail-Karte -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/60 backdrop-blur-xs p-4" onclick="closeModalOnBackdrop(event)">
+        <div class="bg-parchment-50 border border-parchment-300 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden transform transition-all">
+            <div id="modal-header" class="px-6 py-4 bg-parchment-100 border-b border-parchment-300 flex items-center justify-between">
+                <span id="modal-badge" class="text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded"></span>
+                <button onclick="closeModal()" class="text-stone-500 hover:text-stone-900 p-1 rounded-lg hover:bg-parchment-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 font-serif text-parchment-900 space-y-4 max-h-[75vh] overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // GRIECHISCHES LEXIKON (MATTHÄUS 24)
+        // ==========================================
+        const greekLexicon = {
+            biblosGeneseos: {
+                greek: "βίβλος γενέσεως",
+                translit: "biblos geneseōs",
+                literal: "Buch des Ursprungs / Buch der Entstehung (Genesis)",
+                meaning: "Diese zwei griechischen Wörter sind das exakte Zitat aus der Septuaginta (der griechischen Bibelübersetzung des Alten Testaments) in Genesis 2,4 („Dies ist das Buch der Entstehung von Himmel und Erde“) und Genesis 5,1 („Dies ist das Buch der Entstehung der Menschen“). Matthäus eröffnet das Neue Testament bewusst wie ein neues Buch Genesis!",
+                theology: "Mit Jesus Christus beginnt kein bloßes weiteres Kapitel menschlicher Geschichte, sondern Gottes zweite, endgültige Schöpfung."
+            },
+            christos: {
+                greek: "Χριστός (מָשִׁיחַ)",
+                translit: "Christos (hebr. Maschiach)",
+                literal: "Der Gesalbte (Messias)",
+                meaning: "Im Alten Testament wurden Könige, Priester und gelegentlich Propheten mit heiligem Salböl übergossen, um sie für Gottes Auftrag auszusondern. Im 1. Jahrhundert n. Chr. war ‚der Gesalbte‘ der glühende Hoffnungstitel für den verheißenen Endzeitkönig aus dem Hause Davids.",
+                theology: "Durch die Verbindung ‚Sohn Davids, Sohn Abrahams‘ zeigt Matthäus sofort die doppelte Reichweite: Als Sohn Davids ist er der rechtmäßige König Israels; als Sohn Abrahams ist er der Segen für alle Völker der Erde (1. Mose 12,3)."
+            },
+            metoikesia: {
+                greek: "μετοικεσία Βαβυλῶνος",
+                translit: "metoikesia Babylōnos",
+                literal: "Umsiedlung / Wegführung nach Babylon",
+                meaning: "Wörtlich bezeichnet metoikesia den erzwungenen Wohnortwechsel (587/586 v. Chr.), als Nebukadnezar Jerusalem zerstörte, den Tempel niederbrannte und die davidische Königsdynastie beendete. Für Israel war dies die tiefste geistliche und politische Katastrophe seiner Geschichte.",
+                theology: "Dass Matthäus diese Katastrophe als einen der drei großen Pfeiler seines Stammbaums setzt, zeigt: Gott verliert seinen roten Faden selbst im tiefsten Scheitern seines Volkes nicht."
+            },
+            mnesteutheises: {
+                greek: "μνηστευθείσης",
+                translit: "mnēsteutheisēs",
+                literal: "verlobt / rechtskräftig angetraut",
+                meaning: "Eine jüdische Verlobung (Kidduschin / Erusin) im 1. Jahrhundert war weit mehr als ein unverbindliches Versprechen heute: Mit dem Verlobungsvertrag war die Braut bereits rechtsgültig die Ehefrau des Mannes (darum nennt der Engel Josef in V. 20 ‚deine Frau‘!), obwohl das Paar noch getrennt bei den Eltern lebte, bis die Heimholung (Nissuin) stattfand. Eine Auflösung war nur durch einen formellen Scheidebrief möglich.",
+                theology: "Nur vor diesem jüdischen Rechtsrahmen wird Josefs inneres Drama verständlich: Nach dem Gesetz galt Marias Schwangerschaft als Ehebruch."
+            },
+            dikaios: {
+                greek: "δίκαιος (καὶ μὴ θέλων δειγματίσαι)",
+                translit: "dikaios (kai mē thelōn deigmatisai)",
+                literal: "gerecht (und nicht willens, sie öffentlich bloßzustellen)",
+                meaning: "Dikaios ist der höchste Ehrentitel der jüdischen Frömmigkeit: ein Mensch, der die Tora liebt und treu hält. Das Verb deigmatisai bedeutet ‚ein öffentliches Exempel statuieren, an den Pranger stellen‘ (bei einem öffentlichen Prozess vor dem Ältestenrat hätte Maria Schande oder gar die Steinigung nach 5. Mose 22,23f. gedroht).",
+                theology: "Wahre biblische Gerechtigkeit ist niemals kalte Paragrafenreiterei, sondern verbindet Treue zu Gottes Gebot mit tiefer Barmherzigkeit."
+            },
+            iesous: {
+                greek: "Ἰησοῦς (יֵשׁוּעַ)",
+                translit: "Iēsous (hebr./aram. Jeschua)",
+                literal: "JHWH rettet / Der HERR ist Heil",
+                meaning: "Iēsous ist die griechische Form des verbreiteten hebräischen Namens Jeschua (Kurzform von Jehoschua / Josua). Der Engel gibt sofort die Begründung für diesen Namen: ‚Denn er wird sein Volk retten (sōsei) von ihren Sünden‘.",
+                theology: "Viele Juden erwarteten einen Messias, der Israel von der römischen Besatzung befreit. Der Engel macht unmissverständlich klar: Die eigentliche Gefangenschaft des Menschen ist die Sünde – und genau davon rettet Jesus."
+            },
+            parthenos: {
+                greek: "ἡ παρθένος",
+                translit: "hē parthenos",
+                literal: "die Jungfrau",
+                meaning: "Matthäus zitiert Jesaja 7,14 nach der griechischen Septuaginta, die das hebräische Wort ‚almah‘ (junge, heiratsfähige Frau im unberührten Alter) eindeutig mit parthenos (Jungfrau) wiedergab. Im Griechischen bezeichnet parthenos unmissverständlich eine Frau, die noch keinen Mann erkannt hat.",
+                theology: "Die Jungfrauengeburt bedeutet für die Kirchenväter: Das Heil wächst nicht aus menschlicher Kraft von unten nach oben, sondern ist reine Schöpfungstat Gottes von oben."
+            },
+            emmanouel: {
+                greek: "Ἐμμανουήλ (עִמָּנוּ אֵל)",
+                translit: "Emmanouēl (hebr. Immanuel)",
+                literal: "Mit uns ist Gott",
+                meaning: "Dieser Name bildet eine gewaltige literarische Klammer über das gesamte Matthäusevangelium: Im ersten Kapitel wird Jesus als ‚Gott mit uns‘ angekündigt (Mt 1,23) – und im allerletzten Vers des Evangeliums verheißt der Auferstandene: ‚Siehe, ich bin bei euch alle Tage bis an das Ende der Welt‘ (Mt 28,20).",
+                theology: "Gott sendet nicht bloß eine Botschaft aus der Ferne – er tritt selbst in unsere Menschlichkeit ein."
+            },
+            prototokos: {
+                greek: "πρωτότοκος",
+                translit: "prōtotokos",
+                literal: "Erstgeborener",
+                meaning: "Im biblischen und jüdischen Sprachgebrauch (vgl. 2. Mose 13,2) ist ‚Erstgeborener‘ ein fester Rechts- und Kulttitel für das erste Kind, das den Mutterschoß öffnet – völlig unabhängig davon, ob später noch weitere Kinder folgen oder nicht. Auch auf Grabinschriften der Antike wurden Einzelkinder als prōtotokos bezeichnet.",
+                theology: "Hieronymus nutzte genau diesen sprachlichen Nachweis, um zu zeigen, dass aus dem Wort ‚Erstgeborener‘ nicht auf spätere leibliche Kinder Marias geschlossen werden muss."
+            }
+        };
+
+        // ==========================================
+        // KIRCHENVÄTER & AUSLEGER
+        // ==========================================
+        const churchFathers = {
+            chrysostomus: {
+                name: "Johannes Chrysostomus",
+                dates: "ca. 349 – 407 n. Chr.",
+                role: "Erzbischof von Konstantinopel · ‚Goldmund‘",
+                bio: "Einer der bedeutendsten Prediger der Alten Kirche. Seine berühmten Homilien zum Matthäusevangelium (gehalten um 390 n. Chr. in Antiochia) erklären jeden Vers mit außergewöhnlicher psychologischer Feinfühligkeit und seelsorgerlicher Wärme.",
+                focusInMt1: "Erklärt meisterhaft, warum ausgerechnet vier Frauen mit brüchiger Geschichte im Stammbaum stehen: Damit niemand auf seine edle Herkunft stolz sei und kein Sünder an Gottes Gnade verzweifle."
+            },
+            hieronymus: {
+                name: "Hieronymus von Stridon",
+                dates: "ca. 347 – 420 n. Chr.",
+                role: "Bibelübersetzer (Vulgata) · Gelehrter in Bethlehem",
+                bio: "Lebte über dreißig Jahre in Bethlehem, lernte Hebräisch von jüdischen Gelehrten und kannte die jüdischen Traditionen sowie den biblischen Sprachgebrauch wie kaum ein anderer westlicher Kirchenvater.",
+                focusInMt1: "Verfasste einen kompakten Matthäus-Kommentar sowie seine berühmte Schrift über die immerwährende Jungfräulichkeit Marias, in der er die jüdischen Ehebräuche und den Begriff ‚Erstgeborener‘ (prōtotokos) sprachlich präzise auslegt."
+            },
+            augustinus: {
+                name: "Augustinus von Hippo",
+                dates: "354 – 430 n. Chr.",
+                role: "Bischof von Hippo Regius (Nordafrika) · Kirchenlehrer",
+                bio: "Der einflussreichste Denker der lateinischen Christenheit. In seinem Werk ‚De consensu evangelistarum‘ (Über die Übereinstimmung der Evangelisten) untersucht er unter anderem das Verhältnis zwischen dem Stammbaum bei Matthäus und dem bei Lukas.",
+                focusInMt1: "Betont die Symbolik der drei Epochen Israels (Patriarchen, Könige, Exil bis Christus) und erklärt, wie Josef durch die gesetzliche Vaterschaft Jesus das volle Erbrecht Davids vermittelt."
+            },
+            ambrosius: {
+                name: "Ambrosius von Mailand",
+                dates: "ca. 339 – 397 n. Chr.",
+                role: "Bischof von Mailand · Lehrer des Augustinus",
+                bio: "Römischer Statthalter, der durch Volkswahl Bischof von Mailand wurde und die westliche Schriftauslegung sowie den Kirchengesang nachhaltig prägte.",
+                focusInMt1: "Sieht in den 42 Generationen von Abraham bis Christus den langen Pilgerweg des Volkes Gottes (analog zu den 42 Lagerplätzen Israels in der Wüste in 4. Mose 33), an dessen Ziel Christus selbst steht."
+            },
+            irenaeus: {
+                name: "Irenäus von Lyon",
+                dates: "ca. 135 – 202 n. Chr.",
+                role: "Bischof von Lyon · Schüler Polykarps (der noch Johannes kannte)",
+                bio: "Schlug in seinem Hauptwerk ‚Adversus haereses‘ (Gegen die Häresien) die Brücke von der Apostelzeit zur großen Kirche. Er prägte die Lehre von der ‚Rekapitulatio‘: Christus durchlebt und heilt alle Stufen des Menschseins neu.",
+                focusInMt1: "Verteidigt die Jungfrauengeburt (Jesaja 7,14) als entscheidenden Beweis dafür, dass der Erlöser wahrer Gott und wahrer Mensch zugleich ist – der neue Adam aus der neuen Eva (Maria)."
+            },
+            leo: {
+                name: "Leo der Große",
+                dates: "ca. 400 – 461 n. Chr.",
+                role: "Bischof von Rom · Kirchenlehrer der Menschwerdung",
+                bio: "Seine Weihnachtspredigten und sein berühmter Lehrbrief an Flavian (Tomus Leonis, 449 n. Chr.) formulierten klassisch das Geheimnis der zwei Naturen Christi (wahrer Gott und wahrer Mensch in einer Person).",
+                focusInMt1: "Betrachtet das Geheimnis der Empfängnis durch den Heiligen Geist: Christus nimmt unsere menschliche Natur ohne Sünde an, um sie von innen her zu heilen."
+            }
+        };
+
+        // ==========================================
+        // INHALT: MATTHÄUS 24
+        // ==========================================
+        const studySections = [
+            {
+                id: "perikope-1",
+                sectionTitle: "I. Der Stammbaum Jesu Christi – Gnade mitten in der Geschichte",
+                sectionRange: "Matthäus 1,1–17",
+                sectionIntro: "Für jüdische Leser war ein lückenloser Stammbaum der unverzichtbare Echtheitsnachweis des Messias. Doch Matthäus baut überraschende Brüche und verborgene Zahlensymbolik ein.",
+                blocks: [
+                    {
+                        verses: "1–6a",
+                        bibleText: `<span class="verse-num">1</span><span class="greek-term" onclick="openGreek('biblosGeneseos')">Buch des Geschlechts</span> Jesu <span class="greek-term" onclick="openGreek('christos')">Christi</span>, des Sohnes Davids, des Sohnes Abrahams. <span class="verse-num">2</span>Abraham zeugte Isaak, Isaak zeugte Jakob, Jakob zeugte Juda und seine Brüder; <span class="verse-num">3</span>Juda aber zeugte Perez und Serach von der Tamar; Perez zeugte Hezron, Hezron zeugte Aram, <span class="verse-num">4</span>Aram zeugte Amminadab, Amminadab zeugte Nachschon, Nachschon zeugte Salmon; <span class="verse-num">5</span>Salmon aber zeugte Boas von der Rahab; Boas zeugte Obed von der Rut; Obed zeugte Isai, <span class="verse-num">6</span>Isai aber zeugte David, den König.`,
+                        commentary: {
+                            history: `<em>Antike jüdische Stammbäume nannten fast ausschließlich Männer. Dass Matthäus ausgerechnet hier drei Frauen erwähnt – und dazu noch solche mit höchst ungewöhnlicher Geschichte! – ist eine kleine Sensation: <strong>Tamar</strong> (1. Mose 38) verkleidete sich als Prostituierte, um ihr Recht von Juda zu erzwingen; <strong>Rahab</strong> (Josua 2) war eine kanaanäische Dirne aus Jericho; <strong>Rut</strong> (Buch Rut) war eine Ausländerin aus dem verfeindeten Volk der Moabiter.</em>`,
+                            greek: `<em>Die Eröffnung <span class="greek-term" onclick="openGreek('biblosGeneseos')">Biblos geneseōs</span> erinnert jeden Bibelkenner sofort an die Schöpfungsgeschichte (1. Mose 2,4; 5,1). Zugleich steht der Titel <span class="greek-term" onclick="openGreek('christos')">Christos</span> (Messias) schon im ersten Vers fest wie ein Siegel über dem gesamten Evangelium.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('chrysostomus')">Johannes Chrysostomus</span> und <span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> fragen: Warum lässt Matthäus die ehrwürdigen Stammmütter Sara, Rebekka und Rahel aus und nennt stattdessen Tamar, Rahab und Rut? Chrysostomus antwortet: „Damit niemand stolz auf seine Ahnen sei und kein Sünder verzweifle! Er, der gekommen ist, unsere Krankheiten zu heilen, schämt sich nicht, aus einem verwundeten Geschlecht hervorzugehen.“ Und durch die Heidinnen Rahab und Rut leuchtet schon hier die Rettung aller Völker auf.</em>`
+                        }
+                    },
+                    {
+                        verses: "6b–11",
+                        bibleText: `<span class="verse-num">6b</span>David aber zeugte Salomo von der Frau des Uria; <span class="verse-num">7</span>Salomo zeugte Rehabeam, Rehabeam zeugte Abija, Abija zeugte Asa, <span class="verse-num">8</span>Asa zeugte Joschafat, Joschafat zeugte Joram, Joram zeugte Usija, <span class="verse-num">9</span>Usija zeugte Jotam, Jotam zeugte Ahas, Ahas zeugte Hiskia, <span class="verse-num">10</span>Hiskia zeugte Manasse, Manasse zeugte Amon, Amon zeugte Josia, <span class="verse-num">11</span>Josia aber zeugte Jechonja und seine Brüder um die Zeit der <span class="greek-term" onclick="openGreek('metoikesia')">Wegführung nach Babylon</span>.`,
+                        commentary: {
+                            history: `<em>Zwei faszinierende Details verbergen sich in der Königsliste: Erstens wird Batseba in V. 6 nicht beim Namen genannt, sondern schmerzhaft ehrlich als <strong>„die Frau des Uria“</strong> – Matthäus vertuscht Davids Ehebruch und den Mord an dem Hethiter Uria (2. Samuel 11) nicht! Zweitens überspringt Matthäus in V. 8 zwischen Joram und Usija bewusst drei besonders gottlose Könige (Ahasja, Joasch, Amazja – vgl. 1. Chronik 3,11f.), um die heilige Zahl 14 exakt einzuhalten.</em>`,
+                            greek: `<em>Das Wort <span class="greek-term" onclick="openGreek('metoikesia')">metoikesia</span> („Umsiedlung / Wegführung nach Babylon“, 586 v. Chr.) markiert den tiefsten Sturz Israels: Tempel zerstört, Königsthron gestürzt, Volk verschleppt.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('augustinus')">Augustinus</span> weist darauf hin, dass das Auslassen einzelner Zwischenglieder im hebräischen Sprachgebrauch völlig legitim war („zeugte“ meint dort oft auch „war der Vorfahre von“). Geistlich zeigt die Linie vom großen König David bis hinab ins babylonische Exil: Menschliches Königtum scheitert an der Sünde – nur der verheißene Messias kann das gefallene Haus Davids wieder aufrichten.</em>`
+                        }
+                    },
+                    {
+                        verses: "12–17",
+                        bibleText: `<span class="verse-num">12</span>Nach der Wegführung nach Babylon aber zeugte Jechonja Schealtiël, Schealtiël zeugte Serubbabel, <span class="verse-num">13</span>Serubbabel zeugte Abihud, Abihud zeugte Eljakim, Eljakim zeugte Asor, <span class="verse-num">14</span>Asor zeugte Zadok, Zadok zeugte Achim, Achim zeugte Eliud, <span class="verse-num">15</span>Eliud zeugte Eleasar, Eleasar zeugte Mattan, Mattan zeugte Jakob, <span class="verse-num">16</span>Jakob aber zeugte Josef, den Mann der Maria, von welcher Jesus geboren wurde, der Christus genannt wird. <span class="verse-num">17</span>Alle Geschlechter nun von Abraham bis David sind vierzehn Geschlechter, und von David bis zur Wegführung nach Babylon vierzehn Geschlechter, und von der Wegführung nach Babylon bis zu Christus vierzehn Geschlechter.`,
+                        commentary: {
+                            history: `<em><strong>Das Geheimnis der Zahl 14 (Gematrie):</strong> Im Hebräischen hat jeder Buchstabe einen Zahlenwert. Der Name <strong>David</strong> schreibt sich mit drei Konsonanten: <strong>ד (Dalet = 4) + ו (Waw = 6) + ד (Dalet = 4) = 14!</strong> Indem Matthäus die Geschichte Israels in drei mal 14 Generationen gliedert (Aufstieg unter David – Niedergang bis Babylon – verborgenes Warten bis Christus), ruft er dem jüdischen Leser wie ein geheimes Passwort zu: „David! David! David! Der wahre Sohn Davids ist da!“</em>`,
+                            greek: `<em>Beachte den plötzlichen Bruch der Formel in Vers 16! 39-mal hieß es monoton: „A zeugte B“. Doch bei Josef ändert Matthäus sorgfältig die Grammatik: Nicht „Josef zeugte Jesus“, sondern „Josef, der Mann der Maria, <strong>von welcher</strong> (ἐξ ἧς, weiblicher Singular!) Jesus geboren wurde“.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('ambrosius')">Ambrosius von Mailand</span> vergleicht die dreimal 14 (= 42) Generationen mit den 42 Stationen der Wüstenwanderung Israels in 4. Mose 33: Durch alle Umwege, Höhen und Tiefen der Geschichte hindurch führt Gott sein Volk wie durch die Wüste – bis es in Christus das verheißene Land erreicht.</em>`
+                        }
+                    }
+                ]
+            },
+            {
+                id: "perikope-2",
+                sectionTitle: "II. Josefs Traum, die Jungfrauengeburt und der Name Immanuel",
+                sectionRange: "Matthäus 1,18–25",
+                sectionIntro: "Während Lukas die Verkündigung aus der Sicht Marias erzählt, führt uns Matthäus tief in die Seele eines gerechten jüdischen Mannes, dessen Welt über Nacht zerbricht.",
+                blocks: [
+                    {
+                        verses: "18–19",
+                        bibleText: `<span class="verse-num">18</span>Mit der Geburt Jesu Christi verhielt es sich aber so: Als seine Mutter Maria dem Josef <span class="greek-term" onclick="openGreek('mnesteutheises')">verlobt</span> war, fand es sich, ehe sie zusammengekommen waren, dass sie schwanger war von dem Heiligen Geist. <span class="verse-num">19</span>Josef aber, ihr Mann, weil er <span class="greek-term" onclick="openGreek('dikaios')">gerecht</span> war und sie nicht <span class="greek-term" onclick="openGreek('deigmatisai')">öffentlich bloßstellen</span> wollte, gedachte, sie heimlich zu entlassen.`,
+                        commentary: {
+                            history: `<em>Im antiken Judentum bestand die Eheschließung aus zwei Stufen: Mit der Verlobung (<em>Erusin</em>) war das Paar rechtlich bereits verheiratet, doch die Braut wohnte noch bis zu einem Jahr im Elternhaus, bevor die feierliche Heimholung (<em>Nissuin</em>) stattfand. Als Maria in dieser Zwischenzeit schwanger wurde, stand Josef vor einem scheinbar unlösbaren Dilemma: Heiratete er sie trotz vermeintlicher Untreue, machte er sich vor der Tora mitschuldig; klagte er sie öffentlich an, drohte Maria soziale Vernichtung oder gar die Todesstrafe.</em>`,
+                            greek: `<em>Matthäus beschreibt Josef mit dem höchsten alttestamentlichen Ehrentitel: <span class="greek-term" onclick="openGreek('dikaios')">dikaios</span> (gerecht) – und zeigt sofort, wie sich echte Gerechtigkeit äußert: Er will Maria nicht <span class="greek-term" onclick="openGreek('deigmatisai')">deigmatisai</span> (an den öffentlichen Pranger stellen), sondern einen stillen Scheidebrief vor nur zwei Zeugen ausstellen.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('chrysostomus')">Johannes Chrysostomus</span> bewundert Josefs Sanftmut: „Er zürnte nicht, er schmähte sie nicht, er verriet ihr Geheimnis keinem einzigen Menschen – selbst als er noch glaubte, betrogen worden zu sein, schonte er ihre Ehre.“ <span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> ergänzt, dass Josef aus ehrfürchtiger Scheu vor dem ihm unbegreiflichen Geheimnis an Maria zurücktrat.</em>`
+                        }
+                    },
+                    {
+                        verses: "20–21",
+                        bibleText: `<span class="verse-num">20</span>Während er aber dies überlegte, siehe, da erschien ihm ein Engel des Herrn im Traum und sprach: Josef, Sohn Davids, fürchte dich nicht, Maria, deine Frau, zu dir zu nehmen; denn das in ihr Gezeugte ist von dem Heiligen Geist. <span class="verse-num">21</span>Sie wird aber einen Sohn gebären, und du sollst ihm den Namen <span class="greek-term" onclick="openGreek('iesous')">Jesus</span> geben; denn er wird sein Volk retten von ihren Sünden.`,
+                        commentary: {
+                            history: `<em><strong>Warum nennt der Engel Josef „Sohn Davids“?</strong> Dieser feierliche Titel erinnert Josef daran, dass er nicht bloß ein einfacher Zimmermann in Galiläa ist, sondern der Erbe der davidischen Verheißung! Im jüdischen Recht galt: Wenn ein Mann ein Kind bei der Beschneidung öffentlich als das seine annimmt und ihm den Namen gibt (V. 21: „<strong>du</strong> sollst ihm den Namen geben“), wird das Kind rechtlich vollgültig sein Sohn – und damit erbt Jesus durch Josef den legalen Thronanspruch Davids!</em>`,
+                            greek: `<em>Der Name <span class="greek-term" onclick="openGreek('iesous')">Iēsous</span> (hebr. <em>Jeschua</em> = „JHWH rettet“) wird vom Engel sofort gedeutet: „Er wird sein Volk retten (σώσει, <em>sōsei</em>) von ihren Sünden.“ Das betonte „Er“ (αὐτός, <em>autos</em>) im Griechischen heißt: Kein bloßer menschlicher Befreier, sondern Er selbst wird das tun, was im Alten Testament nur Gott allein vorbehalten war (vgl. Psalm 130,8).</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('leo')">Leo der Große</span> betrachtet dieses Wunder der Empfängnis durch den Heiligen Geist: „Er wurde vom Heiligen Geist empfangen im Schoß der Jungfrau – ohne Verlust der Jungfräulichkeit geboren, so wie er ohne Verlust der Jungfräulichkeit empfangen wurde. So verband sich die göttliche Natur mit unserer menschlichen, um das Heilmittel genau dort zu wirken, wo die Krankheit ihren Ursprung hatte.“</em>`
+                        }
+                    },
+                    {
+                        verses: "22–25",
+                        bibleText: `<span class="verse-num">22</span>Dies alles aber ist geschehen, damit erfüllt würde, was von dem Herrn geredet ist durch den Propheten, der spricht: <span class="verse-num">23</span>„Siehe, die <span class="greek-term" onclick="openGreek('parthenos')">Jungfrau</span> wird schwanger werden und einen Sohn gebären, und man wird ihm den Namen <span class="greek-term" onclick="openGreek('emmanouel')">Immanuel</span> geben“, was übersetzt ist: Gott mit uns. <span class="verse-num">24</span>Als aber Josef vom Schlaf erwacht war, tat er, wie ihm der Engel des Herrn befohlen hatte, und nahm seine Frau zu sich; <span class="verse-num">25</span>und er erkannte sie nicht, bis sie ihren <span class="greek-term" onclick="openGreek('prototokos')">erstgeborenen</span> Sohn gebar; und er gab ihm den Namen Jesus.`,
+                        commentary: {
+                            history: `<em>Mit Vers 22 beginnt die berühmte Reihe der sogenannten „Erfüllungszitate“ bei Matthäus. Das Zitat aus Jesaja 7,14 stammt ursprünglich aus der Krisenzeit um 734 v. Chr., als König Ahas von Jerusalem vor feindlichen Heeren zitterte und Gott ihm als Zeichen der Rettung die Geburt eines königlichen Kindes namens <strong>Immanuel</strong> verhieß. Matthäus erkennt darin die tiefste, endgültige Erfüllung.</em>`,
+                            greek: `<em>1. <span class="greek-term" onclick="openGreek('parthenos')">Parthenos</span>: Die griechische Septuaginta übersetzte Jesaja 7,14 eindeutig mit „Jungfrau“.<br>
+                            2. <span class="greek-term" onclick="openGreek('emmanouel')">Emmanouēl</span> („Gott mit uns“): Bildet mit dem letzten Vers des Evangeliums („Ich bin bei euch alle Tage“, Mt 28,20) die große theologische Klammer des ganzen Buches.<br>
+                            3. „Er erkannte sie nicht“ (<em>ouk eginōsken autēn</em>): Klassischer biblischer Ausdruck für eheliche Gemeinschaft (vgl. 1. Mose 4,1). Und <span class="greek-term" onclick="openGreek('prototokos')">prōtotokos</span> („Erstgeborener“) bezeichnet im jüdischen Recht den Erstlingsstatus vor Gott (2. Mose 13,2).</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('irenaeus')">Irenäus von Lyon</span> schreibt zur Jungfrauengeburt: „Wie durch eine ungehorsame Jungfrau (Eva) der Mensch geschlagen wurde und fiel, so wurde durch die Jungfrau (Maria), die dem Wort Gottes gehorchte, der Mensch wiederbelebt und empfing das Leben.“ Und <span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> betont gegen Fehlinterpretationen von Vers 25: Das griechische „bis“ (<em>heōs hou</em>) besagt in der Bibel nicht, dass danach das Gegenteil eintrat (vgl. Psalm 110,1 oder Mt 28,20), sondern schützt allein die Tatsache, dass Jesus ohne menschlichen Vater geboren wurde.</em>`
+                        }
+                    }
+                ]
+            }
+        ];
+
+        // ==========================================
+        // ZUSTAND & STEUERUNG
+        // ==========================================
+        let activeFilters = { greek: true, history: true, fathers: true };
+        const CHAPTER = 1;
+        const NOTES_KEY = 'mt' + CHAPTER + '_notes';
+        let userNotes = {};
+        try { userNotes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}'); } catch (e) {}
+
+        function renderStudy() {
+            const container = document.getElementById('study-container');
+            container.innerHTML = '';
+
+            studySections.forEach(section => {
+                const sectionEl = document.createElement('section');
+                sectionEl.id = section.id;
+                sectionEl.className = 'folio-page rounded-2xl border border-parchment-300 overflow-hidden scroll-mt-16';
+
+                let html = `
+                    <div class="bg-parchment-100/90 px-5 sm:px-8 py-5 border-b border-parchment-300">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <h3 class="font-display text-2xl sm:text-3xl font-bold text-burgundy-900">
+                                ${section.sectionTitle}
+                            </h3>
+                            <span class="font-sans text-xs font-semibold tracking-wider uppercase px-2.5 py-1 rounded bg-parchment-200 text-parchment-900 border border-parchment-300">
+                                ${section.sectionRange}
+                            </span>
+                        </div>
+                        <p class="font-serif italic text-stone-700 text-base mt-1.5">
+                            ${section.sectionIntro}
+                        </p>
+                    </div>
+                    <div class="divide-y divide-parchment-200">
+                `;
+
+                section.blocks.forEach((block, idx) => {
+                    const blockKey = `${section.id}-${idx}`;
+                    const savedNote = userNotes[blockKey] || '';
+
+                    let commentaryParts = [];
+                    if (activeFilters.history && block.commentary.history) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-amber-700/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-amber-800 block mb-0.5">Historischer & Jüdischer Kontext</span>
+                                <div class="text-stone-800">${block.commentary.history}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.greek && block.commentary.greek) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-sky-800/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-sky-900 block mb-0.5">Griechischer Urtext & Wortbedeutung</span>
+                                <div class="text-stone-800">${block.commentary.greek}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.fathers && block.commentary.fathers) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-burgundy-800/70">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-800 block mb-0.5">Kirchenväter & Alte Ausleger</span>
+                                <div class="text-stone-800">${block.commentary.fathers}</div>
+                            </div>
+                        `);
+                    }
+
+                    const commentaryHtml = commentaryParts.length > 0
+                        ? `<div class="space-y-3.5 font-serif italic text-[15.5px] sm:text-base leading-relaxed">${commentaryParts.join('')}</div>`
+                        : `<div class="font-sans text-xs text-stone-400 italic">Alle Kommentar-Ebenen sind ausgeblendet.</div>`;
+
+                    html += `
+                        <div class="p-5 sm:p-8 bg-parchment-50 max-w-4xl mx-auto">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-700">
+                                    Matthäus ${CHAPTER},${block.verses}
+                                </span>
+                                <button onclick="toggleNoteBox('${blockKey}')" class="text-xs font-sans text-stone-400 hover:text-burgundy-800 flex items-center gap-1 transition no-print">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                </button>
+                            </div>
+                            <p class="font-serif text-xl sm:text-[21px] leading-[1.8] text-parchment-900 mb-5">
+                                ${block.bibleText}
+                            </p>
+                            <div class="bg-parchment-100/80 rounded-xl p-4 sm:p-5 border border-parchment-300/80">
+                                ${commentaryHtml}
+                            </div>
+                            ${renderNoteArea(blockKey, savedNote)}
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                sectionEl.innerHTML = html;
+                container.appendChild(sectionEl);
+            });
+        }
+
+        function renderNoteArea(blockKey, savedNote) {
+            const isHidden = savedNote ? '' : 'hidden';
+            return `
+                <div id="note-box-${blockKey}" class="${isHidden} mt-4 pt-3 border-t border-parchment-200 no-print">
+                    <label class="block font-sans text-[11px] font-medium text-stone-500 mb-1">Eigene Studiennotiz:</label>
+                    <textarea 
+                        onchange="saveNote('${blockKey}', this.value)"
+                        onkeyup="saveNote('${blockKey}', this.value)"
+                        rows="2" 
+                        placeholder="Deine Gedanken..."
+                        class="w-full rounded-lg bg-white border border-parchment-300 p-2 text-xs font-sans text-parchment-900 focus:outline-none focus:border-gold-600"
+                    >${savedNote}</textarea>
+                </div>
+            `;
+        }
+
+        function toggleNoteBox(blockKey) {
+            const box = document.getElementById(`note-box-${blockKey}`);
+            if (box) {
+                box.classList.toggle('hidden');
+                if (!box.classList.contains('hidden')) box.querySelector('textarea').focus();
+            }
+        }
+
+        function saveNote(blockKey, text) {
+            if (text.trim() === '') delete userNotes[blockKey];
+            else userNotes[blockKey] = text;
+            try { localStorage.setItem(NOTES_KEY, JSON.stringify(userNotes)); } catch (e) {}
+        }
+
+        function toggleFilter(type) {
+            activeFilters[type] = !activeFilters[type];
+            const btn = document.getElementById(`filter-${type}`);
+            if (activeFilters[type]) btn.classList.remove('opacity-45', 'line-through');
+            else btn.classList.add('opacity-45', 'line-through');
+            renderStudy();
+        }
+
+        function openGreek(key) {
+            const item = greekLexicon[key];
+            if (!item) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Griechisches Original';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-sky-900/10 text-sky-900 border border-sky-800/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <div class="text-3xl font-serif font-bold text-greek-800">${item.greek}</div>
+                    <div class="text-sm font-sans text-stone-500 mt-0.5">Umschrift: <span class="italic font-medium text-stone-700">${item.translit}</span> · Wörtlich: <span class="font-medium text-stone-700">${item.literal}</span></div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${item.meaning}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Theologische Tiefe</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${item.theology}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        // Schwerpunkt-Text: Feld heißt je Kapitel anders (focusInMtN)
+        function fatherFocus(f) {
+            const k = Object.keys(f).find(x => x === 'focus' || x.startsWith('focusIn'));
+            return k ? f[k] : '';
+        }
+
+        function openFather(key) {
+            const father = churchFathers[key];
+            if (!father) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Ausleger / Patristik';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-red-900/10 text-burgundy-900 border border-red-900/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <h3 class="text-2xl font-display font-bold text-burgundy-900">${father.name}</h3>
+                    <div class="text-xs font-sans text-stone-600 mt-0.5">${father.dates} · ${father.role}</div>
+                    ${father.classificationNote ? `<p class="text-xs font-sans text-burgundy-800 mt-1.5 font-medium">${father.classificationNote}</p>` : ''}
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Biografie & Einordnung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${father.bio}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-gold-700 mb-1">Schwerpunkt in Mt ${CHAPTER}</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${fatherFocus(father)}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openGlossaryModal() {
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Lexikon & Kirchenväter';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-amber-900/10 text-amber-900 border border-amber-800/30';
+            
+            let greekList = Object.entries(greekLexicon).map(([k, v]) => `
+                <button onclick="openGreek('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-sky-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-serif font-bold text-greek-800 text-base">${v.greek}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${v.translit}</span>
+                </button>
+            `).join('');
+
+            let fathersList = Object.entries(churchFathers).map(([k, f]) => `
+                <button onclick="openFather('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-amber-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-display font-bold text-burgundy-900 text-base">${f.name}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${f.dates} · ${f.role}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('modal-body').innerHTML = `
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-sky-900 mb-2">Griechische Begriffe</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${greekList}</div>
+                </div>
+                <div class="pt-3 border-t border-parchment-200">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Kirchenväter & Ausleger</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${fathersList}</div>
+                </div>
+            `;
+            showModal();
+        }
+
+        function showModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeModalOnBackdrop(e) {
+            if (e.target.id === 'detail-modal') closeModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderStudy);
+    </script>
+</body>
+</html>

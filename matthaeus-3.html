@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matthäus 3 – Interaktive Studienausgabe (Griechisch, Historie & Auslegung)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+/* ===== Gemeinsames Theme-Skript für alle Kapitel ===== */
+/* Einbinden direkt NACH dem Tailwind-CDN-Skript im <head>. Ersetzt den alten tailwind.config-Block. */
+
+(function () {
+    // 1) Theme sofort setzen (vor dem ersten Rendern, kein Aufblitzen)
+    try {
+        var t = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (t === 'dark' || (!t && prefersDark)) document.documentElement.classList.add('dark');
+    } catch (e) {}
+
+    // 2) Tailwind-Konfiguration: Farben laufen über CSS-Variablen aus theme.css
+    if (window.tailwind) {
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif']
+                    },
+                    colors: {
+                        parchment: {
+                            50: 'rgb(var(--parchment-50) / <alpha-value>)',
+                            100: 'rgb(var(--parchment-100) / <alpha-value>)',
+                            200: 'rgb(var(--parchment-200) / <alpha-value>)',
+                            300: 'rgb(var(--parchment-300) / <alpha-value>)',
+                            800: 'rgb(var(--parchment-800) / <alpha-value>)',
+                            900: 'rgb(var(--parchment-900) / <alpha-value>)'
+                        },
+                        burgundy: {
+                            700: 'rgb(var(--burgundy-700) / <alpha-value>)',
+                            800: 'rgb(var(--burgundy-800) / <alpha-value>)',
+                            900: 'rgb(var(--burgundy-900) / <alpha-value>)'
+                        },
+                        gold: {
+                            600: 'rgb(var(--gold-600) / <alpha-value>)',
+                            700: 'rgb(var(--gold-700) / <alpha-value>)'
+                        },
+                        greek: {
+                            50: 'rgb(var(--greek-50) / <alpha-value>)',
+                            700: 'rgb(var(--greek-700) / <alpha-value>)',
+                            800: 'rgb(var(--greek-800) / <alpha-value>)'
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    // 3) Umschalten
+    function isDark() {
+        return document.documentElement.classList.contains('dark');
+    }
+    function applyTheme(dark) {
+        document.documentElement.classList.toggle('dark', dark);
+        var btn = document.getElementById('theme-toggle-float');
+        if (btn) btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    }
+    window.toggleTheme = function () {
+        var next = !isDark();
+        applyTheme(next);
+        try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch (e) {}
+    };
+
+    // 4) Systemeinstellung live verfolgen, solange keine manuelle Wahl gespeichert ist
+    if (window.matchMedia) {
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        var onChange = function (e) {
+            var stored = null;
+            try { stored = localStorage.getItem('theme'); } catch (err) {}
+            if (!stored) applyTheme(e.matches);
+        };
+        if (mq.addEventListener) mq.addEventListener('change', onChange);
+        else if (mq.addListener) mq.addListener(onChange);
+    }
+
+    // 5) Schwebenden Umschalt-Button einfügen
+    document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.createElement('button');
+        btn.id = 'theme-toggle-float';
+        btn.type = 'button';
+        btn.className = 'no-print';
+        btn.title = 'Hell/Dunkel umschalten';
+        btn.setAttribute('aria-label', 'Dunkelmodus umschalten');
+        btn.setAttribute('aria-pressed', isDark() ? 'true' : 'false');
+        btn.onclick = window.toggleTheme;
+        btn.innerHTML =
+            '<svg class="icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>' +
+            '<svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>';
+        document.body.appendChild(btn);
+    });
+})();
+
+    </script>
+    <style>
+        body {
+            background-color: #F7F3E8;
+            color: #262018;
+            background-image: radial-gradient(#DFD2B5 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+
+        .folio-page {
+            background-color: #FCFBF7;
+            box-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+        }
+
+        .greek-term {
+            border-bottom: 1.5px dotted #1E4E79;
+            color: #15395B;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .greek-term:hover {
+            background-color: #E2ECF5;
+            border-bottom-style: solid;
+        }
+
+        .father-link {
+            color: #7C2D12;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px dashed #7C2D12;
+            transition: color 0.15s ease;
+        }
+        .father-link:hover {
+            color: #B48327;
+            border-bottom-color: #B48327;
+        }
+
+        .verse-num {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #8F6519;
+            vertical-align: super;
+            margin-right: 2px;
+            user-select: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F3E8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C3A3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B48327;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .folio-page { box-shadow: none; }
+        }
+    </style>
+    <style>
+/* ===== Gemeinsamer Dark Mode für alle Kapitel ===== */
+/* Einbinden NACH dem <style>-Block der Seite, damit diese Regeln die alten Farbwerte überschreiben. */
+
+:root {
+    --parchment-50: 252 251 247;
+    --parchment-100: 247 243 232;
+    --parchment-200: 239 231 212;
+    --parchment-300: 223 210 181;
+    --parchment-800: 61 53 41;
+    --parchment-900: 38 32 24;
+    --burgundy-700: 124 45 18;
+    --burgundy-800: 101 34 20;
+    --burgundy-900: 74 22 13;
+    --gold-600: 180 131 39;
+    --gold-700: 143 101 25;
+    --greek-50: 240 245 249;
+    --greek-700: 30 78 121;
+    --greek-800: 21 57 91;
+
+    --body-bg: #F7F3E8;
+    --body-fg: #262018;
+    --body-dot: #DFD2B5;
+    --folio-bg: #FCFBF7;
+    --folio-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+    --greek-term-fg: #15395B;
+    --greek-term-border: #1E4E79;
+    --greek-term-hover: #E2ECF5;
+    --father-fg: #7C2D12;
+    --father-hover: #B48327;
+    --verse-num: #8F6519;
+    --scroll-track: #F7F3E8;
+    --scroll-thumb: #D4C3A3;
+    --scroll-thumb-hover: #B48327;
+}
+
+:root.dark {
+    color-scheme: dark;
+
+    --parchment-50: 28 24 19;
+    --parchment-100: 36 31 25;
+    --parchment-200: 46 40 32;
+    --parchment-300: 70 60 47;
+    --parchment-800: 217 207 184;
+    --parchment-900: 238 231 214;
+    --burgundy-700: 224 145 122;
+    --burgundy-800: 232 168 146;
+    --burgundy-900: 240 190 170;
+    --gold-600: 212 166 74;
+    --gold-700: 224 184 96;
+    --greek-50: 26 36 48;
+    --greek-700: 127 178 224;
+    --greek-800: 166 203 238;
+
+    --body-bg: #14110D;
+    --body-fg: #E8E0CF;
+    --body-dot: #2A241C;
+    --folio-bg: #1C1813;
+    --folio-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.55), 0 0 1px 1px rgba(212, 166, 74, 0.22);
+    --greek-term-fg: #A6CBEE;
+    --greek-term-border: #7FB2E0;
+    --greek-term-hover: #1F3045;
+    --father-fg: #E8A892;
+    --father-hover: #E0B860;
+    --verse-num: #D4A64A;
+    --scroll-track: #14110D;
+    --scroll-thumb: #4A4132;
+    --scroll-thumb-hover: #D4A64A;
+}
+
+/* Bestehende Klassen auf Variablen umstellen (überschreibt die festen Werte der Seite) */
+body {
+    background-color: var(--body-bg);
+    color: var(--body-fg);
+    background-image: radial-gradient(var(--body-dot) 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+.folio-page { background-color: var(--folio-bg); box-shadow: var(--folio-shadow); }
+.greek-term { border-bottom-color: var(--greek-term-border); color: var(--greek-term-fg); }
+.greek-term:hover { background-color: var(--greek-term-hover); }
+.father-link { color: var(--father-fg); border-bottom-color: var(--father-fg); }
+.father-link:hover { color: var(--father-hover); border-bottom-color: var(--father-hover); }
+.verse-num { color: var(--verse-num); }
+::-webkit-scrollbar-track { background: var(--scroll-track); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+
+/* Overrides für feste Tailwind-Standardfarben */
+.dark ::selection { background: rgba(212, 166, 74, 0.35); color: #fff; }
+
+.dark .bg-burgundy-800 { background-color: #7C2D12; color: #fff; }
+.dark .hover\:bg-burgundy-900:hover { background-color: #933818; }
+
+.dark .text-stone-400 { color: #8F8575; }
+.dark .text-stone-500 { color: #A39A89; }
+.dark .text-stone-600 { color: #B8AF9D; }
+.dark .text-stone-700 { color: #CFC7B5; }
+.dark .text-stone-800 { color: #E3DCCB; }
+.dark .hover\:text-stone-900:hover { color: #FFFFFF; }
+
+.dark .text-sky-900 { color: #9CC6EE; }
+.dark .text-amber-900,
+.dark .text-amber-800 { color: #E6BF78; }
+.dark .text-red-950 { color: #F0B8A8; }
+.dark .border-sky-800\/30 { border-color: rgba(127, 178, 224, 0.4); }
+.dark .border-amber-800\/30 { border-color: rgba(224, 184, 96, 0.4); }
+.dark .border-red-900\/30 { border-color: rgba(232, 168, 146, 0.4); }
+.dark .border-amber-700\/60 { border-color: rgba(224, 184, 96, 0.6); }
+.dark .border-sky-800\/60 { border-color: rgba(127, 178, 224, 0.6); }
+
+.dark .bg-white { background-color: #1A1611; }
+.dark .hover\:bg-sky-50:hover { background-color: #1B2733; }
+.dark .hover\:bg-amber-50:hover { background-color: #2A2214; }
+.dark textarea::placeholder { color: #8F8575; }
+
+/* Schwebender Umschalt-Button (wird von theme.js eingefügt) */
+#theme-toggle-float {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 40;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    cursor: pointer;
+    background-color: rgb(var(--parchment-50));
+    color: rgb(var(--gold-700));
+    border: 1px solid rgb(var(--parchment-300));
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    transition: background-color 0.2s ease;
+}
+#theme-toggle-float:hover { background-color: rgb(var(--parchment-200)); }
+#theme-toggle-float svg { width: 1.2rem; height: 1.2rem; }
+#theme-toggle-float .icon-sun { display: none; }
+.dark #theme-toggle-float .icon-sun { display: block; }
+.dark #theme-toggle-float .icon-moon { display: none; }
+
+@media print {
+    #theme-toggle-float { display: none !important; }
+    body { background: white; color: #262018; background-image: none; }
+    .folio-page { box-shadow: none; }
+}
+
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-amber-200/60">
+    <!-- Schmale Kopfleiste: Titel + Ebenen-Schalter -->
+    <header class="sticky top-0 z-30 bg-parchment-100/95 backdrop-blur-md border-b border-parchment-300 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
+            <h1 class="font-display text-lg sm:text-xl font-bold text-parchment-900 tracking-tight">
+                Matthäus Kapitel 3
+            </h1>
+            <div class="flex flex-wrap items-center gap-1.5 text-xs font-sans">
+                <button onclick="toggleFilter('greek')" id="filter-greek" class="filter-chip active px-2.5 py-1 rounded-full border border-sky-800/30 bg-sky-900/10 text-sky-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-sky-700"></span> Griechisch
+                </button>
+                <button onclick="toggleFilter('history')" id="filter-history" class="filter-chip active px-2.5 py-1 rounded-full border border-amber-800/30 bg-amber-900/10 text-amber-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-amber-700"></span> Historie
+                </button>
+                <button onclick="toggleFilter('fathers')" id="filter-fathers" class="filter-chip active px-2.5 py-1 rounded-full border border-red-900/30 bg-red-900/10 text-red-950 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-burgundy-800"></span> Kirchenväter
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Haupt-Container (Buchseite / Folio) -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+
+        <!-- Obere Kapitel-Navigation direkt über dem Einführungskasten -->
+        <nav aria-label="Obere Kapitel-Navigation" class="mb-6 pb-4 border-b border-parchment-300 flex items-center justify-between no-print">
+            <a href="matthaeus-2.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kapitel 2</a>
+            <a href="index.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Übersicht</a>
+            <a href="matthaeus-4.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 4 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+        
+        <!-- Einführungskasten -->
+        <div class="folio-page rounded-xl p-5 sm:p-7 mb-8 border border-parchment-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-parchment-200 pb-4 mb-4">
+                <div>
+                    <span class="text-xs font-sans uppercase tracking-widest text-gold-700 font-semibold">Auftakt des öffentlichen Wirkens · Mt 3,1–17</span>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-parchment-900 mt-0.5">
+                        Die Stimme in der Wüste Judäas und die Offenbarung des Sohnes am Jordan
+                    </h2>
+                </div>
+                <div class="text-xs font-sans text-stone-600 bg-parchment-100 px-3.5 py-2 rounded-lg border border-parchment-300">
+                    <strong class="text-parchment-900">Tipp:</strong> Klicke auf <span class="greek-term">blaue Begriffe</span> für den griechischen Urtext oder auf <span class="father-link">Ausleger-Namen</span> für Kommentare.
+                </div>
+            </div>
+            <p class="font-serif text-base sm:text-lg text-stone-700 leading-relaxed">
+                Nach rund dreißig Jahren der Stille in Nazaret bricht das prophetische Wort Gottes mit elementarer Wucht in die Geschichte ein: Nicht in den Marmorhallen des Herodes-Tempels, sondern in der kargen Wüste Judäas tritt Johannes auf – gekleidet wie der wiederkehrende Prophet Elia. Er ruft Israel zu einer einmaligen Bußtaufe im Jordan, durch den das Volk einst unter Josua das Verheißene Land betreten hatte. Doch der Höhepunkt des Kapitels erschüttert selbst den Täufer: Der sündlose Messias stellt sich mitten in die Reihe der Sünder, um <em>„alle Gerechtigkeit zu erfüllen“</em> – und der Himmel reißt auf.
+            </p>
+        </div>
+
+        <!-- Dynamisch gerenderte Bibelabschnitte -->
+        <div id="study-container" class="space-y-10">
+            <!-- Inhalte werden über JavaScript aufgebaut -->
+        </div>
+
+        <!-- Kapitel-Navigation am Ende -->
+        <nav aria-label="Kapitel-Navigation" class="mt-12 pt-6 border-t border-parchment-300 flex items-center justify-between no-print">
+            <a href="matthaeus-2.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kapitel 2</a>
+            <a href="index.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Übersicht</a>
+            <a href="matthaeus-4.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 4 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12 border-t border-parchment-300 text-center text-xs font-sans text-stone-600">
+        <p class="font-serif italic text-sm text-parchment-800 mb-1">
+            „Dieser ist mein geliebter Sohn, an dem ich Wohlgefallen gefunden habe.“ (Matthäus 3,17)
+        </p>
+        <p>Interaktive Studienbibel · Griechischer Grundtext (Nestle-Aland), historische Realienkunde &amp; Patristik (3.–5. Jh. n. Chr.).</p>
+    </footer>
+
+    <!-- Modal / Detail-Karte -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/60 backdrop-blur-xs p-4" onclick="closeModalOnBackdrop(event)">
+        <div class="bg-parchment-50 border border-parchment-300 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden transform transition-all">
+            <div id="modal-header" class="px-6 py-4 bg-parchment-100 border-b border-parchment-300 flex items-center justify-between">
+                <span id="modal-badge" class="text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded"></span>
+                <button onclick="closeModal()" class="text-stone-500 hover:text-stone-900 p-1 rounded-lg hover:bg-parchment-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 font-serif text-parchment-900 space-y-4 max-h-[75vh] overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // GRIECHISCHES LEXIKON (MATTHÄUS 24)
+        // ==========================================
+        const greekLexicon = {
+            eremos: {
+                greek: "ἔρημος τῆς Ἰουδαίας",
+                translit: "erēmos tēs Ioudaias",
+                literal: "Wüste / Einöde Judäas",
+                meaning: "Die Wüste Judäas ist keine sandige Dünenwüste, sondern ein schroffes, zerklüftetes Kalkstein- und Kreidegebirge zwischen Jerusalem (ca. 750 m über dem Meer) und dem Toten Meer (ca. 400 m unter dem Meeresspiegel). In der biblischen Erinnerung ist die Wüste (hebr. midbar – von der Wurzel d-b-r ‚reden‘!) der Ort, an dem Israel einst ohne Ablenkung Gottes Stimme hörte und die Tora empfing (Hosea 2,16).",
+                theology: "Gott beginnt seinen Neuanfang nicht im Zentrum religiöser Macht, sondern draußen in der Stille, wo der Mensch nichts mehr hat, worauf er sich stützen kann."
+            },
+            metanoeite: {
+                greek: "μετανοεῖτε",
+                translit: "metanoeite (Imperativ Präsens)",
+                literal: "Denkt radikal um! / Ändert euren Sinn! (von meta = um/nach + nous = Sinn/Verstand)",
+                meaning: "Im Deutschen klingt ‚Tut Buße‘ oft nach bloßer Selbstbestrafung oder einem kurzen schlechten Gewissen. Das griechische metanoeō (entsprechend dem hebräischen schuv = ‚umkehren auf dem Weg‘) meint jedoch eine tiefgreifende 180-Grad-Wende des gesamten Denkens, Wertens und Handelns. Der Imperativ Präsens drückt eine dauerhafte Lebenshaltung aus.",
+                theology: "Umkehr ist keine Vorleistung, mit der wir Gottes Reich erst verdienen müssten – sie ist die einzige angemessene Antwort darauf, dass dieses Reich bereits ‚nahe herbeigekommen ist‘ (ēngiken)."
+            },
+            basileiaOuranon: {
+                greek: "ἡ βασιλεία τῶν οὐρανῶν",
+                translit: "hē basileia tōn ouranōn",
+                literal: "die Königsherrschaft der Himmel",
+                meaning: "Dieser Ausdruck begegnet im Neuen Testament fast ausschließlich bei Matthäus (32-mal!), während Markus und Lukas ‚Reich Gottes‘ schreiben. Warum? Aus tiefer jüdischer Ehrfurcht vor dem heiligen Gottesnamen (JHWH) vermieden fromme Juden im 1. Jahrhundert das direkte Aussprechen des Wortes ‚Gott‘ und sagten stattdessen ‚der Himmel‘ (vgl. auch den verlorenen Sohn in Lk 15,18: ‚Ich habe gesündigt gegen den Himmel‘). Basileia bezeichnet dabei weniger ein abgegrenztes Territorium als vielmehr Gottes aktive Königsherrschaft.",
+                theology: "Wenn Gott seine Königsherrschaft aufrichtet, werden ungerechte Mächte entthront und gebrochene Menschen aufgerichtet."
+            },
+            akrides: {
+                greek: "ἀκρίδες καὶ μέλι ἄγριον",
+                translit: "akrides kai meli agrion",
+                literal: "Heuschrecken und wilder Honig",
+                meaning: "Kein exotischer Spleen, sondern streng koschere Wüstennahrung nach der Tora! In 3. Mose (Levitikus) 11,22 erlaubt das Gesetz ausdrücklich vier Arten von Wanderheuschrecken zum Verzehr (sie wurden geröstet oder getrocknet gegessen und waren in der Antike eine verbreitete Eiweißquelle armer Wüstenbewohner). Wilder Honig (entweder von wilden Bienen in Felsspalten oder der süße Saft der Johannisbrotschote) lieferte die nötige Energie.",
+                theology: "Johannes lebt radikal unabhängig von den Wirtschaftskreisläufen des korrupten Königshofs in Jerusalem – ein lebendiger Protest gegen Luxus und Kompromiss."
+            },
+            gennemataEchidnon: {
+                greek: "γεννήματα ἐχιδνῶν",
+                translit: "gennēmata echidnōn",
+                literal: "Brut / Nachkommenschaft von Giftschlangen (Vipern)",
+                meaning: "Wenn in der Steppe am Jordan ein Buschfeuer ausbrach, flohen die giftigen Sandvipern (echidnai) panisch aus dem trockenen Gestrüpp vor den Flammen. Johannes sieht in den führenden religiösen Gruppen – den gesetzestreuen Pharisäern und den aristokratischen Tempelpriestern der Sadduzäer – genau dieses Bild: Sie kommen zur Taufe wie Schlangen, die vor dem brennenden Zorn Gottes davonhuschen wollen, ohne ihr giftiges Herz zu ändern!",
+                theology: "Religiöse Zugehörigkeit oder ein frommes Ritual ohne echte Herzensänderung schützt nicht vor Gottes Gericht."
+            },
+            ptyon: {
+                greek: "τὸ πτύον",
+                translit: "to ptyon",
+                literal: "die Worfschaufel / Wurfschaufel",
+                meaning: "Ein Einblick in die palästinensische Landwirtschaft: Nach dem Dreschen auf dem hochgelegenen, windigen Dreschplatz (halōn) warf der Bauer das Gemisch aus Getreidekörnern, zerkleinertem Stroh und Staub mit der hölzernen Worfschaufel (ptyon) hoch in den Abendwind. Die schweren, wertvollen Weizenkörner fielen senkrecht zu Boden, während die leichte Spreu (achyron) vom Wind weggeweht und anschließend im Ofen verbrannt wurde.",
+                theology: "Der Messias kommt nicht als sanfter Dekorateur bestehender Zustände, sondern mit dem reinigenden Wind des Heiligen Geistes und dem läuternden Feuer der Wahrheit."
+            },
+            diekolyen: {
+                greek: "διεκώλυεν αὐτόν",
+                translit: "diekōlyen auton",
+                literal: "er suchte ihn energisch abzuhalten / wehrte ihm wiederholt",
+                meaning: "Das griechische Imperfekt (diekōlyen, verstärkt durch die Vorsilbe dia-) zeigt einen anhaltenden, respektvollen Widerstand: Johannes versuchte immer wieder, Jesus von diesem Schritt abzuhalten. Aus seiner Sicht verkehrte sich hier die gesamte geistliche Ordnung: Der Knecht soll den Herrn taufen, der Sünder den Sündlosen!",
+                theology: "Gerade in diesem Widerstand wird das Geheimnis der Menschwerdung sichtbar: Jesus beansprucht keine Sonderbehandlung als Sündloser, sondern stellt sich ganz auf die Seite der Schuldigen."
+            },
+            plerosaiDikaiosynen: {
+                greek: "πληρῶσαι πᾶσαν δικαιοσύνην",
+                translit: "plērōsai pasan dikaiosynēn",
+                literal: "alle Gerechtigkeit erfüllen / vollmachen",
+                meaning: "Dies sind die allerersten Worte, die Jesus als Erwachsener im Matthäusevangelium spricht! Dikaiosynē ist ein Schlüsselwort bei Matthäus (7-mal): Es meint das volle Entsprechen gegenüber dem Heilswillen Gottes. Indem Jesus in das Taufwasser hinabsteigt, in das Tausende ihre Sünden bekannt haben, übernimmt er stellvertretend die Last seines Volkes.",
+                theology: "Die Taufe Jesu im Jordan ist bereits eine Vorschattung seines Kreuzes: Er taucht in unsere Schuld und unseren Tod ein, damit wir in sein Leben hineingetauft werden."
+            },
+            eneochthesan: {
+                greek: "ἠνεῴχθησαν οἱ οὐρανοί",
+                translit: "ēneōchthēsan hoi ouranoi",
+                literal: "die Himmel wurden aufgetan / aufgerissen",
+                meaning: "Nach jüdischer Überzeugung war der Himmel seit dem Verstummen der letzten alttestamentlichen Propheten (Maleachi) gleichsam ‚verschlossen‘ – Gott sprach nicht mehr direkt zu Israel. Über Jahrhunderte beteten fromme Juden mit den Worten des Propheten Jesaja: ‚Ach, dass du den Himmel zerrissest und herabführest!‘ (Jesaja 63,19). Genau dieses Gebet wird im Moment der Taufe Jesu erhört.",
+                theology: "In Jesus Christus ist die Mauer zwischen Himmel und Erde endgültig durchbrochen."
+            },
+            peristera: {
+                greek: "ὡσεὶ περιστεράν",
+                translit: "hōsei peristeran",
+                literal: "wie eine Taube",
+                meaning: "Die Taube weckt im biblischen Gedächtnis sofort zwei Schöpfungsbilder: (1) In Genesis 1,2 ‚schwebte‘ (hebr. merachefet – ein Wort für das Brüten/Flattern eines Vogels!) der Geist Gottes über den Urwassern der Schöpfung; (2) nach der Sintflut kehrte die Taube Noahs mit einem frischen Ölzweig als Zeichen des neuen Friedens zwischen Gott und Erde zurück (Genesis 8,11).",
+                theology: "Wie über den Wassern der ersten Schöpfung schwebt der Heilige Geist nun über den Wassern des Jordans – die Neuschöpfung der Welt hat begonnen."
+            }
+        };
+
+        // ==========================================
+        // KIRCHENVÄTER & AUSLEGER
+        // ==========================================
+        const churchFathers = {
+            chrysostomus: {
+                name: "Johannes Chrysostomus",
+                dates: "ca. 349 – 407 n. Chr.",
+                role: "Erzbischof von Konstantinopel · ‚Goldmund‘",
+                bio: "Einer der bedeutendsten Prediger der Alten Kirche. Seine Homilien zum Matthäusevangelium (gehalten um 390 n. Chr. in Antiochia) verbinden exakte Beobachtung des griechischen Textes mit leidenschaftlicher Seelsorge.",
+                focusInMt3: "Erklärt das Geheimnis der Taufe Jesu: Jesus bedurfte keiner Reinigung, sondern stieg in den Jordan hinab, um die Wasser durch seine Berührung zu heiligen und das jüdische Volk von den Schatten des Gesetzes zum Evangelium zu führen."
+            },
+            hieronymus: {
+                name: "Hieronymus von Stridon",
+                dates: "ca. 347 – 420 n. Chr.",
+                role: "Bibelübersetzer (Vulgata) · Gelehrter in Bethlehem",
+                bio: "Lebte über dreißig Jahre in Bethlehem, beherrschte Hebräisch, Griechisch und Latein und kannte die Wüste Judäas sowie den Jordan aus eigener Anschauung.",
+                focusInMt3: "Beleuchtet den hebräischen Hintergrund der Gerichtspredigt Johannes’ (das Wortspiel zwischen ‚Söhnen‘ und ‚Steinen‘) und verweist auf die dreifache Bedeutung der Taufe mit Geist und Feuer."
+            },
+            augustinus: {
+                name: "Augustinus von Hippo",
+                dates: "354 – 430 n. Chr.",
+                role: "Bischof von Hippo Regius (Nordafrika) · Kirchenlehrer",
+                bio: "Der prägendste Denker der lateinischen Christenheit. In seinen Predigten und Schriften über die Taufe (De baptismo) legt er Matthäus 3 tief sakramental und ekklesiologisch aus.",
+                focusInMt3: "Betont die Demut des Täufers als Vorbild für jeden Diener der Kirche: Johannes weist von sich selbst weg auf Christus (‚Ich bin nicht wert, ihm die Sandalen zu tragen‘) und lehrt, dass nicht der menschliche Spender, sondern Christus selbst im Heiligen Geist tauft."
+            },
+            hilarius: {
+                name: "Hilarius von Poitiers",
+                dates: "ca. 315 – 367 n. Chr.",
+                role: "Bischof von Poitiers · ‚Athanasius des Westens‘",
+                bio: "Verfasste den ältesten vollständig erhaltenen lateinischen Kommentar zum Matthäusevangelium (um 353–355 n. Chr.) und verteidigte die volle Gottheit Christi in den trinitarischen Auseinandersetzungen.",
+                focusInMt3: "Sieht in der Taufe Jesu ein Urbild unseres eigenen Heils: Was an Christus im Jordan geschah – das Zerreißen des Himmels, das Herabkommen des Geistes und die Vaterschaftserklärung Gottes –, wird durch die Taufe jedem Glaubenden geschenkt."
+            },
+            gregorNazianz: {
+                name: "Gregor von Nazianz",
+                dates: "ca. 329 – 390 n. Chr.",
+                role: "Erzbischof von Konstantinopel · ‚Der Theologe‘ (Kappadokischer Vater)",
+                bio: "Einer der drei großen kappadokischen Kirchenväter, berühmt für seine sprachgewaltigen Festreden auf Epiphanias (das Fest der Taufe Jesu im Osten).",
+                focusInMt3: "Feiert Matthäus 3,16–17 als das leuchtende Fest der Erscheinung der Heiligen Dreifaltigkeit: Der Vater bezeugt mit seiner Stimme, der Sohn empfängt die Taufe im Fleisch, und der Heilige Geist schwebt in Gestalt einer Taube herab."
+            }
+        };
+
+        // ==========================================
+        // INHALT: MATTHÄUS 24
+        // ==========================================
+        const studySections = [
+            {
+                id: "perikope-1",
+                sectionTitle: "I. Die Stimme in der Wüste Judäas und die Umkehrtaufe",
+                sectionRange: "Matthäus 3,1–6",
+                sectionIntro: "Nach vierhundert Jahren ohne anerkannten Propheten in Israel tritt Johannes in der Wüste auf – schon seine Kleidung und Nahrung sind eine stumme Predigt.",
+                blocks: [
+                    {
+                        verses: "1–3",
+                        bibleText: `<span class="verse-num">1</span>In jenen Tagen aber kommt Johannes der Täufer und predigt in der <span class="greek-term" onclick="openGreek('eremos')">Wüste von Judäa</span> <span class="verse-num">2</span>und spricht: <span class="greek-term" onclick="openGreek('metanoeite')">Tut Buße</span>, denn das <span class="greek-term" onclick="openGreek('basileiaOuranon')">Reich der Himmel</span> ist nahe herbeigekommen! <span class="verse-num">3</span>Denn dieser ist es, von dem durch den Propheten Jesaja geredet ist, der spricht: „Stimme eines Rufenden in der Wüste: Bereitet den Weg des Herrn, macht seine Pfade gerade!“`,
+                        commentary: {
+                            history: `<em><strong>Königsstraßen in der Antike:</strong> Wenn im Alten Orient ein Großkönig eine Provinz besuchte, schickte er Pioniere voraus, die Schlaglöcher füllten, Steine wegräumten und gewundene Pfadstrecken begradigten. Genau dieses Bild aus Jesaja 40,3 (ursprünglich die Heimkehr Israels aus dem babylonischen Exil) wendet Johannes auf die Herzen der Menschen an: Nicht Steine auf der Straße sollen weggeräumt werden, sondern Hochmut, Heuchelei und Ungerechtigkeit vor der Ankunft des wahren Königs.</em>`,
+                            greek: `<em>Zwei Schlüsselbegriffe prägen die Botschaft des Täufers: <span class="greek-term" onclick="openGreek('metanoeite')">metanoeite</span> („Denkt radikal um / kehrt mit eurem ganzen Sinn um!“) und <span class="greek-term" onclick="openGreek('basileiaOuranon')">basileia tōn ouranōn</span> („Reich der Himmel“ – die typisch jüdische Ehrfurchtsumschreibung bei Matthäus, um den heiligen Gottesnamen nicht direkt auszusprechen).</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> bemerkt zur Ortswahl in der <span class="greek-term" onclick="openGreek('eremos')">Wüste Judäas</span>: „Johannes predigt nicht in Jerusalem, wo die Herrschaft der Pharisäer und die Sorgen des Marktes die Herzen betäuben, sondern in der Wüste – fern vom Lärm der Stadt, wo die Seele leichter zu sich selbst und zu Gott zurückfindet.“</em>`
+                        }
+                    },
+                    {
+                        verses: "4–6",
+                        bibleText: `<span class="verse-num">4</span>Er aber, Johannes, hatte sein Gewand von Kamelhaaren und einen ledernen Gürtel um seine Lenden; seine Speise aber waren <span class="greek-term" onclick="openGreek('akrides')">Heuschrecken und wilder Honig</span>. <span class="verse-num">5</span>Da zog zu ihm hinaus Jerusalem und ganz Judäa und die ganze Umgegend des Jordan, <span class="verse-num">6</span>und sie wurden im Jordanfluss von ihm getauft, indem sie ihre Sünden bekannten.`,
+                        commentary: {
+                            history: `<em><strong>1. Das Elia-Kostüm (2. Könige 1,8):</strong> Im Alten Testament wird der Prophet Elia exakt so beschrieben: „Ein Mann in einem haarigen Mantel mit einem ledernen Gürtel um seine Hüften.“ Weil der Prophet Maleachi (Mal 3,23) angekündigt hatte, dass Elia unmittelbar vor dem großen Tag des Herrn wiederkehren werde, verstand jeder Jude sofort ohne ein einziges Wort: Mit Johannes bricht die Endzeit an!<br>
+                            <strong>2. Jüdische Mikwe vs. Johannestaufe:</strong> Fromme Juden (besonders die Gemeinschaft von Qumran direkt am Nordwestufer des Toten Meeres) vollzogen <em>täglich</em> rituelle Selbstwaschungen (<em>Tauchbäder / Mikwaot</em>) zur kultischen Reinheit. Johannes’ Taufe aber war revolutionär: Sie wurde <strong>einmalig</strong> an einem anderen Menschen vollzogen, verbunden mit einem offenen <strong>Sündenbekenntnis</strong>, und fand ausgerechnet im <strong>Jordan</strong> statt – jenem Fluss, durch den Israel einst unter Josua nach der Wüstenwanderung neu in das Verheißene Land einzog!</em>`,
+                            greek: `<em>Die Nahrung aus <span class="greek-term" onclick="openGreek('akrides')">akrides kai meli agrion</span> (Heuschrecken und wildem Honig) entsprach streng den Speisegeboten der Tora (3. Mose 11,22) und unterstrich seine kompromisslose Askese. Das Verb <em>exomologoumenoi</em> („indem sie offen ihre Sünden bekannten“) zeigt, dass das Wasser ohne innere Wahrhaftigkeit wirkungslos blieb.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('chrysostomus')">Johannes Chrysostomus</span> vergleicht die äußere Erscheinung des Täufers mit der Weichlichkeit seiner Zeitgenossen: „Sein Gewand war aus Kamelhaar, damit schon sein Anblick die Herzen erschütterte und zur Nüchternheit rief – ein lebendes Abbild der alten Propheten.“</em>`
+                        }
+                    }
+                ]
+            },
+            {
+                id: "perikope-2",
+                sectionTitle: "II. Gerichtsrede gegen falsche Sicherheit und Ankündigung des Stärkeren",
+                sectionRange: "Matthäus 3,7–12",
+                sectionIntro: "Als die religiösen Eliten am Jordan erscheinen, weigert sich Johannes, ihre Frömmigkeit als Freifahrtschein anzuerkennen – und verweist auf den, der mit Geist und Feuer tauft.",
+                blocks: [
+                    {
+                        verses: "7–10",
+                        bibleText: `<span class="verse-num">7</span>Als er aber viele der Pharisäer und Sadduzäer zu seiner Taufe kommen sah, sprach er zu ihnen: <span class="greek-term" onclick="openGreek('gennemataEchidnon')">Otterngezücht</span>! Wer hat euch gewiesen, dem kommenden Zorn zu entfliehen? <span class="verse-num">8</span>Bringt nun der Buße würdige Frucht! <span class="verse-num">9</span>Und denkt nicht, bei euch selbst zu sagen: Wir haben Abraham zum Vater. Denn ich sage euch, dass Gott dem Abraham aus diesen Steinen Kinder zu erwecken vermag. <span class="verse-num">10</span>Schon ist aber die Axt an die Wurzel der Bäume gelegt; jeder Baum nun, der nicht gute Frucht bringt, wird abgehauen und ins Feuer geworfen.`,
+                        commentary: {
+                            history: `<em><strong>1. Pharisäer und Sadduzäer vereint:</strong> Normalerweise waren diese beiden Gruppen erbitterte Gegner (die Pharisäer als volksnahe Schriftgelehrte glaubten an Auferstehung und Engel; die Sadduzäer als aristokratische Tempelpriester lehnten beides ab). Dass beide gemeinsam am Jordan auftauchen, zeigt, wie sehr Johannes’ Bewegung ganz Judäa bewegte.<br>
+                            <strong>2. Das hebräisch-aramäische Wortspiel in V. 9:</strong> Im Griechischen geht ein brillantes Sprachspiel verloren, das jeder Zuhörer im Original sofort hörte: „Kinder/Söhne“ heißt auf Hebräisch/Aramäisch <strong>banim (בָּנִים)</strong> und „Steine“ heißt <strong>abanim (אֲבָנִים)</strong>! Zugleich erinnerte das Bild an Jesaja 51,1–2, wo Israel aufgefordert wird, auf den „Felsen“ zu blicken, aus dem es gehauen wurde (Abraham und Sara).</em>`,
+                            greek: `<em>Mit <span class="greek-term" onclick="openGreek('gennemataEchidnon')">gennēmata echidnōn</span> („Brut von Vipern“) entlarvt Johannes den Versuch, ein religiöses Ritual als bloße Versicherungspolice vor dem Gericht zu benutzen, ohne die „Frucht“ (<em>karpos</em> – im Singular für den gesamten Lebenswandel!) eines veränderten Lebens zu tragen.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('augustinus')">Augustinus</span> und <span class="father-link" onclick="openFather('hilarius')">Hilarius von Poitiers</span> sehen in den „Steinen“, aus denen Gott dem Abraham Kinder erweckt, bereits eine prophetische Vorschau auf die Heidenvölker: Völker, die zuvor leblose Götzenbilder aus Stein anbeteten und selbst ein steinernes Herz hatten, werden durch den Glauben zu wahren Kindern Abrahams (vgl. Galater 3,7).</em>`
+                        }
+                    },
+                    {
+                        verses: "11–12",
+                        bibleText: `<span class="verse-num">11</span>Ich zwar taufe euch mit Wasser zur Buße; der aber nach mir kommt, ist stärker als ich, dem ich nicht wert bin, die Sandalen zu tragen; der wird euch mit Heiligem Geist und Feuer taufen. <span class="verse-num">12</span>Seine <span class="greek-term" onclick="openGreek('ptyon')">Worfschaufel</span> ist in seiner Hand, und er wird seine Tenne gründlich reinigen und seinen Weizen in die Scheune sammeln, die Spreu aber wird er verbrennen mit unauslöschlichem Feuer.`,
+                        commentary: {
+                            history: `<em><strong>Rabbinische Regel zum Sklavendienst:</strong> In der rabbinischen Überlieferung (später im Babylonischen Talmud, <em>Ketubot</em> 96a festgehalten) hieß es: „Alle Dienste, die ein Sklave seinem Herrn leistet, leistet ein Schüler seinem Lehrer – <em>ausgenommen das Lösen und Tragen der Sandalen!</em>“ Das Abnehmen und Tragen staubiger Sandalen galt als die niedrigste Arbeit, die selbst einem jüdischen Schüler gegenüber seinem Rabbi nicht zugemutet werden durfte. Johannes sagt damit: Ich bin nicht einmal wert, dem Messias jenen niedrigsten Sklavendienst zu erweisen!</em>`,
+                            greek: `<em>Das Bild der <span class="greek-term" onclick="openGreek('ptyon')">Worfschaufel (to ptyon)</span> zeigt die Unmittelbarkeit des Handelns: Sie liegt nicht mehr in der Ecke, sondern ist bereits „in seiner Hand“ (en tē cheiri autou). Geist und Feuer stehen hier für die doppelte Wirkung des Messias: für die Umkehrwilligen die reinigende Glut des Heiligen Geistes (wie an Pfingsten, Apg 2,3), für die Verstockten das verzehrende Feuer des Gerichts.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('chrysostomus')">Johannes Chrysostomus</span> hebt die einzigartige Größe dieser Demut hervor: „Als ganz Judäa Johannes für den Messias hielt und ihm zu Füßen lag, raubte er sich keine fremde Ehre, sondern stellte sich noch unter den niedrigsten Diener Christi.“</em>`
+                        }
+                    }
+                ]
+            },
+            {
+                id: "perikope-3",
+                sectionTitle: "III. Die Taufe Jesu im Jordan und die Stimme des Vaters",
+                sectionRange: "Matthäus 3,13–17",
+                sectionIntro: "Der dramatische Höhepunkt des Kapitels: Der Sündlose steigt hinab in das Wasser der Sünder, und Himmel, Geist und Vater bezeugen ihn feierlich.",
+                blocks: [
+                    {
+                        verses: "13–15",
+                        bibleText: `<span class="verse-num">13</span>Dann kommt Jesus aus Galiläa an den Jordan zu Johannes, um von ihm getauft zu werden. <span class="verse-num">14</span>Johannes aber <span class="greek-term" onclick="openGreek('diekolyen')">wehrte ihm</span> und sprach: Ich habe nötig, von dir getauft zu werden, und du kommst zu mir? <span class="verse-num">15</span>Jesus aber antwortete und sprach zu ihm: Lass es jetzt so sein; denn so gebührt es uns, <span class="greek-term" onclick="openGreek('plerosaiDikaiosynen')">alle Gerechtigkeit zu erfüllen</span>. Da lässt er es ihm zu.`,
+                        commentary: {
+                            history: `<em>Dieses Gespräch überliefert allein das Matthäusevangelium! In der frühen Kirche war die Taufe Jesu durch Johannes eine heikle Frage: Warum ließ sich der Sündlose einer „Taufe zur Vergebung der Sünden“ unterziehen? Matthäus beantwortet diese Frage direkt durch das erste öffentliche Wort Jesu: Es geschieht nicht aus eigener Schuld, sondern aus solidarischer Liebe, um sich ganz an die Stelle seines Volkes zu stellen.</em>`,
+                            greek: `<em>Das Imperfekt <span class="greek-term" onclick="openGreek('diekolyen')">diekōlyen</span> zeigt Johannes’ hartnäckigen, ehrfürchtigen Widerstand. Jesu Antwort – <span class="greek-term" onclick="openGreek('plerosaiDikaiosynen')">plērōsai pasan dikaiosynēn</span> („alle Gerechtigkeit zu erfüllen“) – schließt Johannes ausdrücklich mit ein („gebührt es <strong>uns</strong>“, <em>hēmin</em>): Täufer und Messias dienen gemeinsam dem Heilswillen Gottes.</em>`,
+                            fathers: `<em><span class="father-link" onclick="openFather('gregorNazianz')">Gregor von Nazianz</span> erklärt dieses Wunder der Herablassung: „Jesus steigt in das Wasser hinab und hebt die ganze Welt mit sich herauf! Nicht er bedurfte der Reinigung – er reinigte vielmehr die Wasser durch die Berührung seines reinen Leibes, damit sie künftig die Kraft hätten, uns von Sünden zu waschen.“</em>`
+                        }
+                    },
+                    {
+                        verses: "16–17",
+                        bibleText: `<span class="verse-num">16</span>Und als Jesus getauft war, stieg er sogleich aus dem Wasser herauf; und siehe, <span class="greek-term" onclick="openGreek('eneochthesan')">die Himmel wurden ihm aufgetan</span>, und er sah den Geist Gottes <span class="greek-term" onclick="openGreek('peristera')">wie eine Taube</span> herabfahren und auf ihn kommen. <span class="verse-num">17</span>Und siehe, eine Stimme aus den Himmeln sprach: Dieser ist mein geliebter Sohn, an dem ich Wohlgefallen gefunden habe.`,
+                        commentary: {
+                            history: `<em><strong>1. Die Himmelsstimme (Bat Kol) als Doppelzitat:</strong> Im rabbinischen Judentum nannte man eine göttliche Stimme aus dem Himmel <em>Bat Kol</em> („Tochter der Stimme“). Die Worte des Vaters in V. 17 verschmelzen zwei entscheidende Verheißungen des Alten Testaments zu einer einzigen Identität:<br>
+                            • <strong>„Du bist mein Sohn“</strong> (Psalm 2,7) – die Inthronisationsformel des verheißenen davidischen Messias-Königs.<br>
+                            • <strong>„An dem ich Wohlgefallen habe“</strong> (Jesaja 42,1) – die Berufung des <em>leidenden Gottesknechts</em> (Ebed JHWH), der durch Hingabe und Leiden Heil für alle Völker bringt!<br>
+                            Jesus ist also Messias-König und leidender Gottesknecht in einer Person.</em>`,
+                            greek: `<em>Beachte das doppelte „Und siehe!“ (<em>kai idou</em>) für das plötzliche Aufreißen des Himmels (<span class="greek-term" onclick="openGreek('eneochthesan')">ēneōchthēsan</span>, Echo auf Jesaja 63,19) und die Stimme des Vaters. Die Taube (<span class="greek-term" onclick="openGreek('peristera')">peristera</span>) ruft die Neuschöpfung über den Urwassern (1. Mose 1,2) und das Friedenszeichen Noahs (1. Mose 8,11) wach.</em>`,
+                            fathers: `<em>Für alle Kirchenväter – besonders <span class="father-link" onclick="openFather('hilarius')">Hilarius von Poitiers</span>, <span class="father-link" onclick="openFather('gregorNazianz')">Gregor von Nazianz</span> und <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> – ist diese Szene am Jordan die erste große Offenbarung der <strong>Heiligen Dreifaltigkeit</strong> im Neuen Testament: Der <strong>Vater</strong> spricht aus dem Himmel, der <strong>Sohn</strong> steigt im Jordan aus dem Wasser, und der <strong>Heilige Geist</strong> ruht sichtbar wie eine Taube auf ihm (weshalb das Fest der Taufe Jesu in den Ostkirchen bis heute <em>Theophanie</em> – „Gotteserscheinung“ – heißt).</em>`
+                        }
+                    }
+                ]
+            }
+        ];
+
+        // ==========================================
+        // ZUSTAND & STEUERUNG
+        // ==========================================
+        let activeFilters = { greek: true, history: true, fathers: true };
+        const CHAPTER = 3;
+        const NOTES_KEY = 'mt' + CHAPTER + '_notes';
+        let userNotes = {};
+        try { userNotes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}'); } catch (e) {}
+
+        function renderStudy() {
+            const container = document.getElementById('study-container');
+            container.innerHTML = '';
+
+            studySections.forEach(section => {
+                const sectionEl = document.createElement('section');
+                sectionEl.id = section.id;
+                sectionEl.className = 'folio-page rounded-2xl border border-parchment-300 overflow-hidden scroll-mt-16';
+
+                let html = `
+                    <div class="bg-parchment-100/90 px-5 sm:px-8 py-5 border-b border-parchment-300">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <h3 class="font-display text-2xl sm:text-3xl font-bold text-burgundy-900">
+                                ${section.sectionTitle}
+                            </h3>
+                            <span class="font-sans text-xs font-semibold tracking-wider uppercase px-2.5 py-1 rounded bg-parchment-200 text-parchment-900 border border-parchment-300">
+                                ${section.sectionRange}
+                            </span>
+                        </div>
+                        <p class="font-serif italic text-stone-700 text-base mt-1.5">
+                            ${section.sectionIntro}
+                        </p>
+                    </div>
+                    <div class="divide-y divide-parchment-200">
+                `;
+
+                section.blocks.forEach((block, idx) => {
+                    const blockKey = `${section.id}-${idx}`;
+                    const savedNote = userNotes[blockKey] || '';
+
+                    let commentaryParts = [];
+                    if (activeFilters.history && block.commentary.history) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-amber-700/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-amber-800 block mb-0.5">Historischer & Jüdischer Kontext</span>
+                                <div class="text-stone-800">${block.commentary.history}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.greek && block.commentary.greek) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-sky-800/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-sky-900 block mb-0.5">Griechischer Urtext & Wortbedeutung</span>
+                                <div class="text-stone-800">${block.commentary.greek}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.fathers && block.commentary.fathers) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-burgundy-800/70">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-800 block mb-0.5">Kirchenväter & Alte Ausleger</span>
+                                <div class="text-stone-800">${block.commentary.fathers}</div>
+                            </div>
+                        `);
+                    }
+
+                    const commentaryHtml = commentaryParts.length > 0
+                        ? `<div class="space-y-3.5 font-serif italic text-[15.5px] sm:text-base leading-relaxed">${commentaryParts.join('')}</div>`
+                        : `<div class="font-sans text-xs text-stone-400 italic">Alle Kommentar-Ebenen sind ausgeblendet.</div>`;
+
+                    html += `
+                        <div class="p-5 sm:p-8 bg-parchment-50 max-w-4xl mx-auto">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-700">
+                                    Matthäus ${CHAPTER},${block.verses}
+                                </span>
+                                <button onclick="toggleNoteBox('${blockKey}')" class="text-xs font-sans text-stone-400 hover:text-burgundy-800 flex items-center gap-1 transition no-print">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                </button>
+                            </div>
+                            <p class="font-serif text-xl sm:text-[21px] leading-[1.8] text-parchment-900 mb-5">
+                                ${block.bibleText}
+                            </p>
+                            <div class="bg-parchment-100/80 rounded-xl p-4 sm:p-5 border border-parchment-300/80">
+                                ${commentaryHtml}
+                            </div>
+                            ${renderNoteArea(blockKey, savedNote)}
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                sectionEl.innerHTML = html;
+                container.appendChild(sectionEl);
+            });
+        }
+
+        function renderNoteArea(blockKey, savedNote) {
+            const isHidden = savedNote ? '' : 'hidden';
+            return `
+                <div id="note-box-${blockKey}" class="${isHidden} mt-4 pt-3 border-t border-parchment-200 no-print">
+                    <label class="block font-sans text-[11px] font-medium text-stone-500 mb-1">Eigene Studiennotiz:</label>
+                    <textarea 
+                        onchange="saveNote('${blockKey}', this.value)"
+                        onkeyup="saveNote('${blockKey}', this.value)"
+                        rows="2" 
+                        placeholder="Deine Gedanken..."
+                        class="w-full rounded-lg bg-white border border-parchment-300 p-2 text-xs font-sans text-parchment-900 focus:outline-none focus:border-gold-600"
+                    >${savedNote}</textarea>
+                </div>
+            `;
+        }
+
+        function toggleNoteBox(blockKey) {
+            const box = document.getElementById(`note-box-${blockKey}`);
+            if (box) {
+                box.classList.toggle('hidden');
+                if (!box.classList.contains('hidden')) box.querySelector('textarea').focus();
+            }
+        }
+
+        function saveNote(blockKey, text) {
+            if (text.trim() === '') delete userNotes[blockKey];
+            else userNotes[blockKey] = text;
+            try { localStorage.setItem(NOTES_KEY, JSON.stringify(userNotes)); } catch (e) {}
+        }
+
+        function toggleFilter(type) {
+            activeFilters[type] = !activeFilters[type];
+            const btn = document.getElementById(`filter-${type}`);
+            if (activeFilters[type]) btn.classList.remove('opacity-45', 'line-through');
+            else btn.classList.add('opacity-45', 'line-through');
+            renderStudy();
+        }
+
+        function openGreek(key) {
+            const item = greekLexicon[key];
+            if (!item) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Griechisches Original';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-sky-900/10 text-sky-900 border border-sky-800/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <div class="text-3xl font-serif font-bold text-greek-800">${item.greek}</div>
+                    <div class="text-sm font-sans text-stone-500 mt-0.5">Umschrift: <span class="italic font-medium text-stone-700">${item.translit}</span> · Wörtlich: <span class="font-medium text-stone-700">${item.literal}</span></div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${item.meaning}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Theologische Tiefe</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${item.theology}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        // Schwerpunkt-Text: Feld heißt je Kapitel anders (focusInMtN)
+        function fatherFocus(f) {
+            const k = Object.keys(f).find(x => x === 'focus' || x.startsWith('focusIn'));
+            return k ? f[k] : '';
+        }
+
+        function openFather(key) {
+            const father = churchFathers[key];
+            if (!father) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Ausleger / Patristik';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-red-900/10 text-burgundy-900 border border-red-900/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <h3 class="text-2xl font-display font-bold text-burgundy-900">${father.name}</h3>
+                    <div class="text-xs font-sans text-stone-600 mt-0.5">${father.dates} · ${father.role}</div>
+                    ${father.classificationNote ? `<p class="text-xs font-sans text-burgundy-800 mt-1.5 font-medium">${father.classificationNote}</p>` : ''}
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Biografie & Einordnung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${father.bio}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-gold-700 mb-1">Schwerpunkt in Mt ${CHAPTER}</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${fatherFocus(father)}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openGlossaryModal() {
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Lexikon & Kirchenväter';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-amber-900/10 text-amber-900 border border-amber-800/30';
+            
+            let greekList = Object.entries(greekLexicon).map(([k, v]) => `
+                <button onclick="openGreek('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-sky-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-serif font-bold text-greek-800 text-base">${v.greek}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${v.translit}</span>
+                </button>
+            `).join('');
+
+            let fathersList = Object.entries(churchFathers).map(([k, f]) => `
+                <button onclick="openFather('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-amber-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-display font-bold text-burgundy-900 text-base">${f.name}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${f.dates} · ${f.role}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('modal-body').innerHTML = `
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-sky-900 mb-2">Griechische Begriffe</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${greekList}</div>
+                </div>
+                <div class="pt-3 border-t border-parchment-200">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Kirchenväter & Ausleger</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${fathersList}</div>
+                </div>
+            `;
+            showModal();
+        }
+
+        function showModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeModalOnBackdrop(e) {
+            if (e.target.id === 'detail-modal') closeModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderStudy);
+    </script>
+</body>
+</html>
