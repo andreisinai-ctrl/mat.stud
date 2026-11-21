@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matthäus 23 – Interaktive Studienausgabe (Griechisch, Historie & Auslegung)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+/* ===== Gemeinsames Theme-Skript für alle Kapitel ===== */
+/* Einbinden direkt NACH dem Tailwind-CDN-Skript im <head>. Ersetzt den alten tailwind.config-Block. */
+
+(function () {
+    // 1) Theme sofort setzen (vor dem ersten Rendern, kein Aufblitzen)
+    try {
+        var t = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (t === 'dark' || (!t && prefersDark)) document.documentElement.classList.add('dark');
+    } catch (e) {}
+
+    // 2) Tailwind-Konfiguration: Farben laufen über CSS-Variablen aus theme.css
+    if (window.tailwind) {
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif']
+                    },
+                    colors: {
+                        parchment: {
+                            50: 'rgb(var(--parchment-50) / <alpha-value>)',
+                            100: 'rgb(var(--parchment-100) / <alpha-value>)',
+                            200: 'rgb(var(--parchment-200) / <alpha-value>)',
+                            300: 'rgb(var(--parchment-300) / <alpha-value>)',
+                            800: 'rgb(var(--parchment-800) / <alpha-value>)',
+                            900: 'rgb(var(--parchment-900) / <alpha-value>)'
+                        },
+                        burgundy: {
+                            700: 'rgb(var(--burgundy-700) / <alpha-value>)',
+                            800: 'rgb(var(--burgundy-800) / <alpha-value>)',
+                            900: 'rgb(var(--burgundy-900) / <alpha-value>)'
+                        },
+                        gold: {
+                            600: 'rgb(var(--gold-600) / <alpha-value>)',
+                            700: 'rgb(var(--gold-700) / <alpha-value>)'
+                        },
+                        greek: {
+                            50: 'rgb(var(--greek-50) / <alpha-value>)',
+                            700: 'rgb(var(--greek-700) / <alpha-value>)',
+                            800: 'rgb(var(--greek-800) / <alpha-value>)'
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    // 3) Umschalten
+    function isDark() {
+        return document.documentElement.classList.contains('dark');
+    }
+    function applyTheme(dark) {
+        document.documentElement.classList.toggle('dark', dark);
+        var btn = document.getElementById('theme-toggle-float');
+        if (btn) btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    }
+    window.toggleTheme = function () {
+        var next = !isDark();
+        applyTheme(next);
+        try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch (e) {}
+    };
+
+    // 4) Systemeinstellung live verfolgen, solange keine manuelle Wahl gespeichert ist
+    if (window.matchMedia) {
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        var onChange = function (e) {
+            var stored = null;
+            try { stored = localStorage.getItem('theme'); } catch (err) {}
+            if (!stored) applyTheme(e.matches);
+        };
+        if (mq.addEventListener) mq.addEventListener('change', onChange);
+        else if (mq.addListener) mq.addListener(onChange);
+    }
+
+    // 5) Schwebenden Umschalt-Button einfügen
+    document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.createElement('button');
+        btn.id = 'theme-toggle-float';
+        btn.type = 'button';
+        btn.className = 'no-print';
+        btn.title = 'Hell/Dunkel umschalten';
+        btn.setAttribute('aria-label', 'Dunkelmodus umschalten');
+        btn.setAttribute('aria-pressed', isDark() ? 'true' : 'false');
+        btn.onclick = window.toggleTheme;
+        btn.innerHTML =
+            '<svg class="icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>' +
+            '<svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>';
+        document.body.appendChild(btn);
+    });
+})();
+
+    </script>
+    <style>
+        body {
+            background-color: #F7F3E8;
+            color: #262018;
+            background-image: radial-gradient(#DFD2B5 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+
+        .folio-page {
+            background-color: #FCFBF7;
+            box-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+        }
+
+        .greek-term {
+            border-bottom: 1.5px dotted #1E4E79;
+            color: #15395B;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .greek-term:hover {
+            background-color: #E2ECF5;
+            border-bottom-style: solid;
+        }
+
+        .father-link {
+            color: #7C2D12;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px dashed #7C2D12;
+            transition: color 0.15s ease;
+        }
+        .father-link:hover {
+            color: #B48327;
+            border-bottom-color: #B48327;
+        }
+
+        .verse-num {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #8F6519;
+            vertical-align: super;
+            margin-right: 2px;
+            user-select: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F3E8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C3A3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B48327;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .folio-page { box-shadow: none; }
+        }
+    </style>
+    <style>
+/* ===== Gemeinsamer Dark Mode für alle Kapitel ===== */
+/* Einbinden NACH dem <style>-Block der Seite, damit diese Regeln die alten Farbwerte überschreiben. */
+
+:root {
+    --parchment-50: 252 251 247;
+    --parchment-100: 247 243 232;
+    --parchment-200: 239 231 212;
+    --parchment-300: 223 210 181;
+    --parchment-800: 61 53 41;
+    --parchment-900: 38 32 24;
+    --burgundy-700: 124 45 18;
+    --burgundy-800: 101 34 20;
+    --burgundy-900: 74 22 13;
+    --gold-600: 180 131 39;
+    --gold-700: 143 101 25;
+    --greek-50: 240 245 249;
+    --greek-700: 30 78 121;
+    --greek-800: 21 57 91;
+
+    --body-bg: #F7F3E8;
+    --body-fg: #262018;
+    --body-dot: #DFD2B5;
+    --folio-bg: #FCFBF7;
+    --folio-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+    --greek-term-fg: #15395B;
+    --greek-term-border: #1E4E79;
+    --greek-term-hover: #E2ECF5;
+    --father-fg: #7C2D12;
+    --father-hover: #B48327;
+    --verse-num: #8F6519;
+    --scroll-track: #F7F3E8;
+    --scroll-thumb: #D4C3A3;
+    --scroll-thumb-hover: #B48327;
+}
+
+:root.dark {
+    color-scheme: dark;
+
+    --parchment-50: 28 24 19;
+    --parchment-100: 36 31 25;
+    --parchment-200: 46 40 32;
+    --parchment-300: 70 60 47;
+    --parchment-800: 217 207 184;
+    --parchment-900: 238 231 214;
+    --burgundy-700: 224 145 122;
+    --burgundy-800: 232 168 146;
+    --burgundy-900: 240 190 170;
+    --gold-600: 212 166 74;
+    --gold-700: 224 184 96;
+    --greek-50: 26 36 48;
+    --greek-700: 127 178 224;
+    --greek-800: 166 203 238;
+
+    --body-bg: #14110D;
+    --body-fg: #E8E0CF;
+    --body-dot: #2A241C;
+    --folio-bg: #1C1813;
+    --folio-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.55), 0 0 1px 1px rgba(212, 166, 74, 0.22);
+    --greek-term-fg: #A6CBEE;
+    --greek-term-border: #7FB2E0;
+    --greek-term-hover: #1F3045;
+    --father-fg: #E8A892;
+    --father-hover: #E0B860;
+    --verse-num: #D4A64A;
+    --scroll-track: #14110D;
+    --scroll-thumb: #4A4132;
+    --scroll-thumb-hover: #D4A64A;
+}
+
+/* Bestehende Klassen auf Variablen umstellen (überschreibt die festen Werte der Seite) */
+body {
+    background-color: var(--body-bg);
+    color: var(--body-fg);
+    background-image: radial-gradient(var(--body-dot) 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+.folio-page { background-color: var(--folio-bg); box-shadow: var(--folio-shadow); }
+.greek-term { border-bottom-color: var(--greek-term-border); color: var(--greek-term-fg); }
+.greek-term:hover { background-color: var(--greek-term-hover); }
+.father-link { color: var(--father-fg); border-bottom-color: var(--father-fg); }
+.father-link:hover { color: var(--father-hover); border-bottom-color: var(--father-hover); }
+.verse-num { color: var(--verse-num); }
+::-webkit-scrollbar-track { background: var(--scroll-track); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+
+/* Overrides für feste Tailwind-Standardfarben */
+.dark ::selection { background: rgba(212, 166, 74, 0.35); color: #fff; }
+
+.dark .bg-burgundy-800 { background-color: #7C2D12; color: #fff; }
+.dark .hover\:bg-burgundy-900:hover { background-color: #933818; }
+
+.dark .text-stone-400 { color: #8F8575; }
+.dark .text-stone-500 { color: #A39A89; }
+.dark .text-stone-600 { color: #B8AF9D; }
+.dark .text-stone-700 { color: #CFC7B5; }
+.dark .text-stone-800 { color: #E3DCCB; }
+.dark .hover\:text-stone-900:hover { color: #FFFFFF; }
+
+.dark .text-sky-900 { color: #9CC6EE; }
+.dark .text-amber-900,
+.dark .text-amber-800 { color: #E6BF78; }
+.dark .text-red-950 { color: #F0B8A8; }
+.dark .border-sky-800\/30 { border-color: rgba(127, 178, 224, 0.4); }
+.dark .border-amber-800\/30 { border-color: rgba(224, 184, 96, 0.4); }
+.dark .border-red-900\/30 { border-color: rgba(232, 168, 146, 0.4); }
+.dark .border-amber-700\/60 { border-color: rgba(224, 184, 96, 0.6); }
+.dark .border-sky-800\/60 { border-color: rgba(127, 178, 224, 0.6); }
+
+.dark .bg-white { background-color: #1A1611; }
+.dark .hover\:bg-sky-50:hover { background-color: #1B2733; }
+.dark .hover\:bg-amber-50:hover { background-color: #2A2214; }
+.dark textarea::placeholder { color: #8F8575; }
+
+/* Schwebender Umschalt-Button (wird von theme.js eingefügt) */
+#theme-toggle-float {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 40;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    cursor: pointer;
+    background-color: rgb(var(--parchment-50));
+    color: rgb(var(--gold-700));
+    border: 1px solid rgb(var(--parchment-300));
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    transition: background-color 0.2s ease;
+}
+#theme-toggle-float:hover { background-color: rgb(var(--parchment-200)); }
+#theme-toggle-float svg { width: 1.2rem; height: 1.2rem; }
+#theme-toggle-float .icon-sun { display: none; }
+.dark #theme-toggle-float .icon-sun { display: block; }
+.dark #theme-toggle-float .icon-moon { display: none; }
+
+@media print {
+    #theme-toggle-float { display: none !important; }
+    body { background: white; color: #262018; background-image: none; }
+    .folio-page { box-shadow: none; }
+}
+
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-amber-200/60">
+    <!-- Schmale Kopfleiste: Titel + Ebenen-Schalter -->
+    <header class="sticky top-0 z-30 bg-parchment-100/95 backdrop-blur-md border-b border-parchment-300 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
+            <h1 class="font-display text-lg sm:text-xl font-bold text-parchment-900 tracking-tight">
+                Matthäus Kapitel 23
+            </h1>
+            <div class="flex flex-wrap items-center gap-1.5 text-xs font-sans">
+                <button onclick="toggleFilter('greek')" id="filter-greek" class="filter-chip active px-2.5 py-1 rounded-full border border-sky-800/30 bg-sky-900/10 text-sky-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-sky-700"></span> Griechisch
+                </button>
+                <button onclick="toggleFilter('history')" id="filter-history" class="filter-chip active px-2.5 py-1 rounded-full border border-amber-800/30 bg-amber-900/10 text-amber-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-amber-700"></span> Historie
+                </button>
+                <button onclick="toggleFilter('fathers')" id="filter-fathers" class="filter-chip active px-2.5 py-1 rounded-full border border-red-900/30 bg-red-900/10 text-red-950 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-burgundy-800"></span> Kirchenväter
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Haupt-Container (Buchseite / Folio) -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+
+        <!-- Obere Kapitel-Navigation direkt über dem Einführungskasten -->
+        <nav aria-label="Obere Kapitel-Navigation" class="mb-6 pb-4 border-b border-parchment-300 flex items-center justify-between no-print">
+            <a href="matthaeus-22.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kapitel 22</a>
+            <a href="matthaeus-23.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Kapitel 23</a>
+            <a href="matthaeus-24.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 24 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+        
+        <!-- Einführungskasten -->
+        <div class="folio-page rounded-xl p-5 sm:p-7 mb-8 border border-parchment-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-parchment-200 pb-4 mb-4">
+                <div>
+                    <span class="text-xs font-sans uppercase tracking-widest text-gold-700 font-semibold">Die Weherufe (Mt 23)</span>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-parchment-900 mt-0.5">
+                        Gegen Heuchelei: Warnung, sieben Wehe und Klage über Jerusalem
+                    </h2>
+                </div>
+                <div class="text-xs font-sans text-stone-600 bg-parchment-100 px-3.5 py-2 rounded-lg border border-parchment-300">
+                    <strong class="text-parchment-900">Tipp:</strong> Klicke auf <span class="greek-term">blaue Begriffe</span> für den griechischen Urtext oder auf <span class="father-link">Ausleger-Namen</span> für Kommentare.
+                </div>
+            </div>
+            <p class="font-serif text-base sm:text-lg text-stone-700 leading-relaxed">
+                Im Tempel hält Jesus seine letzte öffentliche Rede an die Volksmengen und die Jünger. Er warnt vor dem Anspruch der Schriftgelehrten und Pharisäer, die lehren, aber nicht tun, und spricht danach über sie in scharfen Weherufen. Das Kapitel endet mit der Klage über Jerusalem und leitet zur Rede über die Endzeit (Mt 24) über.
+            </p>
+        </div>
+
+        <!-- Dynamisch gerenderte Bibelabschnitte -->
+        <div id="study-container" class="space-y-10">
+            <!-- Inhalte werden über JavaScript aufgebaut -->
+        </div>
+
+        <!-- Kapitel-Navigation am Ende -->
+        <nav aria-label="Kapitel-Navigation" class="mt-12 pt-6 border-t border-parchment-300 flex items-center justify-between no-print">
+            <a href="matthaeus-22.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kapitel 22</a>
+            <a href="matthaeus-23.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Kapitel 23</a>
+            <a href="matthaeus-24.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 24 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12 border-t border-parchment-300 text-center text-xs font-sans text-stone-600">
+        <p class="font-serif italic text-sm text-parchment-800 mb-1">
+            „Wer sich selbst erhöhen wird, wird erniedrigt werden, und wer sich selbst erniedrigen wird, wird erhöht werden.“ (Matthäus 23,12)
+        </p>
+        <p>Interaktive Studienbibel · Griechischer Grundtext (Nestle-Aland), historische Realienkunde &amp; Patristik. (Hinweis: Origenes gehört streng genommen nicht zu den Kirchenvätern.)</p>
+    </footer>
+
+    <!-- Modal / Detail-Karte -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/60 backdrop-blur-xs p-4" onclick="closeModalOnBackdrop(event)">
+        <div class="bg-parchment-50 border border-parchment-300 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden transform transition-all">
+            <div id="modal-header" class="px-6 py-4 bg-parchment-100 border-b border-parchment-300 flex items-center justify-between">
+                <span id="modal-badge" class="text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded"></span>
+                <button onclick="closeModal()" class="text-stone-500 hover:text-stone-900 p-1 rounded-lg hover:bg-parchment-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 font-serif text-parchment-900 space-y-4 max-h-[75vh] overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // GRIECHISCHES LEXIKON (MATTHÄUS 23)
+        // ==========================================
+        const greekLexicon = {
+  kathedra: { greek: `καθέδρα Μωϋσέως`, translit: `kathedra Mōÿséōs`, literal: `Stuhl des Mose`,
+    meaning: `Der „Stuhl des Mose“ war der Ehrenplatz in der Synagoge, von dem aus die Schrift ausgelegt wurde. In Synagogen sind steinerne Lehrstühle gefunden worden (z. B. in Chorazin).`,
+    theology: `Die Schriftgelehrten sitzen auf dem Platz des Mose und haben deshalb Autorität. Jesus unterscheidet ihr Lehren vom Tun und trennt so Amt und Lebenswandel.` },
+  phylakteria: { greek: `φυλακτήρια`, translit: `phylaktēria`, literal: `Gebetsriemen, Schutzkapseln`,
+    meaning: `Kleine Lederkapseln mit Schriftabschnitten (Ex 13; Dtn 6; 11), die beim Gebet an Stirn und Arm getragen wurden (hebr. <em>tefillin</em>). Das griechische Wort bedeutet „Schutzmittel“.`,
+    theology: `Die Zeichen sind nach Dtn 6,8 geboten. Kritisiert wird nicht das Tragen, sondern das Zurschaustellen.` },
+  hypokrites: { greek: `ὑποκριτής`, translit: `hypokritēs`, literal: `Heuchler, Schauspieler`,
+    meaning: `Ursprünglich der Schauspieler, der unter einer Maske spricht. Im Evangelium steht das Wort für Menschen, deren Frömmigkeit nur Rolle ist (6,2.5.16).`,
+    theology: `Heuchelei ist die Lücke zwischen Auftritt und Wirklichkeit. Jesus kritisiert sie als Abkehr von dem, was Gott im Herzen sieht.` },
+  proselytos: { greek: `προσήλυτος`, translit: `prosēlytos`, literal: `Proselyt, Hinzugekommener`,
+    meaning: `Ein Heide, der sich dem jüdischen Glauben angeschlossen hatte, in der Regel mit Beschneidung. Das Wort stammt aus der griechischen Übersetzung der Tora, wo es den „Fremdling“ meint.`,
+    theology: `Der Eifer für die Mission wird nicht getadelt, wohl aber das Ergebnis: Der Gewonnene wird nicht zu Gott, sondern zur Nachahmung falscher Haltung geführt.` },
+  koniao: { greek: `κεκονιαμένοις`, translit: `kekoniamenois`, literal: `getüncht, weiß gekalkt`,
+    meaning: `Von <em>konia</em> („Kalk, Staub“). Gräber wurden vor dem Passafest weiß getüncht, damit niemand sie unbemerkt berührte und unrein wurde (vgl. Mischna Schekalim 1,1).`,
+    theology: `Das Bild zeigt den Schein der Reinheit über dem Innern der Verwesung. Äußere Gerechtigkeit ersetzt nicht die Hingabe des Herzens.` },
+  episynago: { greek: `ἐπισυναγαγεῖν`, translit: `episynagagein`, literal: `versammeln`,
+    meaning: `Das Verb beschreibt das Zusammenholen, hier mit dem Bild der Henne, die ihre Küken unter die Flügel nimmt (vgl. Ps 17,8; 36,8; 91,4).`,
+    theology: `Das Wort drückt das Werben Gottes um sein Volk aus. Der Satz „ihr habt nicht gewollt“ zeigt, dass die Verweigerung nicht aus Mangel an Zuwendung entsteht.` }
+};
+
+        // ==========================================
+        // KIRCHENVÄTER & AUSLEGER
+        // ==========================================
+        const churchFathers = {
+  chrysostomus: { name: `Johannes Chrysostomus`, dates: `ca. 349–407`, role: `Bischof von Konstantinopel, Prediger`,
+    bio: `Der „Goldmund“ predigte Vers für Vers durch das Matthäusevangelium. Seine Homilien verbinden genaue Textarbeit mit seelsorgerlicher Mahnung.`,
+    focusInMt23: `In seinen Predigten zu Mt 23 betont er, dass Jesus nicht das Amt, sondern die Eitelkeit angreift. Die Lehre dürfe befolgt werden, auch wenn das Leben des Lehrers ihr widerspricht.` },
+  augustinus: { name: `Augustinus von Hippo`, dates: `354–430`, role: `Bischof und Kirchenlehrer`,
+    bio: `Der einflussreichste lateinische Kirchenvater. Er predigte ausführlich über das Zusammenleben in der Kirche.`,
+    focusInMt23: `Er zitiert den „Stuhl des Mose“ oft als Beleg dafür, dass die Wahrheit der Lehre nicht vom Leben des Lehrers abhängt. Wer auf Christus hört, höre auch durch einen unwürdigen Boten.` },
+  hieronymus: { name: `Hieronymus`, dates: `ca. 347–420`, role: `Gelehrter, Bibelübersetzer (Vulgata)`,
+    bio: `Hieronymus verfasste um 398 einen Kommentar zu Matthäus und verband Sprachkenntnis mit der Auslegungstradition.`,
+    focusInMt23: `Zu V. 35 erwähnt er mehrere Deutungen, wer „Secharja“ sei, und hält fest, wie schwer sich die Gestalt zuordnen lässt. Die Stelle zeigt für ihn, dass Gott das vergossene Blut der Gerechten nicht vergisst.` },
+  origenes: { name: `Origenes`, dates: `ca. 185–253`, role: `Alexandrinischer Gelehrter und Ausleger`,
+    classificationNote: `Hinweis: streng genommen kein Kirchenvater, da seine Lehre teils verurteilt wurde.`,
+    bio: `Origenes begründete die wissenschaftliche Bibelauslegung und die allegorische Deutung. Sein Matthäus-Kommentar ist nur teilweise erhalten.`,
+    focusInMt23: `Er sieht in den Weherufen eine Mahnung an alle, die lehren: Auch in der Kirche gebe es die Gefahr, geistliche Ämter zu Ehre und Besitz zu missbrauchen.` }
+};
+
+        // ==========================================
+        // INHALT: MATTHÄUS 23
+        // ==========================================
+        const studySections = [
+{
+  id: `warnung`, sectionTitle: `Warnung vor Heuchelei und Titelsucht`, sectionRange: `Mt 23,1–12`,
+  sectionIntro: `Jesus erkennt die Stellung der Lehrer an, warnt aber vor ihrem Vorbild und ruft seine Jünger zur Demut.`,
+  blocks: [
+  { verses: `1–7`,
+    bibleText: `<span class="verse-num">1</span>Dann redete Jesus zu den Volksmengen und zu seinen Jüngern <span class="verse-num">2</span>und sprach: Auf dem <span class="greek-term" onclick="openGreek('kathedra')">Stuhl des Mose</span> haben sich die Schriftgelehrten und die Pharisäer gesetzt. <span class="verse-num">3</span>Alles nun, was sie euch sagen, das tut und haltet; nach ihren Werken aber tut nicht, denn sie sagen es und tun es nicht. <span class="verse-num">4</span>Sie binden schwere Lasten zusammen und legen sie auf die Schultern der Menschen, sie selbst aber wollen sie nicht mit ihrem Finger bewegen. <span class="verse-num">5</span>Alle ihre Werke aber tun sie, um von den Menschen gesehen zu werden; denn sie machen ihre <span class="greek-term" onclick="openGreek('phylakteria')">Gebetsriemen</span> breit und die Quasten ihrer Gewänder groß, <span class="verse-num">6</span>und sie lieben den ersten Platz bei den Gastmählern und die ersten Sitze in den Synagogen <span class="verse-num">7</span>und die Begrüßungen auf den Märkten und von den Menschen Rabbi genannt zu werden.`,
+    commentary: {
+      history: `Die Schriftgelehrten legten die Tora aus, die Pharisäer waren eine Laienbewegung, die Reinheit und Gesetzestreue im Alltag betonte. Quasten (<em>zizit</em>) an den Gewandecken waren nach Num 15,38–39 geboten; breite Riemen und lange Quasten machten die Frömmigkeit sichtbar. Wer bei Gastmählern die Ehrenplätze einnahm, zeigte seinen Rang.`,
+      greek: `Die Verben „tut und haltet“ (<em>poiēsate kai tēreite</em>) stehen im Plural und sind an die Hörer gerichtet. „Binden“ (<em>desmeuousin</em>) meint das Schnüren von Bündeln; das Bild kehrt in 11,28–30 als Gegenbild wieder (Jesu „leichtes Joch“).`,
+      fathers: `<span class="father-link" onclick="openFather('augustinus')">Augustinus</span> nennt den Stuhl des Mose ein Zeichen dafür, dass Gutes auch durch schlechte Lehrer gesagt wird. <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> sieht im Streben nach Ehre die Wurzel aller Heuchelei.` } },
+  { verses: `8–12`,
+    bibleText: `<span class="verse-num">8</span>Ihr aber, lasst euch nicht Rabbi nennen; denn einer ist euer Lehrer, ihr alle aber seid Brüder. <span class="verse-num">9</span>Und nennt niemanden auf der Erde euren Vater; denn einer ist euer Vater, der im Himmel. <span class="verse-num">10</span>Lasst euch auch nicht Anführer nennen; denn einer ist euer Anführer, der Christus. <span class="verse-num">11</span>Der Größte unter euch soll euer Diener sein. <span class="verse-num">12</span>Wer sich aber selbst erhöhen wird, wird erniedrigt werden, und wer sich selbst erniedrigen wird, wird erhöht werden.`,
+    commentary: {
+      history: `„Rabbi“ bedeutet „mein Großer“ und war eine Ehrenanrede für Lehrer. „Vater“ war eine Ehrenbezeichnung für verehrte Lehrer und Vorfahren (vgl. „die Väter“). Jesus wendet sich gegen Titel, die den Platz Gottes besetzen. In der Gemeinde sind alle Geschwister.`,
+      greek: `Der Wechsel zu „ihr aber“ (<em>hymeis de</em>) schließt die Jünger gegen das Vorbild der Gegner ab. V. 11 wiederholt 20,26. Das Wort „Anführer“ (<em>kathēgētēs</em>) kommt nur hier vor und meint den Wegbereiter oder Lehrer.`,
+      fathers: `<span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> versteht das Verbot als Warnung vor Eitelkeit, nicht als Verbot von Ämtern. <span class="father-link" onclick="openFather('origenes')">Origenes</span> bezieht die Aussage auf die Einzigkeit Christi als Lehrer.` } }
+  ]
+},
+{
+  id: `wehe`, sectionTitle: `Die sieben Weherufe`, sectionRange: `Mt 23,13–36`,
+  sectionIntro: `In sieben Weherufen deckt Jesus die Verfehlungen der Schriftgelehrten und Pharisäer auf: Verschließen des Reiches, falsche Eide, Vernachlässigung des Wichtigen, äußere Reinheit, Gräber der Propheten.`,
+  blocks: [
+  { verses: `13–15`,
+    bibleText: `<span class="verse-num">13</span>Wehe aber euch, Schriftgelehrte und Pharisäer, <span class="greek-term" onclick="openGreek('hypokrites')">Heuchler</span>! Denn ihr verschließt das Reich der Himmel vor den Menschen; ihr geht nicht hinein, und die Hineingehenden lasst ihr nicht hineingehen. <span class="verse-num">14</span>[Wehe euch, Schriftgelehrte und Pharisäer, Heuchler! Denn ihr fresst die Häuser der Witwen und verrichtet zum Schein lange Gebete; darum werdet ihr ein schwereres Urteil empfangen.] <span class="verse-num">15</span>Wehe euch, Schriftgelehrte und Pharisäer, Heuchler! Denn ihr durchzieht das Meer und das trockene Land, um einen einzigen <span class="greek-term" onclick="openGreek('proselytos')">Proselyten</span> zu machen; und wenn er es geworden ist, macht ihr ihn zu einem doppelt so schlimmen Sohn der Gehenna, wie ihr es seid.`,
+    commentary: {
+      history: `„Wehe“ ist die Gerichtsform der Propheten (Jes 5,8–23; Hab 2,6–19). Jesus spricht keine Verfluchung, sondern eine Klage mit Warnung aus. Zur Zeit Jesu gab es eine rege Werbung unter Heiden für das Judentum; Proselyten waren in manchen Städten zahlreich. „Sohn der Gehenna“ ist ein semitischer Ausdruck für den, der dem Gericht verfallen ist.`,
+      greek: `V. 14 fehlt in den ältesten Handschriften (ℵ, B, D, L u. a.) und stammt vermutlich aus Mk 12,40 und Lk 20,47. Deshalb steht er hier in Klammern. <span class="greek-term" onclick="openGreek('hypokrites')">ὑποκριτής</span> bezeichnet ursprünglich den Schauspieler.`,
+      fathers: `<span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> sieht das Verschließen des Reiches in der Lehre, die andere von der Wahrheit abhält. <span class="father-link" onclick="openFather('origenes')">Origenes</span> bezieht es auch auf Lehrer in der Kirche, die den Zugang zur Erkenntnis behindern.` } },
+  { verses: `16–22`,
+    bibleText: `<span class="verse-num">16</span>Wehe euch, ihr blinden Führer, die ihr sagt: Wer beim Tempel schwört, das gilt nichts; wer aber beim Gold des Tempels schwört, der ist gebunden. <span class="verse-num">17</span>Ihr Narren und Blinden! Was ist denn größer: das Gold oder der Tempel, der das Gold heiligt? <span class="verse-num">18</span>Und: Wer beim Altar schwört, das gilt nichts; wer aber bei der Gabe schwört, die darauf liegt, der ist gebunden. <span class="verse-num">19</span>Ihr Blinden! Was ist denn größer: die Gabe oder der Altar, der die Gabe heiligt? <span class="verse-num">20</span>Wer nun beim Altar schwört, schwört bei ihm und bei allem, was darauf ist; <span class="verse-num">21</span>und wer beim Tempel schwört, schwört bei ihm und bei dem, der darin wohnt; <span class="verse-num">22</span>und wer beim Himmel schwört, schwört beim Thron Gottes und bei dem, der darauf sitzt.`,
+    commentary: {
+      history: `Zur Zeit Jesu gab es Streit darüber, welche Schwurformeln bindend waren. Wer „beim Tempel“ schwor, konnte sich nach manchen Lehrern lösen, wer beim Tempelgold schwor, nicht. Jesus zeigt, dass jede Formel am Ende auf Gott verweist. In der Bergpredigt hat er das Schwören ganz abgelehnt (5,33–37).`,
+      greek: `„Blind“ (<em>typhloi</em>) und „Narren“ (<em>mōroi</em>) sind prophetische Anreden. Der Schluss zieht die Schwurformeln auf Gott zurück: „bei ihm und bei dem, der darin wohnt“. Das Verb „heiligt“ (<em>hagiazei</em>) legt die Rangfolge fest: Das Heiligende ist größer als das Geheiligte.`,
+      fathers: `<span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> verweist auf die Torheit, das Geschaffene über den Schöpfer zu stellen. <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> sieht im Schwören um des Geldes willen eine Verkehrung der Ordnung.` } },
+  { verses: `23–24`,
+    bibleText: `<span class="verse-num">23</span>Wehe euch, Schriftgelehrte und Pharisäer, Heuchler! Denn ihr verzehntet Minze und Dill und Kümmel und lasst das Gewichtigere des Gesetzes beiseite: das Recht und die Barmherzigkeit und die Treue. Dies hätte man tun und jenes nicht lassen sollen. <span class="verse-num">24</span>Blinde Führer, die ihr die Mücke aussiebt, das Kamel aber verschluckt!`,
+    commentary: {
+      history: `Der Zehnte wurde nach Lev 27,30 und Dtn 14,22 von Feldfrüchten gegeben. Dass die Pharisäer auch Küchenkräuter verzehnteten, zeigt ihre Sorgfalt, die Jesus nicht tadelt. Er tadelt, dass die Gewichte falsch verteilt werden. Recht, Barmherzigkeit und Treue erinnern an Mi 6,8 und Hos 6,6. Beim Mücken-Seihen ging es darum, keine unreinen Insekten im Wein zu trinken.`,
+      greek: `Die Wörter „Mücke“ (<em>kōnōps</em>) und „Kamel“ (<em>kamēlos</em>) werden oft als Wiedergabe eines aramäischen Wortspiels gelesen (<em>galma</em> und <em>gamla</em>), das im Griechischen nicht mehr hörbar ist. „Dies hätte man tun“ bestätigt ausdrücklich, dass das Gebot des Zehnten gilt.`,
+      fathers: `<span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> sieht in Recht, Barmherzigkeit und Treue den Kern, an dem sich alle Einzelgebote messen. <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> mahnt, das Kleine nicht zu verachten, aber das Große nicht zu vergessen.` } },
+  { verses: `25–28`,
+    bibleText: `<span class="verse-num">25</span>Wehe euch, Schriftgelehrte und Pharisäer, Heuchler! Denn ihr reinigt das Äußere des Bechers und der Schüssel, innen aber sind sie voll von Raub und Maßlosigkeit. <span class="verse-num">26</span>Blinder Pharisäer, reinige zuerst das Innere des Bechers, damit auch sein Äußeres rein werde! <span class="verse-num">27</span>Wehe euch, Schriftgelehrte und Pharisäer, Heuchler! Denn ihr gleicht <span class="greek-term" onclick="openGreek('koniao')">übertünchten</span> Gräbern, die von außen schön erscheinen, innen aber voll sind von Totengebeinen und aller Unreinheit. <span class="verse-num">28</span>So erscheint auch ihr von außen den Menschen zwar gerecht, innen aber seid ihr voll von Heuchelei und Gesetzlosigkeit.`,
+    commentary: {
+      history: `Die Reinheitsregeln für Gefäße (Lev 11,32–35; 15,12) wurden von den Pharisäern sorgfältig beachtet. Jesus rückt die Reihenfolge zurecht: Zuerst das Innere. Gräber wurden vor dem Passafest weiß markiert, damit Pilger sie nicht aus Versehen berührten; wer ein Grab berührte, war sieben Tage unrein (Num 19,16).`,
+      greek: `Die Bilder gehören zusammen: Becher und Schüssel (Haushalt) und Gräber (Tod). „Raub und Maßlosigkeit“ (<em>harpagēs kai akrasias</em>) benennt Habgier und Mangel an Selbstbeherrschung. „Gesetzlosigkeit“ (<em>anomia</em>) steht auch in 7,23 und 24,12.`,
+      fathers: `<span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> sagt, die Sorge um das Innere habe Vorrang vor dem Äußeren. <span class="father-link" onclick="openFather('origenes')">Origenes</span> bezieht das Bild des Grabes auf eine Seele, die äußerlich fromm, innerlich aber tot ist.` } },
+  { verses: `29–36`,
+    bibleText: `<span class="verse-num">29</span>Wehe euch, Schriftgelehrte und Pharisäer, Heuchler! Denn ihr baut die Gräber der Propheten und schmückt die Denkmäler der Gerechten <span class="verse-num">30</span>und sagt: Wenn wir in den Tagen unserer Väter gelebt hätten, wären wir nicht ihre Mitschuldigen am Blut der Propheten gewesen. <span class="verse-num">31</span>So bezeugt ihr euch selbst, dass ihr Söhne derer seid, die die Propheten ermordet haben. <span class="verse-num">32</span>So macht auch ihr das Maß eurer Väter voll! <span class="verse-num">33</span>Schlangen, Otternbrut! Wie solltet ihr dem Gericht der Gehenna entfliehen? <span class="verse-num">34</span>Darum, siehe, ich sende zu euch Propheten und Weise und Schriftgelehrte; manche von ihnen werdet ihr töten und kreuzigen, und manche von ihnen werdet ihr in euren Synagogen geißeln und von Stadt zu Stadt verfolgen, <span class="verse-num">35</span>damit über euch komme alles gerechte Blut, das auf Erden vergossen wurde, vom Blut Abels, des Gerechten, bis zum Blut des Secharja, des Sohnes Berechjas, den ihr zwischen dem Heiligtum und dem Altar ermordet habt. <span class="verse-num">36</span>Wahrlich, ich sage euch: Dies alles wird über dieses Geschlecht kommen.`,
+    commentary: {
+      history: `Zur Zeit Jesu wurden die Grabmäler der Propheten verehrt und ausgebaut. Jesus sagt, dass gerade die Verehrung der Toten die Ablehnung der Lebenden nicht ausschließt. Abel ist der erste Ermordete in der Bibel (Gen 4), Secharja der Priester, der nach 2 Chr 24,20–22 im Vorhof des Tempels gesteinigt wurde. Die Bibel der Juden endet mit der Chronik, so umfasst die Reihe „von Abel bis Secharja“ die ganze Schrift.`,
+      greek: `Die Identität des „Sohnes Berechjas“ ist umstritten: Der Prophet Sacharja trägt diesen Vatersnamen (Sach 1,1), der ermordete Priester in 2 Chr 24 heißt Sohn des Jojada. Wie sich beide Angaben zueinander verhalten, ist offen. Das Wort „Geschlecht“ (<em>genea</em>) meint hier die Generation der Zuhörer.`,
+      fathers: `<span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> führt mehrere Deutungen auf Secharja an und lässt die Frage offen. <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> sieht in V. 34 die Sendung der Apostel und der Boten Christi, die zum Teil getötet wurden.` } }
+  ]
+},
+{
+  id: `klage`, sectionTitle: `Klage über Jerusalem`, sectionRange: `Mt 23,37–39`,
+  sectionIntro: `Nach den Weherufen wendet sich Jesus mit einer Klage an die Stadt, die die Propheten tötet. Er kündigt an, dass das Haus öde gelassen wird.`,
+  blocks: [
+  { verses: `37–39`,
+    bibleText: `<span class="verse-num">37</span>Jerusalem, Jerusalem, die du die Propheten tötest und steinigst, die zu dir gesandt sind! Wie oft habe ich deine Kinder <span class="greek-term" onclick="openGreek('episynago')">versammeln</span> wollen, wie eine Henne ihre Küken unter die Flügel versammelt, und ihr habt nicht gewollt! <span class="verse-num">38</span>Siehe, euer Haus wird euch öde gelassen. <span class="verse-num">39</span>Denn ich sage euch: Ihr werdet mich von jetzt an nicht mehr sehen, bis ihr sagt: Gepriesen sei, der da kommt im Namen des Herrn!`,
+    commentary: {
+      history: `Das Bild von den schützenden Flügeln steht für Gottes Fürsorge (Dtn 32,11; Ps 91,4). Mit „euer Haus“ ist wohl der Tempel gemeint, der im Jahr 70 n. Chr. zerstört wurde. Der Ruf „Gepriesen sei, der da kommt“ stammt aus Ps 118,26 und wurde schon beim Einzug gerufen (21,9). Jesus stellt ihn als künftigen Ruf Jerusalems in Aussicht.`,
+      greek: `Die Verdoppelung des Namens „Jerusalem, Jerusalem“ ist eine Anrede voller Klage (vgl. Lk 10,41; Apg 9,4). Der Satz „ihr habt nicht gewollt“ (<em>ouk ēthelēsate</em>) steht im Gegensatz zu „ich habe gewollt“ (<em>ēthelēsa</em>). Das Wort „öde“ (<em>erēmos</em>) erinnert an Jer 22,5.`,
+      fathers: `<span class="father-link" onclick="openFather('origenes')">Origenes</span> sieht in der Henne ein Bild der Fürsorge Christi für sein Volk. <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> betont, dass Jesus nicht kalt über die Stadt urteilt, sondern über sie klagt.` } }
+  ]
+}
+];
+
+        // ==========================================
+        // ZUSTAND & STEUERUNG
+        // ==========================================
+        let activeFilters = { greek: true, history: true, fathers: true };
+        const CHAPTER = 23;
+        const NOTES_KEY = 'mt' + CHAPTER + '_notes';
+        let userNotes = {};
+        try { userNotes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}'); } catch (e) {}
+
+        function renderStudy() {
+            const container = document.getElementById('study-container');
+            container.innerHTML = '';
+
+            studySections.forEach(section => {
+                const sectionEl = document.createElement('section');
+                sectionEl.id = section.id;
+                sectionEl.className = 'folio-page rounded-2xl border border-parchment-300 overflow-hidden scroll-mt-16';
+
+                let html = `
+                    <div class="bg-parchment-100/90 px-5 sm:px-8 py-5 border-b border-parchment-300">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <h3 class="font-display text-2xl sm:text-3xl font-bold text-burgundy-900">
+                                ${section.sectionTitle}
+                            </h3>
+                            <span class="font-sans text-xs font-semibold tracking-wider uppercase px-2.5 py-1 rounded bg-parchment-200 text-parchment-900 border border-parchment-300">
+                                ${section.sectionRange}
+                            </span>
+                        </div>
+                        <p class="font-serif italic text-stone-700 text-base mt-1.5">
+                            ${section.sectionIntro}
+                        </p>
+                    </div>
+                    <div class="divide-y divide-parchment-200">
+                `;
+
+                section.blocks.forEach((block, idx) => {
+                    const blockKey = `${section.id}-${idx}`;
+                    const savedNote = userNotes[blockKey] || '';
+
+                    let commentaryParts = [];
+                    if (activeFilters.history && block.commentary.history) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-amber-700/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-amber-800 block mb-0.5">Historischer & Jüdischer Kontext</span>
+                                <div class="text-stone-800">${block.commentary.history}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.greek && block.commentary.greek) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-sky-800/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-sky-900 block mb-0.5">Griechischer Urtext & Wortbedeutung</span>
+                                <div class="text-stone-800">${block.commentary.greek}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.fathers && block.commentary.fathers) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-burgundy-800/70">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-800 block mb-0.5">Kirchenväter & Alte Ausleger</span>
+                                <div class="text-stone-800">${block.commentary.fathers}</div>
+                            </div>
+                        `);
+                    }
+
+                    const commentaryHtml = commentaryParts.length > 0
+                        ? `<div class="space-y-3.5 font-serif italic text-[15.5px] sm:text-base leading-relaxed">${commentaryParts.join('')}</div>`
+                        : `<div class="font-sans text-xs text-stone-400 italic">Alle Kommentar-Ebenen sind ausgeblendet.</div>`;
+
+                    html += `
+                        <div class="p-5 sm:p-8 bg-parchment-50 max-w-4xl mx-auto">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-700">
+                                    Matthäus ${CHAPTER},${block.verses}
+                                </span>
+                                <button onclick="toggleNoteBox('${blockKey}')" class="text-xs font-sans text-stone-400 hover:text-burgundy-800 flex items-center gap-1 transition no-print">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                </button>
+                            </div>
+                            <p class="font-serif text-xl sm:text-[21px] leading-[1.8] text-parchment-900 mb-5">
+                                ${block.bibleText}
+                            </p>
+                            <div class="bg-parchment-100/80 rounded-xl p-4 sm:p-5 border border-parchment-300/80">
+                                ${commentaryHtml}
+                            </div>
+                            ${renderNoteArea(blockKey, savedNote)}
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                sectionEl.innerHTML = html;
+                container.appendChild(sectionEl);
+            });
+        }
+
+        function renderNoteArea(blockKey, savedNote) {
+            const isHidden = savedNote ? '' : 'hidden';
+            return `
+                <div id="note-box-${blockKey}" class="${isHidden} mt-4 pt-3 border-t border-parchment-200 no-print">
+                    <label class="block font-sans text-[11px] font-medium text-stone-500 mb-1">Eigene Studiennotiz:</label>
+                    <textarea 
+                        onchange="saveNote('${blockKey}', this.value)"
+                        onkeyup="saveNote('${blockKey}', this.value)"
+                        rows="2" 
+                        placeholder="Deine Gedanken..."
+                        class="w-full rounded-lg bg-white border border-parchment-300 p-2 text-xs font-sans text-parchment-900 focus:outline-none focus:border-gold-600"
+                    >${savedNote}</textarea>
+                </div>
+            `;
+        }
+
+        function toggleNoteBox(blockKey) {
+            const box = document.getElementById(`note-box-${blockKey}`);
+            if (box) {
+                box.classList.toggle('hidden');
+                if (!box.classList.contains('hidden')) box.querySelector('textarea').focus();
+            }
+        }
+
+        function saveNote(blockKey, text) {
+            if (text.trim() === '') delete userNotes[blockKey];
+            else userNotes[blockKey] = text;
+            try { localStorage.setItem(NOTES_KEY, JSON.stringify(userNotes)); } catch (e) {}
+        }
+
+        function toggleFilter(type) {
+            activeFilters[type] = !activeFilters[type];
+            const btn = document.getElementById(`filter-${type}`);
+            if (activeFilters[type]) btn.classList.remove('opacity-45', 'line-through');
+            else btn.classList.add('opacity-45', 'line-through');
+            renderStudy();
+        }
+
+        function openGreek(key) {
+            const item = greekLexicon[key];
+            if (!item) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Griechisches Original';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-sky-900/10 text-sky-900 border border-sky-800/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <div class="text-3xl font-serif font-bold text-greek-800">${item.greek}</div>
+                    <div class="text-sm font-sans text-stone-500 mt-0.5">Umschrift: <span class="italic font-medium text-stone-700">${item.translit}</span> · Wörtlich: <span class="font-medium text-stone-700">${item.literal}</span></div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${item.meaning}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Theologische Tiefe</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${item.theology}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        // Schwerpunkt-Text: Feld heißt je Kapitel anders (focusInMtN)
+        function fatherFocus(f) {
+            const k = Object.keys(f).find(x => x === 'focus' || x.startsWith('focusIn'));
+            return k ? f[k] : '';
+        }
+
+        function openFather(key) {
+            const father = churchFathers[key];
+            if (!father) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Ausleger / Patristik';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-red-900/10 text-burgundy-900 border border-red-900/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <h3 class="text-2xl font-display font-bold text-burgundy-900">${father.name}</h3>
+                    <div class="text-xs font-sans text-stone-600 mt-0.5">${father.dates} · ${father.role}</div>
+                    ${father.classificationNote ? `<p class="text-xs font-sans text-burgundy-800 mt-1.5 font-medium">${father.classificationNote}</p>` : ''}
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Biografie & Einordnung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${father.bio}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-gold-700 mb-1">Schwerpunkt in Mt ${CHAPTER}</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${fatherFocus(father)}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openGlossaryModal() {
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Lexikon & Kirchenväter';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-amber-900/10 text-amber-900 border border-amber-800/30';
+            
+            let greekList = Object.entries(greekLexicon).map(([k, v]) => `
+                <button onclick="openGreek('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-sky-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-serif font-bold text-greek-800 text-base">${v.greek}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${v.translit}</span>
+                </button>
+            `).join('');
+
+            let fathersList = Object.entries(churchFathers).map(([k, f]) => `
+                <button onclick="openFather('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-amber-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-display font-bold text-burgundy-900 text-base">${f.name}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${f.dates} · ${f.role}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('modal-body').innerHTML = `
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-sky-900 mb-2">Griechische Begriffe</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${greekList}</div>
+                </div>
+                <div class="pt-3 border-t border-parchment-200">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Kirchenväter & Ausleger</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${fathersList}</div>
+                </div>
+            `;
+            showModal();
+        }
+
+        function showModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeModalOnBackdrop(e) {
+            if (e.target.id === 'detail-modal') closeModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderStudy);
+    </script>
+</body>
+</html>
