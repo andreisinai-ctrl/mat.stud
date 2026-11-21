@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matthäus 13 – Interaktive Studienausgabe (Griechisch, Historie & Auslegung)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+/* ===== Gemeinsames Theme-Skript für alle Kapitel ===== */
+/* Einbinden direkt NACH dem Tailwind-CDN-Skript im <head>. Ersetzt den alten tailwind.config-Block. */
+
+(function () {
+    // 1) Theme sofort setzen (vor dem ersten Rendern, kein Aufblitzen)
+    try {
+        var t = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (t === 'dark' || (!t && prefersDark)) document.documentElement.classList.add('dark');
+    } catch (e) {}
+
+    // 2) Tailwind-Konfiguration: Farben laufen über CSS-Variablen aus theme.css
+    if (window.tailwind) {
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif']
+                    },
+                    colors: {
+                        parchment: {
+                            50: 'rgb(var(--parchment-50) / <alpha-value>)',
+                            100: 'rgb(var(--parchment-100) / <alpha-value>)',
+                            200: 'rgb(var(--parchment-200) / <alpha-value>)',
+                            300: 'rgb(var(--parchment-300) / <alpha-value>)',
+                            800: 'rgb(var(--parchment-800) / <alpha-value>)',
+                            900: 'rgb(var(--parchment-900) / <alpha-value>)'
+                        },
+                        burgundy: {
+                            700: 'rgb(var(--burgundy-700) / <alpha-value>)',
+                            800: 'rgb(var(--burgundy-800) / <alpha-value>)',
+                            900: 'rgb(var(--burgundy-900) / <alpha-value>)'
+                        },
+                        gold: {
+                            600: 'rgb(var(--gold-600) / <alpha-value>)',
+                            700: 'rgb(var(--gold-700) / <alpha-value>)'
+                        },
+                        greek: {
+                            50: 'rgb(var(--greek-50) / <alpha-value>)',
+                            700: 'rgb(var(--greek-700) / <alpha-value>)',
+                            800: 'rgb(var(--greek-800) / <alpha-value>)'
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    // 3) Umschalten
+    function isDark() {
+        return document.documentElement.classList.contains('dark');
+    }
+    function applyTheme(dark) {
+        document.documentElement.classList.toggle('dark', dark);
+        var btn = document.getElementById('theme-toggle-float');
+        if (btn) btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    }
+    window.toggleTheme = function () {
+        var next = !isDark();
+        applyTheme(next);
+        try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch (e) {}
+    };
+
+    // 4) Systemeinstellung live verfolgen, solange keine manuelle Wahl gespeichert ist
+    if (window.matchMedia) {
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        var onChange = function (e) {
+            var stored = null;
+            try { stored = localStorage.getItem('theme'); } catch (err) {}
+            if (!stored) applyTheme(e.matches);
+        };
+        if (mq.addEventListener) mq.addEventListener('change', onChange);
+        else if (mq.addListener) mq.addListener(onChange);
+    }
+
+    // 5) Schwebenden Umschalt-Button einfügen
+    document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.createElement('button');
+        btn.id = 'theme-toggle-float';
+        btn.type = 'button';
+        btn.className = 'no-print';
+        btn.title = 'Hell/Dunkel umschalten';
+        btn.setAttribute('aria-label', 'Dunkelmodus umschalten');
+        btn.setAttribute('aria-pressed', isDark() ? 'true' : 'false');
+        btn.onclick = window.toggleTheme;
+        btn.innerHTML =
+            '<svg class="icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>' +
+            '<svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>';
+        document.body.appendChild(btn);
+    });
+})();
+
+    </script>
+    <style>
+        body {
+            background-color: #F7F3E8;
+            color: #262018;
+            background-image: radial-gradient(#DFD2B5 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+
+        .folio-page {
+            background-color: #FCFBF7;
+            box-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+        }
+
+        .greek-term {
+            border-bottom: 1.5px dotted #1E4E79;
+            color: #15395B;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .greek-term:hover {
+            background-color: #E2ECF5;
+            border-bottom-style: solid;
+        }
+
+        .father-link {
+            color: #7C2D12;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px dashed #7C2D12;
+            transition: color 0.15s ease;
+        }
+        .father-link:hover {
+            color: #B48327;
+            border-bottom-color: #B48327;
+        }
+
+        .verse-num {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #8F6519;
+            vertical-align: super;
+            margin-right: 2px;
+            user-select: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F3E8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C3A3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B48327;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .folio-page { box-shadow: none; }
+        }
+    </style>
+    <style>
+/* ===== Gemeinsamer Dark Mode für alle Kapitel ===== */
+/* Einbinden NACH dem <style>-Block der Seite, damit diese Regeln die alten Farbwerte überschreiben. */
+
+:root {
+    --parchment-50: 252 251 247;
+    --parchment-100: 247 243 232;
+    --parchment-200: 239 231 212;
+    --parchment-300: 223 210 181;
+    --parchment-800: 61 53 41;
+    --parchment-900: 38 32 24;
+    --burgundy-700: 124 45 18;
+    --burgundy-800: 101 34 20;
+    --burgundy-900: 74 22 13;
+    --gold-600: 180 131 39;
+    --gold-700: 143 101 25;
+    --greek-50: 240 245 249;
+    --greek-700: 30 78 121;
+    --greek-800: 21 57 91;
+
+    --body-bg: #F7F3E8;
+    --body-fg: #262018;
+    --body-dot: #DFD2B5;
+    --folio-bg: #FCFBF7;
+    --folio-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+    --greek-term-fg: #15395B;
+    --greek-term-border: #1E4E79;
+    --greek-term-hover: #E2ECF5;
+    --father-fg: #7C2D12;
+    --father-hover: #B48327;
+    --verse-num: #8F6519;
+    --scroll-track: #F7F3E8;
+    --scroll-thumb: #D4C3A3;
+    --scroll-thumb-hover: #B48327;
+}
+
+:root.dark {
+    color-scheme: dark;
+
+    --parchment-50: 28 24 19;
+    --parchment-100: 36 31 25;
+    --parchment-200: 46 40 32;
+    --parchment-300: 70 60 47;
+    --parchment-800: 217 207 184;
+    --parchment-900: 238 231 214;
+    --burgundy-700: 224 145 122;
+    --burgundy-800: 232 168 146;
+    --burgundy-900: 240 190 170;
+    --gold-600: 212 166 74;
+    --gold-700: 224 184 96;
+    --greek-50: 26 36 48;
+    --greek-700: 127 178 224;
+    --greek-800: 166 203 238;
+
+    --body-bg: #14110D;
+    --body-fg: #E8E0CF;
+    --body-dot: #2A241C;
+    --folio-bg: #1C1813;
+    --folio-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.55), 0 0 1px 1px rgba(212, 166, 74, 0.22);
+    --greek-term-fg: #A6CBEE;
+    --greek-term-border: #7FB2E0;
+    --greek-term-hover: #1F3045;
+    --father-fg: #E8A892;
+    --father-hover: #E0B860;
+    --verse-num: #D4A64A;
+    --scroll-track: #14110D;
+    --scroll-thumb: #4A4132;
+    --scroll-thumb-hover: #D4A64A;
+}
+
+/* Bestehende Klassen auf Variablen umstellen (überschreibt die festen Werte der Seite) */
+body {
+    background-color: var(--body-bg);
+    color: var(--body-fg);
+    background-image: radial-gradient(var(--body-dot) 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+.folio-page { background-color: var(--folio-bg); box-shadow: var(--folio-shadow); }
+.greek-term { border-bottom-color: var(--greek-term-border); color: var(--greek-term-fg); }
+.greek-term:hover { background-color: var(--greek-term-hover); }
+.father-link { color: var(--father-fg); border-bottom-color: var(--father-fg); }
+.father-link:hover { color: var(--father-hover); border-bottom-color: var(--father-hover); }
+.verse-num { color: var(--verse-num); }
+::-webkit-scrollbar-track { background: var(--scroll-track); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+
+/* Overrides für feste Tailwind-Standardfarben */
+.dark ::selection { background: rgba(212, 166, 74, 0.35); color: #fff; }
+
+.dark .bg-burgundy-800 { background-color: #7C2D12; color: #fff; }
+.dark .hover\:bg-burgundy-900:hover { background-color: #933818; }
+
+.dark .text-stone-400 { color: #8F8575; }
+.dark .text-stone-500 { color: #A39A89; }
+.dark .text-stone-600 { color: #B8AF9D; }
+.dark .text-stone-700 { color: #CFC7B5; }
+.dark .text-stone-800 { color: #E3DCCB; }
+.dark .hover\:text-stone-900:hover { color: #FFFFFF; }
+
+.dark .text-sky-900 { color: #9CC6EE; }
+.dark .text-amber-900,
+.dark .text-amber-800 { color: #E6BF78; }
+.dark .text-red-950 { color: #F0B8A8; }
+.dark .border-sky-800\/30 { border-color: rgba(127, 178, 224, 0.4); }
+.dark .border-amber-800\/30 { border-color: rgba(224, 184, 96, 0.4); }
+.dark .border-red-900\/30 { border-color: rgba(232, 168, 146, 0.4); }
+.dark .border-amber-700\/60 { border-color: rgba(224, 184, 96, 0.6); }
+.dark .border-sky-800\/60 { border-color: rgba(127, 178, 224, 0.6); }
+
+.dark .bg-white { background-color: #1A1611; }
+.dark .hover\:bg-sky-50:hover { background-color: #1B2733; }
+.dark .hover\:bg-amber-50:hover { background-color: #2A2214; }
+.dark textarea::placeholder { color: #8F8575; }
+
+/* Schwebender Umschalt-Button (wird von theme.js eingefügt) */
+#theme-toggle-float {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 40;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    cursor: pointer;
+    background-color: rgb(var(--parchment-50));
+    color: rgb(var(--gold-700));
+    border: 1px solid rgb(var(--parchment-300));
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    transition: background-color 0.2s ease;
+}
+#theme-toggle-float:hover { background-color: rgb(var(--parchment-200)); }
+#theme-toggle-float svg { width: 1.2rem; height: 1.2rem; }
+#theme-toggle-float .icon-sun { display: none; }
+.dark #theme-toggle-float .icon-sun { display: block; }
+.dark #theme-toggle-float .icon-moon { display: none; }
+
+@media print {
+    #theme-toggle-float { display: none !important; }
+    body { background: white; color: #262018; background-image: none; }
+    .folio-page { box-shadow: none; }
+}
+
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-amber-200/60">
+    <!-- Schmale Kopfleiste: Titel + Ebenen-Schalter -->
+    <header class="sticky top-0 z-30 bg-parchment-100/95 backdrop-blur-md border-b border-parchment-300 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
+            <h1 class="font-display text-lg sm:text-xl font-bold text-parchment-900 tracking-tight">
+                Matthäus Kapitel 13
+            </h1>
+            <div class="flex flex-wrap items-center gap-1.5 text-xs font-sans">
+                <button onclick="toggleFilter('greek')" id="filter-greek" class="filter-chip active px-2.5 py-1 rounded-full border border-sky-800/30 bg-sky-900/10 text-sky-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-sky-700"></span> Griechisch
+                </button>
+                <button onclick="toggleFilter('history')" id="filter-history" class="filter-chip active px-2.5 py-1 rounded-full border border-amber-800/30 bg-amber-900/10 text-amber-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-amber-700"></span> Historie
+                </button>
+                <button onclick="toggleFilter('fathers')" id="filter-fathers" class="filter-chip active px-2.5 py-1 rounded-full border border-red-900/30 bg-red-900/10 text-red-950 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-burgundy-800"></span> Kirchenväter
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Haupt-Container (Buchseite / Folio) -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+
+        <!-- Obere Kapitel-Navigation direkt über dem Einführungskasten -->
+        <nav aria-label="Obere Kapitel-Navigation" class="mb-6 pb-4 border-b border-parchment-300 flex items-center justify-between no-print">
+            <a href="matthaeus-12.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kapitel 12</a>
+            <a href="index.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Kapitel 13</a>
+            <a href="matthaeus-14.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 14 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+        
+        <!-- Einführungskasten -->
+        <div class="folio-page rounded-xl p-5 sm:p-7 mb-8 border border-parchment-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-parchment-200 pb-4 mb-4">
+                <div>
+                    <span class="text-xs font-sans uppercase tracking-widest text-gold-700 font-semibold">Die Gleichnisrede am See (Mt 13)</span>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-parchment-900 mt-0.5">
+                        Vom Geheimnis des Reiches der Himmel
+                    </h2>
+                </div>
+                <div class="text-xs font-sans text-stone-600 bg-parchment-100 px-3.5 py-2 rounded-lg border border-parchment-300">
+                    <strong class="text-parchment-900">Tipp:</strong> Klicke auf <span class="greek-term">blaue Begriffe</span> für den griechischen Urtext oder auf <span class="father-link">Ausleger-Namen</span> für Kommentare.
+                </div>
+            </div>
+            <p class="font-serif text-base sm:text-lg text-stone-700 leading-relaxed">
+                Nach dem Streit um Jesu Vollmacht (Mt 12) wendet sich Jesus mit sieben Gleichnissen an die Menge und die Jünger: Das Reich kommt verborgen, wächst langsam und scheidet am Ende. Wer hört, versteht, und wer sich verschließt, bleibt draußen. Das Kapitel endet in Nazareth, wo die Menschen am vertrauten Jesus Anstoß nehmen.
+            </p>
+        </div>
+
+        <!-- Dynamisch gerenderte Bibelabschnitte -->
+        <div id="study-container" class="space-y-10">
+            <!-- Inhalte werden über JavaScript aufgebaut -->
+        </div>
+
+        <!-- Kapitel-Navigation am Ende -->
+        <nav aria-label="Kapitel-Navigation" class="mt-12 pt-6 border-t border-parchment-300 flex items-center justify-between no-print">
+            <a href="matthaeus-12.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kapitel 12</a>
+            <a href="index.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Kapitel 13</a>
+            <a href="matthaeus-14.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 14 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12 border-t border-parchment-300 text-center text-xs font-sans text-stone-600">
+        <p class="font-serif italic text-sm text-parchment-800 mb-1">
+            „Selig aber sind eure Augen, dass sie sehen, und eure Ohren, dass sie hören.“ (Matthäus 13,16)
+        </p>
+        <p>Interaktive Studienbibel · Griechischer Grundtext (Nestle-Aland), historische Realienkunde &amp; Patristik. (Hinweis: Origenes gehört streng genommen nicht zu den Kirchenvätern.)</p>
+    </footer>
+
+    <!-- Modal / Detail-Karte -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/60 backdrop-blur-xs p-4" onclick="closeModalOnBackdrop(event)">
+        <div class="bg-parchment-50 border border-parchment-300 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden transform transition-all">
+            <div id="modal-header" class="px-6 py-4 bg-parchment-100 border-b border-parchment-300 flex items-center justify-between">
+                <span id="modal-badge" class="text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded"></span>
+                <button onclick="closeModal()" class="text-stone-500 hover:text-stone-900 p-1 rounded-lg hover:bg-parchment-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 font-serif text-parchment-900 space-y-4 max-h-[75vh] overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // GRIECHISCHES LEXIKON (MATTHÄUS 24)
+        // ==========================================
+        const greekLexicon = {
+  parabole: { greek: `παραβολή`, translit: `parabolē`, literal: `das Daneben-Geworfene, Vergleich`,
+    meaning: `Von paraballein („daneben legen“): ein Vergleich, der eine Wahrheit neben ein Bild aus dem Alltag stellt. Im Hebräischen entspricht mashal, das auch Rätsel und Sprichwort umfasst.`,
+    theology: `Das Gleichnis offenbart und verhüllt zugleich: Wer offen ist, bekommt Einsicht, wer sich verschließt, hört nur eine Geschichte.` },
+  mysterion: { greek: `μυστήριον`, translit: `mystērion`, literal: `Geheimnis`,
+    meaning: `Keine Rätselkunde, sondern ein von Gott verborgener Plan, der nur durch Offenbarung bekannt wird (vgl. Dan 2,28).`,
+    theology: `Das „Geheimnis des Reiches“ ist, dass Gottes Herrschaft schon beginnt, aber noch nicht sichtbar vollendet ist.` },
+  skandal: { greek: `σκανδαλίζεται`, translit: `skandalizetai`, literal: `er nimmt Anstoß, kommt zu Fall`,
+    meaning: `Abgeleitet von skandalon, dem Stellholz einer Falle. Gemeint ist: im Glauben straucheln und abfallen (V. 21; ebenso V. 57).`,
+    theology: `Anstoß nimmt, wer ein bequemes Wort will. Die Verfolgung deckt auf, ob der Glaube Wurzeln hat.` },
+  zyme: { greek: `ζύμη`, translit: `zymē`, literal: `Sauerteig`,
+    meaning: `Gärender Teig. In anderen Texten ein Bild für das Verderben (16,6; 1 Kor 5,6), hier für die verborgene, durchdringende Kraft des Reiches.`,
+    theology: `Das Reich wirkt von innen. Es setzt keine Mauern, sondern verändert das Ganze, bis nichts unberührt bleibt.` },
+  synteleia: { greek: `συντέλεια τοῦ αἰῶνος`, translit: `synteleia tou aiōnos`, literal: `Vollendung der Weltzeit`,
+    meaning: `Das Ziel der Geschichte (V. 39, 40, 49; 24,3; 28,20). synteleia meint die Vollendung, nicht bloß das „Ende“.`,
+    theology: `Dieselbe Wendung rahmt das Matthäusevangelium: Bis zur Vollendung ist Christus bei den Seinen (28,20).` },
+  kaina: { greek: `καινὰ καὶ παλαιά`, translit: `kaina kai palaia`, literal: `Neues und Altes`,
+    meaning: `Kainos meint das qualitativ Neue, nicht nur das Spätere. Der Schriftgelehrte des Reiches schöpft aus beiden Vorräten.`,
+    theology: `Die Lehre Jesu ersetzt das Alte nicht, sondern erschließt es neu: Verheißung und Erfüllung gehören zusammen.` }
+};
+
+        // ==========================================
+        // KIRCHENVÄTER & AUSLEGER
+        // ==========================================
+        const churchFathers = {
+  chrysostomus: { name: `Johannes Chrysostomus`, dates: `ca. 349–407`, role: `Bischof von Konstantinopel, Prediger`,
+    bio: `Der „Goldmund“ predigte Vers für Vers durch das Matthäusevangelium. Seine Homilien verbinden genaue Textarbeit mit seelsorgerlicher Mahnung.`,
+    focusInMt13: `Er betont, dass die Menge selbst schuld an ihrer Blindheit ist: Sie verschließt die Augen, und Jesus spricht in Gleichnissen, um sie zum Fragen zu bewegen.` },
+  augustinus: { name: `Augustinus von Hippo`, dates: `354–430`, role: `Bischof und Kirchenlehrer`,
+    bio: `Der einflussreichste lateinische Kirchenvater. Im Streit mit den Donatisten prägte er das Bild der Kirche als gemischter Gemeinschaft.`,
+    focusInMt13: `Das Unkraut unter dem Weizen deutet er auf die Kirche: Gute und Böse leben bis zum Endgericht nebeneinander. Menschen sollen nicht vorzeitig aussondern.` },
+  hieronymus: { name: `Hieronymus`, dates: `ca. 347–420`, role: `Gelehrter, Bibelübersetzer (Vulgata)`,
+    bio: `Hieronymus verfasste um 398 einen Kommentar zu Matthäus und verband Sprachkenntnis mit der Auslegungstradition.`,
+    focusInMt13: `Er deutet das Senfkorn auf die Verkündigung Christi und den „Schriftgelehrten“ auf den, der beide Testamente kennt: das Alte und das Neue.` },
+  origenes: { name: `Origenes`, dates: `ca. 185–253`, role: `Alexandrinischer Gelehrter und Ausleger`,
+    classificationNote: `Hinweis: streng genommen kein Kirchenvater, da seine Lehre teils verurteilt wurde.`,
+    bio: `Origenes begründete die wissenschaftliche Bibelauslegung und die allegorische Deutung. Sein Matthäus-Kommentar ist nur teilweise erhalten.`,
+    focusInMt13: `Er liest den vierfachen Ackerboden als Zustände der Seele und fragt, welche Frucht aus dem gehörten Wort tatsächlich wächst.` }
+};
+
+        // ==========================================
+        // INHALT: MATTHÄUS 24
+        // ==========================================
+        const studySections = [
+{
+  id: `saemann`, sectionTitle: `Das Gleichnis vom Sämann`, sectionRange: `Mt 13,1–23`,
+  sectionIntro: `Jesus lehrt vom Boot aus am See. Das erste Gleichnis erklärt, warum das Wort nicht überall Frucht bringt.`,
+  blocks: [
+  { verses: `1–9`,
+    bibleText: `An jenem Tag ging Jesus aus dem Haus und setzte sich an den See. Und es versammelten sich große Volksmengen bei ihm, sodass er in ein Boot stieg und sich setzte; und die ganze Menge stand am Ufer. Und er redete vieles zu ihnen in <span class="greek-term" onclick="openGreek('parabole')">Gleichnissen</span> und sprach: Siehe, der Sämann ging aus, um zu säen. Und beim Säen fiel einiges an den Weg, und die Vögel kamen und fraßen es auf. Anderes aber fiel auf felsigen Boden, wo es nicht viel Erde hatte, und ging sogleich auf, weil es keine tiefe Erde hatte. Als aber die Sonne aufging, wurde es verbrannt, und weil es keine Wurzel hatte, verdorrte es. Anderes aber fiel unter die Dornen, und die Dornen wuchsen auf und erstickten es. Anderes aber fiel auf die gute Erde und brachte Frucht, das eine hundertfach, das andere sechzigfach, das andere dreißigfach. Wer Ohren hat, der höre!`,
+    commentary: {
+      history: `In Palästina wurde breitwürfig gesät und erst danach gepflügt. Pfade führten quer durch die Felder, unter dünner Erde lag oft Kalkfels. Normale Erträge waren ein Mehrfaches der Saat; „hundertfach“ ist ein Segensertrag (vgl. Gen 26,12).`,
+      greek: `<span class="greek-term" onclick="openGreek('parabole')">παραβολή</span> kann auch ein Rätselwort sein. Der abschließende Ruf „Wer Ohren hat“ verlangt aktives Hören, nicht bloßes Zuhören.`,
+      fathers: `<span class="father-link" onclick="openFather('origenes')">Origenes</span> sieht im vierfachen Boden vier Haltungen der Seele und fragt jeden Hörer, welche Frucht sein Leben zeigt.` } },
+  { verses: `10–17`,
+    bibleText: `Und die Jünger traten herzu und sagten zu ihm: Warum redest du zu ihnen in Gleichnissen? Er aber antwortete und sprach zu ihnen: Euch ist gegeben, die <span class="greek-term" onclick="openGreek('mysterion')">Geheimnisse</span> des Reiches der Himmel zu erkennen, jenen aber ist es nicht gegeben. Denn wer hat, dem wird gegeben werden, und er wird Überfluss haben; wer aber nicht hat, von dem wird auch das genommen werden, was er hat. Darum rede ich zu ihnen in Gleichnissen, weil sie sehend nicht sehen und hörend nicht hören noch verstehen. Und an ihnen erfüllt sich die Weissagung Jesajas, die sagt: „Mit dem Gehör werdet ihr hören und doch nicht verstehen, und sehend werdet ihr sehen und doch nicht erkennen. Denn das Herz dieses Volkes ist verstockt geworden, und mit den Ohren hören sie schwer, und ihre Augen haben sie geschlossen, damit sie nicht mit den Augen sehen und mit den Ohren hören und mit dem Herzen verstehen und umkehren und ich sie heile.“ Selig aber sind eure Augen, dass sie sehen, und eure Ohren, dass sie hören. Denn wahrlich, ich sage euch: Viele Propheten und Gerechte haben begehrt zu sehen, was ihr seht, und haben es nicht gesehen, und zu hören, was ihr hört, und haben es nicht gehört.`,
+    commentary: {
+      history: `Das Jesaja-Zitat (Jes 6,9–10) folgt der griechischen Übersetzung (Septuaginta). Es beschreibt Israels Verstockung zur Zeit des Propheten und wird nun auf die Ablehnung Jesu angewendet.`,
+      greek: `Bei Matthäus steht „weil“ (<em>hoti</em>), nicht „damit“ wie bei Markus (4,12). Die Gleichnisse sind demnach Antwort auf vorhandene Verschlossenheit, nicht deren Ursache. <span class="greek-term" onclick="openGreek('mysterion')">μυστήριον</span> bezeichnet Gottes offenbarten Plan.`,
+      fathers: `<span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> betont, die Menge habe sich selbst verschlossen. Jesus spreche in Bildern, um ihre Neugier zu wecken.` } },
+  { verses: `18–23`,
+    bibleText: `Ihr nun, hört das Gleichnis vom Sämann: Sooft jemand das Wort vom Reich hört und nicht versteht, kommt der Böse und raubt, was in sein Herz gesät war; das ist der, bei dem an den Weg gesät wurde. Der aber auf felsigen Boden gesät wurde, das ist der, der das Wort hört und es sogleich mit Freude aufnimmt; er hat aber keine Wurzel in sich, sondern ist nur für eine Zeit; wenn aber Bedrängnis oder Verfolgung um des Wortes willen entsteht, <span class="greek-term" onclick="openGreek('skandal')">nimmt er sogleich Anstoß</span>. Der aber unter die Dornen gesät wurde, das ist der, der das Wort hört, und die Sorge der Weltzeit und der Betrug des Reichtums ersticken das Wort, und er bringt keine Frucht. Der aber auf die gute Erde gesät wurde, das ist der, der das Wort hört und versteht, der dann auch Frucht bringt und einer hundertfach, einer sechzigfach, einer dreißigfach.`,
+    commentary: {
+      history: `Die Deutung nennt drei Gefahren: den Bösen, die Verfolgung und die Verführung durch Reichtum. Sie spiegelt die Lage der frühen Gemeinden, die Ablehnung und Wohlstand erlebten.`,
+      greek: `<span class="greek-term" onclick="openGreek('skandal')">σκανδαλίζεται</span> beschreibt ein Straucheln. Der Unterschied zum guten Boden liegt im „Verstehen“ (<em>syniēsin</em>): Hören, das in Einsicht und Tat mündet.`,
+      fathers: `<span class="father-link" onclick="openFather('augustinus')">Augustinus</span> mahnt, nicht den Boden anderer zu richten. Auch ein harter Boden könne durch Gnade zu gutem Land werden.` } }
+  ]
+},
+{
+  id: `unkraut`, sectionTitle: `Unkraut, Senfkorn, Sauerteig`, sectionRange: `Mt 13,24–35`,
+  sectionIntro: `Drei Gleichnisse für die Menge: Das Reich wächst gemischt, klein und verborgen, aber unaufhaltsam.`,
+  blocks: [
+  { verses: `24–30`,
+    bibleText: `Ein anderes Gleichnis legte er ihnen vor und sprach: Das Reich der Himmel ist einem Menschen gleich geworden, der guten Samen auf seinen Acker säte. Während aber die Menschen schliefen, kam sein Feind, säte Unkraut mitten unter den Weizen und ging weg. Als aber die Saat aufwuchs und Frucht brachte, da zeigte sich auch das Unkraut. Da kamen die Knechte des Hausherrn und sagten zu ihm: Herr, hast du nicht guten Samen auf deinen Acker gesät? Woher hat er nun das Unkraut? Er aber sagte zu ihnen: Ein Feind hat das getan. Die Knechte aber sagen zu ihm: Willst du nun, dass wir hingehen und es zusammenlesen? Er aber sagt: Nein, damit ihr nicht, wenn ihr das Unkraut zusammenlest, zugleich den Weizen mit ausreißt. Lasst beides zusammen wachsen bis zur Ernte; und zur Zeit der Ernte werde ich den Schnittern sagen: Lest zuerst das Unkraut zusammen und bindet es in Bündel, um es zu verbrennen; den Weizen aber sammelt in meine Scheune.`,
+    commentary: {
+      history: `Gemeint ist wohl der Taumellolch (<em>Lolium temulentum</em>), der dem Weizen bis zur Ähre täuschend ähnlich sieht. Auch das römische Recht kannte die Bosheit, Unkraut auf fremden Acker zu säen.`,
+      greek: `Das Wort für „Unkraut“ ist <em>zizania</em>. Die Knechte wollen „zusammenlesen“ (<em>syllexōmen</em>), und derselbe Begriff steht beim Endgericht (V. 40–41). Das Urteil gehört den Engeln, nicht den Knechten.`,
+      fathers: `<span class="father-link" onclick="openFather('augustinus')">Augustinus</span> wendet das Gleichnis gegen die Donatisten: Die Kirche bleibt bis zum Ende eine gemischte Gemeinschaft, und die Reinigung steht dem Richter zu.` } },
+  { verses: `31–35`,
+    bibleText: `Ein anderes Gleichnis legte er ihnen vor und sprach: Das Reich der Himmel gleicht einem Senfkorn, das ein Mensch nahm und auf seinen Acker säte. Es ist zwar kleiner als alle Samenkörner, wenn es aber gewachsen ist, ist es größer als die Kräuter und wird ein Baum, sodass die Vögel des Himmels kommen und in seinen Zweigen nisten. Ein anderes Gleichnis sprach er zu ihnen: Das Reich der Himmel gleicht einem <span class="greek-term" onclick="openGreek('zyme')">Sauerteig</span>, den eine Frau nahm und unter drei Maß Mehl verbarg, bis alles durchsäuert war. Das alles redete Jesus in Gleichnissen zu den Volksmengen, und ohne Gleichnis redete er nichts zu ihnen, damit erfüllt würde, was durch den Propheten gesagt ist: „Ich will meinen Mund auftun in Gleichnissen, ich will aussprechen, was seit Grundlegung der Welt verborgen war.“`,
+    commentary: {
+      history: `Der schwarze Senf wächst im Jahr bis auf etwa drei Meter und galt als Sinnbild des Kleinen. Das Bild vom Baum mit nistenden Vögeln erinnert an Weltreiche und Gottes Reich (Ez 17,23; Dan 4,9). „Drei Maß“ Mehl sind rund 40 Liter, genug für ein Festmahl (vgl. Gen 18,6). Das Zitat stammt aus Ps 78,2.`,
+      greek: `<span class="greek-term" onclick="openGreek('zyme')">ζύμη</span> steht meist für Verderben. Hier ist die Pointe die verborgene, durchdringende Wirkung. „Verbarg“ (<em>enekrypsen</em>) betont, dass das Wirken zunächst unsichtbar bleibt.`,
+      fathers: `<span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> deutet das Senfkorn auf Christus selbst: unscheinbar in der Niedrigkeit, groß in der Auferstehung.` } }
+  ]
+},
+{
+  id: `reich`, sectionTitle: `Deutung, Schatz, Perle und Netz`, sectionRange: `Mt 13,36–52`,
+  sectionIntro: `Im Haus erklärt Jesus den Jüngern das Unkraut und fügt drei Gleichnisse über den Wert und das Ende des Reiches an.`,
+  blocks: [
+  { verses: `36–43`,
+    bibleText: `Dann entließ er die Volksmengen und ging ins Haus. Und seine Jünger traten zu ihm und sagten: Erkläre uns das Gleichnis vom Unkraut des Ackers. Er aber antwortete und sprach: Der den guten Samen sät, ist der Sohn des Menschen; der Acker ist die Welt; der gute Same, das sind die Söhne des Reiches; das Unkraut aber sind die Söhne des Bösen; der Feind, der es gesät hat, ist der Teufel; die Ernte ist die <span class="greek-term" onclick="openGreek('synteleia')">Vollendung der Weltzeit</span>; die Schnitter sind Engel. Wie nun das Unkraut zusammengelesen und mit Feuer verbrannt wird, so wird es bei der Vollendung der Weltzeit sein: Der Sohn des Menschen wird seine Engel aussenden, und sie werden aus seinem Reich alle Anstöße und die Gesetzlosigkeit Tuenden zusammenlesen und sie in den Feuerofen werfen; dort wird das Heulen und das Zähneknirschen sein. Dann werden die Gerechten leuchten wie die Sonne im Reich ihres Vaters. Wer Ohren hat, der höre!`,
+    commentary: {
+      history: `Der Acker ist die „Welt“, nicht nur die Kirche. Das Bild vom Feuerofen erinnert an Dan 3 und Mal 3,19. Das Leuchten der Gerechten greift Dan 12,3 auf.`,
+      greek: `<span class="greek-term" onclick="openGreek('synteleia')">συντέλεια τοῦ αἰῶνος</span> kehrt in 24,3 und 28,20 wieder. Das Gericht beginnt „aus seinem Reich“: Die Anstöße (<em>skandala</em>) werden entfernt.`,
+      fathers: `<span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> sieht in der Deutung Gottes Langmut: Er wartet, damit das Unkraut sich noch zum Weizen wandeln kann.` } },
+  { verses: `44–46`,
+    bibleText: `Das Reich der Himmel gleicht einem im Acker verborgenen Schatz, den ein Mensch fand und verbarg; und vor Freude darüber geht er hin und verkauft alles, was er hat, und kauft jenen Acker. Wiederum gleicht das Reich der Himmel einem Kaufmann, der schöne Perlen suchte. Als er aber eine sehr wertvolle Perle fand, ging er hin, verkaufte alles, was er hatte, und kaufte sie.`,
+    commentary: {
+      history: `Ohne Banken vergruben Menschen Wertsachen im Boden, besonders in Kriegszeiten. Perlen zählten im römischen Reich zu den teuersten Gütern. Beide Bilder zeigen einen Fund, der alles andere übertrifft.`,
+      greek: `Der Mensch handelt „vor Freude“ (<em>apo tēs charas</em>). Der Verzicht ist keine Last, sondern die Antwort auf den Wert des Gefundenen.`,
+      fathers: `<span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> deutet die eine Perle auf Christus oder die Erkenntnis des Evangeliums. Wer sie findet, verachtet die vielen kleinen Perlen der Welt.` } },
+  { verses: `47–52`,
+    bibleText: `Wiederum gleicht das Reich der Himmel einem Netz, das ins Meer geworfen wurde und von jeder Art Fische zusammenbrachte. Als es voll war, zogen sie es an den Strand, setzten sich und lasen die guten in Gefäße zusammen, die faulen aber warfen sie hinaus. So wird es bei der Vollendung der Weltzeit sein: Die Engel werden ausgehen und die Bösen aus der Mitte der Gerechten aussondern und sie in den Feuerofen werfen; dort wird das Heulen und das Zähneknirschen sein. Habt ihr dies alles verstanden? Sie sagen zu ihm: Ja. Er aber sagte zu ihnen: Darum gleicht jeder Schriftgelehrte, der für das Reich der Himmel unterwiesen wurde, einem Hausherrn, der aus seinem Schatz <span class="greek-term" onclick="openGreek('kaina')">Neues und Altes</span> hervorholt.`,
+    commentary: {
+      history: `Das Schleppnetz am See Genezaret fing reine und unreine Fische (vgl. Lev 11). Das Aussortieren am Ufer war Alltag der Fischer, unter ihnen mehrere Jünger.`,
+      greek: `<span class="greek-term" onclick="openGreek('kaina')">καινά</span> bezeichnet das qualitativ Neue. Der „Schriftgelehrte“ ist hier der Jünger, der „unterwiesen“ (<em>mathēteutheis</em>) wurde, also selbst zum Schüler gemacht wurde.`,
+      fathers: `<span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> liest „Neues und Altes“ auf beide Testamente. <span class="father-link" onclick="openFather('origenes')">Origenes</span> sieht im Schatz die ganze Schrift.` } }
+  ]
+},
+{
+  id: `nazareth`, sectionTitle: `Ablehnung in Nazareth`, sectionRange: `Mt 13,53–58`,
+  sectionIntro: `Zum Abschluss kehrt Jesus in seine Heimat zurück. Seine Weisheit wird bestaunt, seine Herkunft aber wird ihm zum Hindernis.`,
+  blocks: [
+  { verses: `53–58`,
+    bibleText: `Und es geschah, als Jesus diese Gleichnisse beendet hatte, zog er von dort weg. Und er kam in seine Vaterstadt und lehrte sie in ihrer Synagoge, sodass sie außer sich gerieten und sagten: Woher hat dieser diese Weisheit und die Wunderkräfte? Ist dieser nicht der Sohn des Zimmermanns? Heißt nicht seine Mutter Maria und seine Brüder Jakobus und Josef und Simon und Judas? Und sind nicht auch seine Schwestern alle bei uns? Woher hat dieser nun das alles? Und sie <span class="greek-term" onclick="openGreek('skandal')">nahmen Anstoß</span> an ihm. Jesus aber sagte zu ihnen: Ein Prophet ist nicht ohne Ehre, außer in seiner Vaterstadt und in seinem Haus. Und er tat dort nicht viele Wunderkräfte wegen ihres Unglaubens.`,
+    commentary: {
+      history: `Nazareth war ein kleines Dorf in Galiläa. „Zimmermann“ (<em>tektōn</em>) meint einen Handwerker für Holz und Stein. Die genannten Brüder und Schwestern zeigen, wie bekannt die Familie war; gerade das machte die Ablehnung leichter.`,
+      greek: `Dasselbe Verb <span class="greek-term" onclick="openGreek('skandal')">σκανδαλίζεται</span> wie in V. 21: Die Heimatstadt „strauchelt“ an Jesus. Unglaube begrenzt hier das Wirken, nicht die Macht Jesu.`,
+      fathers: `<span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> bemerkt, Jesus tue wenige Wunder, nicht aus Schwäche, sondern um den Neid der Zuschauer nicht noch zu steigern.` } }
+  ]
+}
+];
+
+        // ==========================================
+        // ZUSTAND & STEUERUNG
+        // ==========================================
+        let activeFilters = { greek: true, history: true, fathers: true };
+        const CHAPTER = 13;
+        const NOTES_KEY = 'mt' + CHAPTER + '_notes';
+        let userNotes = {};
+        try { userNotes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}'); } catch (e) {}
+
+        function renderStudy() {
+            const container = document.getElementById('study-container');
+            container.innerHTML = '';
+
+            studySections.forEach(section => {
+                const sectionEl = document.createElement('section');
+                sectionEl.id = section.id;
+                sectionEl.className = 'folio-page rounded-2xl border border-parchment-300 overflow-hidden scroll-mt-16';
+
+                let html = `
+                    <div class="bg-parchment-100/90 px-5 sm:px-8 py-5 border-b border-parchment-300">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <h3 class="font-display text-2xl sm:text-3xl font-bold text-burgundy-900">
+                                ${section.sectionTitle}
+                            </h3>
+                            <span class="font-sans text-xs font-semibold tracking-wider uppercase px-2.5 py-1 rounded bg-parchment-200 text-parchment-900 border border-parchment-300">
+                                ${section.sectionRange}
+                            </span>
+                        </div>
+                        <p class="font-serif italic text-stone-700 text-base mt-1.5">
+                            ${section.sectionIntro}
+                        </p>
+                    </div>
+                    <div class="divide-y divide-parchment-200">
+                `;
+
+                section.blocks.forEach((block, idx) => {
+                    const blockKey = `${section.id}-${idx}`;
+                    const savedNote = userNotes[blockKey] || '';
+
+                    let commentaryParts = [];
+                    if (activeFilters.history && block.commentary.history) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-amber-700/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-amber-800 block mb-0.5">Historischer & Jüdischer Kontext</span>
+                                <div class="text-stone-800">${block.commentary.history}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.greek && block.commentary.greek) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-sky-800/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-sky-900 block mb-0.5">Griechischer Urtext & Wortbedeutung</span>
+                                <div class="text-stone-800">${block.commentary.greek}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.fathers && block.commentary.fathers) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-burgundy-800/70">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-800 block mb-0.5">Kirchenväter & Alte Ausleger</span>
+                                <div class="text-stone-800">${block.commentary.fathers}</div>
+                            </div>
+                        `);
+                    }
+
+                    const commentaryHtml = commentaryParts.length > 0
+                        ? `<div class="space-y-3.5 font-serif italic text-[15.5px] sm:text-base leading-relaxed">${commentaryParts.join('')}</div>`
+                        : `<div class="font-sans text-xs text-stone-400 italic">Alle Kommentar-Ebenen sind ausgeblendet.</div>`;
+
+                    html += `
+                        <div class="p-5 sm:p-8 bg-parchment-50 max-w-4xl mx-auto">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-700">
+                                    Matthäus ${CHAPTER},${block.verses}
+                                </span>
+                                <button onclick="toggleNoteBox('${blockKey}')" class="text-xs font-sans text-stone-400 hover:text-burgundy-800 flex items-center gap-1 transition no-print">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                </button>
+                            </div>
+                            <p class="font-serif text-xl sm:text-[21px] leading-[1.8] text-parchment-900 mb-5">
+                                ${block.bibleText}
+                            </p>
+                            <div class="bg-parchment-100/80 rounded-xl p-4 sm:p-5 border border-parchment-300/80">
+                                ${commentaryHtml}
+                            </div>
+                            ${renderNoteArea(blockKey, savedNote)}
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                sectionEl.innerHTML = html;
+                container.appendChild(sectionEl);
+            });
+        }
+
+        function renderNoteArea(blockKey, savedNote) {
+            const isHidden = savedNote ? '' : 'hidden';
+            return `
+                <div id="note-box-${blockKey}" class="${isHidden} mt-4 pt-3 border-t border-parchment-200 no-print">
+                    <label class="block font-sans text-[11px] font-medium text-stone-500 mb-1">Eigene Studiennotiz:</label>
+                    <textarea 
+                        onchange="saveNote('${blockKey}', this.value)"
+                        onkeyup="saveNote('${blockKey}', this.value)"
+                        rows="2" 
+                        placeholder="Deine Gedanken..."
+                        class="w-full rounded-lg bg-white border border-parchment-300 p-2 text-xs font-sans text-parchment-900 focus:outline-none focus:border-gold-600"
+                    >${savedNote}</textarea>
+                </div>
+            `;
+        }
+
+        function toggleNoteBox(blockKey) {
+            const box = document.getElementById(`note-box-${blockKey}`);
+            if (box) {
+                box.classList.toggle('hidden');
+                if (!box.classList.contains('hidden')) box.querySelector('textarea').focus();
+            }
+        }
+
+        function saveNote(blockKey, text) {
+            if (text.trim() === '') delete userNotes[blockKey];
+            else userNotes[blockKey] = text;
+            try { localStorage.setItem(NOTES_KEY, JSON.stringify(userNotes)); } catch (e) {}
+        }
+
+        function toggleFilter(type) {
+            activeFilters[type] = !activeFilters[type];
+            const btn = document.getElementById(`filter-${type}`);
+            if (activeFilters[type]) btn.classList.remove('opacity-45', 'line-through');
+            else btn.classList.add('opacity-45', 'line-through');
+            renderStudy();
+        }
+
+        function openGreek(key) {
+            const item = greekLexicon[key];
+            if (!item) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Griechisches Original';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-sky-900/10 text-sky-900 border border-sky-800/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <div class="text-3xl font-serif font-bold text-greek-800">${item.greek}</div>
+                    <div class="text-sm font-sans text-stone-500 mt-0.5">Umschrift: <span class="italic font-medium text-stone-700">${item.translit}</span> · Wörtlich: <span class="font-medium text-stone-700">${item.literal}</span></div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${item.meaning}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Theologische Tiefe</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${item.theology}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        // Schwerpunkt-Text: Feld heißt je Kapitel anders (focusInMtN)
+        function fatherFocus(f) {
+            const k = Object.keys(f).find(x => x === 'focus' || x.startsWith('focusIn'));
+            return k ? f[k] : '';
+        }
+
+        function openFather(key) {
+            const father = churchFathers[key];
+            if (!father) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Ausleger / Patristik';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-red-900/10 text-burgundy-900 border border-red-900/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <h3 class="text-2xl font-display font-bold text-burgundy-900">${father.name}</h3>
+                    <div class="text-xs font-sans text-stone-600 mt-0.5">${father.dates} · ${father.role}</div>
+                    ${father.classificationNote ? `<p class="text-xs font-sans text-burgundy-800 mt-1.5 font-medium">${father.classificationNote}</p>` : ''}
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Biografie & Einordnung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${father.bio}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-gold-700 mb-1">Schwerpunkt in Mt ${CHAPTER}</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${fatherFocus(father)}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openGlossaryModal() {
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Lexikon & Kirchenväter';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-amber-900/10 text-amber-900 border border-amber-800/30';
+            
+            let greekList = Object.entries(greekLexicon).map(([k, v]) => `
+                <button onclick="openGreek('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-sky-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-serif font-bold text-greek-800 text-base">${v.greek}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${v.translit}</span>
+                </button>
+            `).join('');
+
+            let fathersList = Object.entries(churchFathers).map(([k, f]) => `
+                <button onclick="openFather('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-amber-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-display font-bold text-burgundy-900 text-base">${f.name}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${f.dates} · ${f.role}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('modal-body').innerHTML = `
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-sky-900 mb-2">Griechische Begriffe</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${greekList}</div>
+                </div>
+                <div class="pt-3 border-t border-parchment-200">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Kirchenväter & Ausleger</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${fathersList}</div>
+                </div>
+            `;
+            showModal();
+        }
+
+        function showModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeModalOnBackdrop(e) {
+            if (e.target.id === 'detail-modal') closeModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderStudy);
+    </script>
+</body>
+</html>
