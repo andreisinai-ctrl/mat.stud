@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis 1 – Interaktive Studienausgabe (Hebräisch, Historie & Auslegung)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+/* ===== Gemeinsames Theme-Skript für alle Kapitel ===== */
+/* Einbinden direkt NACH dem Tailwind-CDN-Skript im <head>. Ersetzt den alten tailwind.config-Block. */
+
+(function () {
+    // 1) Theme sofort setzen (vor dem ersten Rendern, kein Aufblitzen)
+    try {
+        var t = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (t === 'dark' || (!t && prefersDark)) document.documentElement.classList.add('dark');
+    } catch (e) {}
+
+    // 2) Tailwind-Konfiguration: Farben laufen über CSS-Variablen aus theme.css
+    if (window.tailwind) {
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif']
+                    },
+                    colors: {
+                        parchment: {
+                            50: 'rgb(var(--parchment-50) / <alpha-value>)',
+                            100: 'rgb(var(--parchment-100) / <alpha-value>)',
+                            200: 'rgb(var(--parchment-200) / <alpha-value>)',
+                            300: 'rgb(var(--parchment-300) / <alpha-value>)',
+                            800: 'rgb(var(--parchment-800) / <alpha-value>)',
+                            900: 'rgb(var(--parchment-900) / <alpha-value>)'
+                        },
+                        burgundy: {
+                            700: 'rgb(var(--burgundy-700) / <alpha-value>)',
+                            800: 'rgb(var(--burgundy-800) / <alpha-value>)',
+                            900: 'rgb(var(--burgundy-900) / <alpha-value>)'
+                        },
+                        gold: {
+                            600: 'rgb(var(--gold-600) / <alpha-value>)',
+                            700: 'rgb(var(--gold-700) / <alpha-value>)'
+                        },
+                        greek: {
+                            50: 'rgb(var(--greek-50) / <alpha-value>)',
+                            700: 'rgb(var(--greek-700) / <alpha-value>)',
+                            800: 'rgb(var(--greek-800) / <alpha-value>)'
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    // 3) Umschalten
+    function isDark() {
+        return document.documentElement.classList.contains('dark');
+    }
+    function applyTheme(dark) {
+        document.documentElement.classList.toggle('dark', dark);
+        var btn = document.getElementById('theme-toggle-float');
+        if (btn) btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    }
+    window.toggleTheme = function () {
+        var next = !isDark();
+        applyTheme(next);
+        try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch (e) {}
+    };
+
+    // 4) Systemeinstellung live verfolgen, solange keine manuelle Wahl gespeichert ist
+    if (window.matchMedia) {
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        var onChange = function (e) {
+            var stored = null;
+            try { stored = localStorage.getItem('theme'); } catch (err) {}
+            if (!stored) applyTheme(e.matches);
+        };
+        if (mq.addEventListener) mq.addEventListener('change', onChange);
+        else if (mq.addListener) mq.addListener(onChange);
+    }
+
+    // 5) Schwebenden Umschalt-Button einfügen
+    document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.createElement('button');
+        btn.id = 'theme-toggle-float';
+        btn.type = 'button';
+        btn.className = 'no-print';
+        btn.title = 'Hell/Dunkel umschalten';
+        btn.setAttribute('aria-label', 'Dunkelmodus umschalten');
+        btn.setAttribute('aria-pressed', isDark() ? 'true' : 'false');
+        btn.onclick = window.toggleTheme;
+        btn.innerHTML =
+            '<svg class="icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>' +
+            '<svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>';
+        document.body.appendChild(btn);
+    });
+})();
+
+    </script>
+    <style>
+        body {
+            background-color: #F7F3E8;
+            color: #262018;
+            background-image: radial-gradient(#DFD2B5 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+
+        .folio-page {
+            background-color: #FCFBF7;
+            box-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+        }
+
+        .greek-term {
+            border-bottom: 1.5px dotted #1E4E79;
+            color: #15395B;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .greek-term:hover {
+            background-color: #E2ECF5;
+            border-bottom-style: solid;
+        }
+
+        .father-link {
+            color: #7C2D12;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px dashed #7C2D12;
+            transition: color 0.15s ease;
+        }
+        .father-link:hover {
+            color: #B48327;
+            border-bottom-color: #B48327;
+        }
+
+        .verse-num {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #8F6519;
+            vertical-align: super;
+            margin-right: 2px;
+            user-select: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F3E8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C3A3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B48327;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .folio-page { box-shadow: none; }
+        }
+    </style>
+    <style>
+/* ===== Gemeinsamer Dark Mode für alle Kapitel ===== */
+/* Einbinden NACH dem <style>-Block der Seite, damit diese Regeln die alten Farbwerte überschreiben. */
+
+:root {
+    --parchment-50: 252 251 247;
+    --parchment-100: 247 243 232;
+    --parchment-200: 239 231 212;
+    --parchment-300: 223 210 181;
+    --parchment-800: 61 53 41;
+    --parchment-900: 38 32 24;
+    --burgundy-700: 124 45 18;
+    --burgundy-800: 101 34 20;
+    --burgundy-900: 74 22 13;
+    --gold-600: 180 131 39;
+    --gold-700: 143 101 25;
+    --greek-50: 240 245 249;
+    --greek-700: 30 78 121;
+    --greek-800: 21 57 91;
+
+    --body-bg: #F7F3E8;
+    --body-fg: #262018;
+    --body-dot: #DFD2B5;
+    --folio-bg: #FCFBF7;
+    --folio-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+    --greek-term-fg: #15395B;
+    --greek-term-border: #1E4E79;
+    --greek-term-hover: #E2ECF5;
+    --father-fg: #7C2D12;
+    --father-hover: #B48327;
+    --verse-num: #8F6519;
+    --scroll-track: #F7F3E8;
+    --scroll-thumb: #D4C3A3;
+    --scroll-thumb-hover: #B48327;
+}
+
+:root.dark {
+    color-scheme: dark;
+
+    --parchment-50: 28 24 19;
+    --parchment-100: 36 31 25;
+    --parchment-200: 46 40 32;
+    --parchment-300: 70 60 47;
+    --parchment-800: 217 207 184;
+    --parchment-900: 238 231 214;
+    --burgundy-700: 224 145 122;
+    --burgundy-800: 232 168 146;
+    --burgundy-900: 240 190 170;
+    --gold-600: 212 166 74;
+    --gold-700: 224 184 96;
+    --greek-50: 26 36 48;
+    --greek-700: 127 178 224;
+    --greek-800: 166 203 238;
+
+    --body-bg: #14110D;
+    --body-fg: #E8E0CF;
+    --body-dot: #2A241C;
+    --folio-bg: #1C1813;
+    --folio-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.55), 0 0 1px 1px rgba(212, 166, 74, 0.22);
+    --greek-term-fg: #A6CBEE;
+    --greek-term-border: #7FB2E0;
+    --greek-term-hover: #1F3045;
+    --father-fg: #E8A892;
+    --father-hover: #E0B860;
+    --verse-num: #D4A64A;
+    --scroll-track: #14110D;
+    --scroll-thumb: #4A4132;
+    --scroll-thumb-hover: #D4A64A;
+}
+
+/* Bestehende Klassen auf Variablen umstellen (überschreibt die festen Werte der Seite) */
+body {
+    background-color: var(--body-bg);
+    color: var(--body-fg);
+    background-image: radial-gradient(var(--body-dot) 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+.folio-page { background-color: var(--folio-bg); box-shadow: var(--folio-shadow); }
+.greek-term { border-bottom-color: var(--greek-term-border); color: var(--greek-term-fg); }
+.greek-term:hover { background-color: var(--greek-term-hover); }
+.father-link { color: var(--father-fg); border-bottom-color: var(--father-fg); }
+.father-link:hover { color: var(--father-hover); border-bottom-color: var(--father-hover); }
+.verse-num { color: var(--verse-num); }
+::-webkit-scrollbar-track { background: var(--scroll-track); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+
+/* Overrides für feste Tailwind-Standardfarben */
+.dark ::selection { background: rgba(212, 166, 74, 0.35); color: #fff; }
+
+.dark .bg-burgundy-800 { background-color: #7C2D12; color: #fff; }
+.dark .hover\:bg-burgundy-900:hover { background-color: #933818; }
+
+.dark .text-stone-400 { color: #8F8575; }
+.dark .text-stone-500 { color: #A39A89; }
+.dark .text-stone-600 { color: #B8AF9D; }
+.dark .text-stone-700 { color: #CFC7B5; }
+.dark .text-stone-800 { color: #E3DCCB; }
+.dark .hover\:text-stone-900:hover { color: #FFFFFF; }
+
+.dark .text-sky-900 { color: #9CC6EE; }
+.dark .text-amber-900,
+.dark .text-amber-800 { color: #E6BF78; }
+.dark .text-red-950 { color: #F0B8A8; }
+.dark .border-sky-800\/30 { border-color: rgba(127, 178, 224, 0.4); }
+.dark .border-amber-800\/30 { border-color: rgba(224, 184, 96, 0.4); }
+.dark .border-red-900\/30 { border-color: rgba(232, 168, 146, 0.4); }
+.dark .border-amber-700\/60 { border-color: rgba(224, 184, 96, 0.6); }
+.dark .border-sky-800\/60 { border-color: rgba(127, 178, 224, 0.6); }
+
+.dark .bg-white { background-color: #1A1611; }
+.dark .hover\:bg-sky-50:hover { background-color: #1B2733; }
+.dark .hover\:bg-amber-50:hover { background-color: #2A2214; }
+.dark textarea::placeholder { color: #8F8575; }
+
+/* Schwebender Umschalt-Button (wird von theme.js eingefügt) */
+#theme-toggle-float {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 40;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    cursor: pointer;
+    background-color: rgb(var(--parchment-50));
+    color: rgb(var(--gold-700));
+    border: 1px solid rgb(var(--parchment-300));
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    transition: background-color 0.2s ease;
+}
+#theme-toggle-float:hover { background-color: rgb(var(--parchment-200)); }
+#theme-toggle-float svg { width: 1.2rem; height: 1.2rem; }
+#theme-toggle-float .icon-sun { display: none; }
+.dark #theme-toggle-float .icon-sun { display: block; }
+.dark #theme-toggle-float .icon-moon { display: none; }
+
+@media print {
+    #theme-toggle-float { display: none !important; }
+    body { background: white; color: #262018; background-image: none; }
+    .folio-page { box-shadow: none; }
+}
+
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-amber-200/60">
+    <!-- Schmale Kopfleiste: Titel + Ebenen-Schalter -->
+    <header class="sticky top-0 z-30 bg-parchment-100/95 backdrop-blur-md border-b border-parchment-300 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
+            <h1 class="font-display text-lg sm:text-xl font-bold text-parchment-900 tracking-tight">
+                Genesis Kapitel 1
+            </h1>
+            <div class="flex flex-wrap items-center gap-1.5 text-xs font-sans">
+                <button onclick="toggleFilter('greek')" id="filter-greek" class="filter-chip active px-2.5 py-1 rounded-full border border-sky-800/30 bg-sky-900/10 text-sky-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-sky-700"></span> Hebräisch
+                </button>
+                <button onclick="toggleFilter('history')" id="filter-history" class="filter-chip active px-2.5 py-1 rounded-full border border-amber-800/30 bg-amber-900/10 text-amber-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-amber-700"></span> Historie
+                </button>
+                <button onclick="toggleFilter('fathers')" id="filter-fathers" class="filter-chip active px-2.5 py-1 rounded-full border border-red-900/30 bg-red-900/10 text-red-950 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-burgundy-800"></span> Kirchenväter
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Haupt-Container (Buchseite / Folio) -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+
+        <!-- Obere Kapitel-Navigation direkt über dem Einführungskasten -->
+        <nav aria-label="Obere Kapitel-Navigation" class="mb-6 pb-4 border-b border-parchment-300 flex items-center justify-between no-print">
+            <span class="w-24"></span>
+            <a href="index.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Kapitel 1</a>
+            <a href="genesis-2.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 2 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+        
+        <!-- Einführungskasten -->
+        <div class="folio-page rounded-xl p-5 sm:p-7 mb-8 border border-parchment-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-parchment-200 pb-4 mb-4">
+                <div>
+                    <span class="text-xs font-sans uppercase tracking-widest text-gold-700 font-semibold">Die Schöpfung (Gen 1)</span>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-parchment-900 mt-0.5">
+                        Das Sechstagewerk und die Erschaffung des Menschen
+                    </h2>
+                </div>
+                <div class="text-xs font-sans text-stone-600 bg-parchment-100 px-3.5 py-2 rounded-lg border border-parchment-300">
+                    <strong class="text-parchment-900">Tipp:</strong> Klicke auf <span class="greek-term">blaue Begriffe</span> für den hebräischen Urtext oder auf <span class="father-link">Ausleger-Namen</span> für Kommentare.
+                </div>
+            </div>
+            <p class="font-serif text-base sm:text-lg text-stone-700 leading-relaxed">
+                Das erste Kapitel der Bibel beschreibt die Schöpfung als geordnete Folge von sechs Tagen. Gott spricht, scheidet und formt: zuerst die Räume (Licht, Himmel, Land), dann ihre Bewohner (Gestirne, Tiere), zuletzt den Menschen in seinem Bild. Alles wird als „sehr gut“ bewertet.
+            </p>
+        </div>
+
+
+        <!-- Dynamisch gerenderte Bibelabschnitte -->
+        <div id="study-container" class="space-y-10">
+            <!-- Inhalte werden über JavaScript aufgebaut -->
+        </div>
+
+        <!-- Kapitel-Navigation am Ende -->
+        <nav aria-label="Kapitel-Navigation" class="mt-12 pt-6 border-t border-parchment-300 flex items-center justify-between no-print">
+            <span class="w-24"></span>
+            <a href="index.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Kapitel 1</a>
+            <a href="genesis-2.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 2 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12 border-t border-parchment-300 text-center text-xs font-sans text-stone-600">
+        <p class="font-serif italic text-sm text-parchment-800 mb-1">
+            „Im Anfang schuf Gott die Himmel und die Erde.“ (1. Mose 1,1)
+        </p>
+        <p>Interaktive Studienbibel · Hebräischer Grundtext (Masoretischer Text), historische Realienkunde &amp; alte Auslegung.</p>
+    </footer>
+
+    <!-- Modal / Detail-Karte -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/60 backdrop-blur-xs p-4" onclick="closeModalOnBackdrop(event)">
+        <div class="bg-parchment-50 border border-parchment-300 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden transform transition-all">
+            <div id="modal-header" class="px-6 py-4 bg-parchment-100 border-b border-parchment-300 flex items-center justify-between">
+                <span id="modal-badge" class="text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded"></span>
+                <button onclick="closeModal()" class="text-stone-500 hover:text-stone-900 p-1 rounded-lg hover:bg-parchment-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 font-serif text-parchment-900 space-y-4 max-h-[75vh] overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // INHALT: MATTHÄUS 1
+        // ==========================================
+        const greekLexicon = {
+  bara: { greek: `בָּרָא`, translit: `bārāʾ`, literal: `schaffen`,
+    meaning: `Das Verb hat im Alten Testament nur Gott zum Subjekt. Es steht in V. 1, 21 und 27 und hebt die drei großen Schöpfungsakte hervor: den Anfang, das Leben und den Menschen.`,
+    theology: `Die Schöpfung geschieht allein durch Gottes Wort und Willen. Anders als in den Schöpfungsmythen Babylons kämpft Gott nicht gegen eine Gegenmacht.` },
+  tohu: { greek: `תֹהוּ וָבֹהוּ`, translit: `tōhû wābōhû`, literal: `wüst und leer`,
+    meaning: `Ein Wortspiel mit zwei Lautverwandten: <em>tōhû</em> („Öde, Wüste“) und <em>bōhû</em> („Leere“), das nur noch Jes 34,11 und Jer 4,23 kennen. Es beschreibt den Zustand vor der Gestaltung.`,
+    theology: `Die Schöpfung beginnt als Formung: Gott gibt der ungestalteten Erde Ordnung und füllt sie mit Leben.` },
+  ruach: { greek: `רוּחַ אֱלֹהִים`, translit: `rûaḥ ʾĕlōhîm`, literal: `Geist, Wind, Atem Gottes`,
+    meaning: `<em>Rûaḥ</em> bedeutet „Wind, Atem, Geist“. „Schwebte“ (<em>mĕraḥepet</em>) beschreibt auch den Flug des Adlers über seinen Jungen (Dtn 32,11). Ob „Gottes Geist“ oder „gewaltiger Wind“ gemeint ist, ist umstritten.`,
+    theology: `Die christliche Auslegung hat hier den Heiligen Geist gesehen. Gottes Atem ist die lebendige Kraft, die der Schöpfung vorausgeht.` },
+  raqia: { greek: `רָקִיעַ`, translit: `rāqîaʿ`, literal: `Ausdehnung, Feste, Gewölbe`,
+    meaning: `Von <em>rāqaʿ</em> („breit schlagen, hämmern“). Das Wort bezeichnet das Himmelsgewölbe, das nach altorientalischer Vorstellung die oberen Wasser vom Land trennt (V. 6–8; vgl. Ps 148,4).`,
+    theology: `Der Text spricht in der Sprache des antiken Weltbildes. Seine Aussage ist nicht die Kosmologie, sondern dass Gott Raum für das Leben schafft.` },
+  tselem: { greek: `צֶלֶם / דְּמוּת`, translit: `ṣelem / dĕmût`, literal: `Bild / Gleichnis`,
+    meaning: `<em>Ṣelem</em> bezeichnet ein Standbild. Im Alten Orient war der König das Bild des Gottes. Hier gilt dies für den Menschen als Ganzen, „als Mann und Frau“ (V. 27). Ob das Bild in Herrschaft, Beziehung oder Gottesnähe besteht, wird verschieden gedeutet.`,
+    theology: `Jeder Mensch hat Würde als Repräsentant Gottes. Die Herrschaft über die Tiere ist als Dienst nach dem Vorbild Gottes zu verstehen.` },
+  tov: { greek: `טוֹב`, translit: `ṭôb`, literal: `gut`,
+    meaning: `Das Wort steht nach jedem Schöpfungswerk (V. 4.10.12.18.21.25) und am Ende „sehr gut“ (<em>ṭôb mĕʾōd</em>, V. 31). Es meint „geeignet, wohlgeordnet, vollkommen für seinen Zweck“.`,
+    theology: `Die Schöpfung ist keine Gegenwelt zu Gott. Sie ist gut, auch das Materielle und Körperliche.` }
+};
+
+        const churchFathers = {
+  basilius: { name: `Basilius der Große`, dates: `ca. 329–379`, role: `Bischof von Cäsarea in Kappadokien`,
+    bio: `Seine neun Predigten über das Sechstagewerk (<em>Hexaemeron</em>) sind die erste große Auslegung von Gen 1.`,
+    focusInGen1: `Er liest Gen 1 als Lob der Weisheit Gottes in der Ordnung der Natur und verbindet es mit Naturkunde seiner Zeit. Das „Im Anfang“ versteht er als Beginn der Zeit.` },
+  ambrosius: { name: `Ambrosius von Mailand`, dates: `ca. 339–397`, role: `Bischof von Mailand`,
+    bio: `Er predigte um 387 über das Sechstagewerk und stützte sich dabei auf Basilius.`,
+    focusInGen1: `Er deutet die Schöpfung als Ordnung, die zum Lob des Schöpfers führt, und den Menschen als Bild Gottes, das Würde und Verantwortung trägt.` },
+  augustinus: { name: `Augustinus von Hippo`, dates: `354–430`, role: `Bischof und Kirchenlehrer`,
+    bio: `Er schrieb mehrere Auslegungen zu Gen 1, darunter „De Genesi ad litteram“ und „Confessiones“ (Bücher XI–XIII).`,
+    focusInGen1: `Er fragt nach dem Sinn der „Tage“ und der Zeit vor der Schöpfung: Gott schuf die Zeit mit der Welt. Er mahnt zur Vorsicht, wenn man die Schrift gegen gesichertes Wissen ausspielt.` },
+  chrysostomus: { name: `Johannes Chrysostomus`, dates: `ca. 349–407`, role: `Bischof von Konstantinopel, Prediger`,
+    bio: `In 67 Homilien legte er die Genesis aus; die ersten gelten der Schöpfung.`,
+    focusInGen1: `Er betont die Großzügigkeit des Schöpfers, der alles für den Menschen bereitet hat, und lehrt, dass die Schrift sich der menschlichen Fassungskraft anpasst.` },
+  raschi: { name: `Raschi (Rabbi Schlomo Jizchaki)`, dates: `1040–1105`, role: `Rabbiner und Bibelkommentator in Troyes`,
+    bio: `Sein Pentateuchkommentar ist die meistgelesene jüdische Auslegung der Tora.`,
+    focusInGen1: `Zu V. 1 liest er „Im Anfang“ als Verbindung („im Anfang des Erschaffens …“) und bemerkt, dass der Text keine Reihenfolge der Dinge angibt. Er verweist auf den Midrasch, nach dem die Tora mit der Schöpfung Gottes Recht auf die Erde begründet.` }
+};
+
+        const studySections = [
+{
+  id: `tag1-3`, sectionTitle: `Der Anfang und die ersten drei Tage`, sectionRange: `Gen 1,1–13`,
+  sectionIntro: `Das erste Kapitel der Bibel schildert die Schöpfung in einem Wochenschema. An den ersten drei Tagen schafft Gott die Räume: Licht, Himmel und Meer, Land und Pflanzen.`,
+  blocks: [
+  { verses: `1–5`,
+    bibleText: `<span class="verse-num">1</span>Im Anfang <span class="greek-term" onclick="openGreek('bara')">schuf</span> Gott die Himmel und die Erde. <span class="verse-num">2</span>Und die Erde war <span class="greek-term" onclick="openGreek('tohu')">wüst und leer</span>, und Finsternis war über der Tiefe; und der <span class="greek-term" onclick="openGreek('ruach')">Geist Gottes</span> schwebte über den Wassern. <span class="verse-num">3</span>Und Gott sprach: Es werde Licht! Und es wurde Licht. <span class="verse-num">4</span>Und Gott sah das Licht, dass es <span class="greek-term" onclick="openGreek('tov')">gut</span> war; und Gott schied das Licht von der Finsternis. <span class="verse-num">5</span>Und Gott nannte das Licht Tag, und die Finsternis nannte er Nacht. Und es wurde Abend, und es wurde Morgen: ein Tag.`,
+    commentary: {
+      history: `Gen 1,1–2,4a gehört nach der Forschung zur Priesterschrift (6./5. Jh. v. Chr.) und steht möglicherweise in bewusster Spannung zu den babylonischen Mythen wie dem <em>Enuma elisch</em>, wo der Gott Marduk die Urmeeresgöttin Tiamat besiegt. Hier gibt es keinen Kampf. Die „Tiefe“ (<em>tĕhôm</em>) ist sprachlich mit Tiamat verwandt, wird aber entmythologisiert. Der Tag beginnt in der biblischen Zählung mit dem Abend.`,
+      greek: `Das erste Wort <em>bĕrēʾšît</em> ist grammatisch umstritten: „Im Anfang“ oder „Am Anfang, als Gott schuf …“. Der Gottesname ist <em>ʾĕlōhîm</em>, eine Pluralform mit Singular-Verb. Die Schöpfung geschieht durch das Wort („Gott sprach“) und durch das Scheiden: Gott trennt Licht und Finsternis.`,
+      fathers: `<span class="father-link" onclick="openFather('basilius')">Basilius</span> sieht im „Anfang“ den Beginn der Zeit, der der Welt vorausgeht. <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> schließt daraus, dass Gott die Zeit mit der Welt erschaffen hat. <span class="father-link" onclick="openFather('raschi')">Raschi</span> hält fest, dass der Text nicht den Anfang der Dinge schlechthin, sondern den Anfang der Erschaffung beschreibt.` } },
+  { verses: `6–8`,
+    bibleText: `<span class="verse-num">6</span>Und Gott sprach: Es werde eine <span class="greek-term" onclick="openGreek('raqia')">Ausdehnung</span> inmitten der Wasser, und sie scheide zwischen den Wassern und den Wassern! <span class="verse-num">7</span>Und Gott machte die Ausdehnung und schied zwischen den Wassern, die unterhalb der Ausdehnung, und den Wassern, die oberhalb der Ausdehnung sind. Und es geschah so. <span class="verse-num">8</span>Und Gott nannte die Ausdehnung Himmel. Und es wurde Abend, und es wurde Morgen: zweiter Tag.`,
+    commentary: {
+      history: `Das antike Weltbild dachte sich ein festes Himmelsgewölbe, über dem „obere Wasser“ standen (Ps 148,4; Gen 7,11). Der Regen kam durch Öffnungen des Gewölbes. Das Wort „gut“ fehlt am zweiten Tag; die Auslegung hat verschiedene Gründe dafür genannt, am häufigsten, dass das Werk der Scheidung erst am dritten Tag vollendet wird.`,
+      greek: `Das Verb „scheiden“ (<em>hibdîl</em>) wiederholt sich in V. 4.6.7.14.18 und kennzeichnet das Wirken Gottes: Er schafft Ordnung durch Trennung. „Und es geschah so“ bestätigt, dass sein Wort wirksam ist.`,
+      fathers: `<span class="father-link" onclick="openFather('basilius')">Basilius</span> erklärt das „Gewölbe“ als Grenze zwischen oberen und unteren Wassern und weist auf Gottes Weisheit in der Naturordnung hin. <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> warnt davor, die Schrift gegen gesicherte Naturerkenntnis zu verteidigen, und fordert Bescheidenheit bei der Auslegung.` } },
+  { verses: `9–13`,
+    bibleText: `<span class="verse-num">9</span>Und Gott sprach: Es sammle sich das Wasser unterhalb des Himmels an einen Ort, und es werde sichtbar das Trockene! Und es geschah so. <span class="verse-num">10</span>Und Gott nannte das Trockene Erde, und die Sammlung der Wasser nannte er Meere. Und Gott sah, dass es <span class="greek-term" onclick="openGreek('tov')">gut</span> war. <span class="verse-num">11</span>Und Gott sprach: Die Erde lasse Gras hervorsprossen, samentragendes Kraut, Fruchtbäume, die auf der Erde Früchte tragen nach ihrer Art, in denen ihr Same ist! Und es geschah so. <span class="verse-num">12</span>Und die Erde brachte Gras hervor, samentragendes Kraut nach seiner Art und Bäume, die Früchte tragen, in denen ihr Same ist, nach ihrer Art. Und Gott sah, dass es gut war. <span class="verse-num">13</span>Und es wurde Abend, und es wurde Morgen: dritter Tag.`,
+    commentary: {
+      history: `Am dritten Tag erscheinen zwei Werke: das Land und die Pflanzen. Damit ist die Schöpfung der „Räume“ abgeschlossen. Die Pflanzen sind Nahrung für Mensch und Tier (V. 29–30). Das Meer gilt im Alten Orient als bedrohliche Macht; hier ist es begrenzt und dem Land zugeordnet (vgl. Ijob 38,8–11).`,
+      greek: `Die Wendung „nach ihrer Art“ (<em>lĕmînô</em>) steht zehnmal im Kapitel und betont, dass die Arten Gottes Ordnung entsprechen. Die Erde ist hier mitwirkend: „Die Erde bringe hervor“ (V. 11–12), wie später in V. 24.`,
+      fathers: `<span class="father-link" onclick="openFather('basilius')">Basilius</span> preist, dass die Erde am dritten Tag Pflanzen hervorbringt, bevor die Sonne scheint, damit niemand das Licht als Quelle des Lebens verehrt. <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> hebt hervor, wie großzügig Gott für den Menschen vorsorgt, noch bevor dieser geschaffen ist.` } }
+  ]
+},
+{
+  id: `tag4-6a`, sectionTitle: `Die Gestirne, die Tiere im Meer, in der Luft und auf dem Land`, sectionRange: `Gen 1,14–25`,
+  sectionIntro: `An den Tagen vier bis sechs füllt Gott die geschaffenen Räume: Sonne, Mond und Sterne, dann die Tiere des Wassers, der Luft und des Landes.`,
+  blocks: [
+  { verses: `14–19`,
+    bibleText: `<span class="verse-num">14</span>Und Gott sprach: Es werden Lichter an der Ausdehnung des Himmels, um zu scheiden zwischen dem Tag und der Nacht; und sie seien zu Zeichen und zur Bestimmung von Zeiten und von Tagen und Jahren; <span class="verse-num">15</span>und sie seien zu Lichtern an der Ausdehnung des Himmels, um auf die Erde zu leuchten! Und es geschah so. <span class="verse-num">16</span>Und Gott machte die beiden großen Lichter: das größere Licht zur Beherrschung des Tages und das kleinere Licht zur Beherrschung der Nacht, und die Sterne. <span class="verse-num">17</span>Und Gott setzte sie an die Ausdehnung des Himmels, auf die Erde zu leuchten <span class="verse-num">18</span>und zu herrschen über den Tag und über die Nacht und zu scheiden zwischen dem Licht und der Finsternis. Und Gott sah, dass es gut war. <span class="verse-num">19</span>Und es wurde Abend, und es wurde Morgen: vierter Tag.`,
+    commentary: {
+      history: `Die Tage vier bis sechs entsprechen den Tagen eins bis drei: Licht – Lichter, Himmel und Wasser – Vögel und Fische, Land und Pflanzen – Tiere und Mensch. Sonne und Mond heißen nur „die großen Lichter“, nicht mit ihren Namen, die im Orient zugleich Götternamen waren. Sie sind Geschöpfe, die Zeiten und Feste ordnen (Ps 104,19).`,
+      greek: `Das Wort „Zeichen und Zeiten“ (<em>ʾōtōt ûmôʿădîm</em>) meint die Zeiten für Feste und den Kalender. „Beherrschen“ (<em>memšelet</em>) und „herrschen“ (<em>māšal</em>) sind Dienstbegriffe: Die Lichter sind Gottes Beamte, nicht Gottheiten.`,
+      fathers: `<span class="father-link" onclick="openFather('basilius')">Basilius</span> lobt, dass die Himmelskörper Gottes Werk sind und Zeitrechnung ermöglichen; der Mensch soll nicht sie, sondern den Schöpfer verehren. <span class="father-link" onclick="openFather('ambrosius')">Ambrosius</span> lässt den Mond zum Bild der Kirche werden, die ihr Licht von Christus empfängt.` } },
+  { verses: `20–25`,
+    bibleText: `<span class="verse-num">20</span>Und Gott sprach: Es wimmle das Wasser von lebendigen Wesen, und Gevögel fliege über der Erde, an der Ausdehnung des Himmels! <span class="verse-num">21</span>Und Gott schuf die großen Seeungeheuer und jedes sich regende lebendige Wesen, von denen das Wasser wimmelt, nach ihrer Art, und alles geflügelte Gevögel nach seiner Art. Und Gott sah, dass es gut war. <span class="verse-num">22</span>Und Gott segnete sie und sprach: Seid fruchtbar und mehrt euch und füllt das Wasser in den Meeren, und das Gevögel mehre sich auf der Erde! <span class="verse-num">23</span>Und es wurde Abend, und es wurde Morgen: fünfter Tag. <span class="verse-num">24</span>Und Gott sprach: Die Erde bringe lebendige Wesen hervor nach ihrer Art: Vieh und kriechende Tiere und Wild der Erde nach seiner Art! Und es geschah so. <span class="verse-num">25</span>Und Gott machte das Wild der Erde nach seiner Art und das Vieh nach seiner Art und alles Kriechende des Erdbodens nach seiner Art. Und Gott sah, dass es <span class="greek-term" onclick="openGreek('tov')">gut</span> war.`,
+    commentary: {
+      history: `Die „Seeungeheuer“ (<em>tannînîm</em>) sind in den Mythen oft Chaosmächte (Ps 74,13; Jes 27,1). Hier sind sie Geschöpfe wie die anderen. Der Segen am fünften Tag ist der erste Segen der Bibel und gilt dem Leben, das sich vermehrt.`,
+      greek: `Der Ausdruck „lebendige Wesen“ (<em>nefesch ḥayyâ</em>) wird später auch für den Menschen gebraucht (2,7). Das Verb <em>bārāʾ</em> steht in V. 21 für das erste Lebewesen. Die Tiere des Landes erscheinen am sechsten Tag, und der Mensch kommt hinzu.`,
+      fathers: `<span class="father-link" onclick="openFather('basilius')">Basilius</span> staunt über die Vielfalt der Tiere und liest sie als Predigt der Weisheit Gottes. <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> sieht den Segen als Zeichen der Fürsorge Gottes auch für die Tiere.` } }
+  ]
+},
+{
+  id: `mensch`, sectionTitle: `Die Erschaffung des Menschen und das Ende des Werks`, sectionRange: `Gen 1,26–31`,
+  sectionIntro: `Der sechste Tag bringt den Höhepunkt: Gott schafft den Menschen in seinem Bild, gibt ihm den Auftrag zur Herrschaft und bewertet alles als sehr gut.`,
+  blocks: [
+  { verses: `26–28`,
+    bibleText: `<span class="verse-num">26</span>Und Gott sprach: Lasst uns Menschen machen in unserem <span class="greek-term" onclick="openGreek('tselem')">Bild</span>, nach unserem Gleichnis; und sie sollen herrschen über die Fische des Meeres und über das Gevögel des Himmels und über das Vieh und über die ganze Erde und über alles Kriechende, das auf der Erde kriecht! <span class="verse-num">27</span>Und Gott <span class="greek-term" onclick="openGreek('bara')">schuf</span> den Menschen in seinem Bilde, im Bilde Gottes schuf er ihn; als Mann und Frau schuf er sie. <span class="verse-num">28</span>Und Gott segnete sie, und Gott sprach zu ihnen: Seid fruchtbar und mehrt euch und füllt die Erde und macht sie euch untertan; und herrscht über die Fische des Meeres und über das Gevögel des Himmels und über alle Tiere, die sich auf der Erde regen!`,
+    commentary: {
+      history: `Im Alten Orient war der König das „Bild“ des Gottes; hier wird die Würde auf jeden Menschen übertragen. Das „Lasst uns“ ist umstritten: Gott im Rat der himmlischen Wesen (Ijob 1,6), ein Pluralis der Selbstberatung oder ein Majestätsplural. Die Kirchenväter lasen darin einen Hinweis auf die Dreieinigkeit; heute wird dies meist als spätere Deutung gesehen.`,
+      greek: `V. 27 ist als Dreizeiler gebaut („Bild“ steht dreimal). „Mann und Frau“ (<em>zākār ûnĕqēbâ</em>) beschreibt die Geschlechter, und Gott nennt das Menschsein als Ganzes sein Bild. Die Verben „herrschen“ (<em>rādâ</em>) und „untertan machen“ (<em>kābaš</em>) beschreiben Herrschaft, die nach Ps 72 als fürsorgliche Königsherrschaft gedacht ist.`,
+      fathers: `<span class="father-link" onclick="openFather('augustinus')">Augustinus</span> sieht das Bild Gottes in der Vernunftseele, durch die der Mensch Gott erkennen kann. <span class="father-link" onclick="openFather('ambrosius')">Ambrosius</span> verbindet Bild und Verantwortung. <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> versteht die Herrschaft als Vorrang der Ehre, nicht als Willkür. <span class="father-link" onclick="openFather('raschi')">Raschi</span> stellt fest, dass Gott seine Demut zeigt, indem er sich mit den himmlischen Wesen berät.` } },
+  { verses: `29–31`,
+    bibleText: `<span class="verse-num">29</span>Und Gott sprach: Siehe, ich habe euch alles samentragende Kraut gegeben, das auf der Fläche der ganzen Erde ist, und jeden Baum, an dem samentragende Baumfrucht ist: es sei euch zur Speise; <span class="verse-num">30</span>aber allem Wild der Erde und allem Gevögel des Himmels und allem, was sich auf der Erde regt, in dem eine lebendige Seele ist, habe ich alles grüne Kraut zur Speise gegeben. Und es geschah so. <span class="verse-num">31</span>Und Gott sah alles, was er gemacht hatte, und siehe, es war sehr <span class="greek-term" onclick="openGreek('tov')">gut</span>. Und es wurde Abend, und es wurde Morgen: der sechste Tag.`,
+    commentary: {
+      history: `Die Nahrung von Mensch und Tier besteht in der Urzeit aus Pflanzen; die Erlaubnis zum Fleischessen folgt erst nach der Flut (Gen 9,3). Das „sehr gut“ fasst die ganze Schöpfung zusammen und steht in Spannung zu dem Chaos, das die folgenden Kapitel schildern. Der Sabbat als Abschluss folgt in 2,1–3.`,
+      greek: `Das Wort „Gabe“ (<em>nātattî</em>, „ich habe gegeben“) rahmt die Nahrung als Geschenk. Mit „es war sehr gut“ (<em>ṭôb mĕʾōd</em>) wird das Siebenfache „gut“ des Kapitels gesteigert. Der sechste Tag trägt als einziger den Artikel („der sechste Tag“) und hebt ihn damit als Abschluss hervor.`,
+      fathers: `<span class="father-link" onclick="openFather('basilius')">Basilius</span> liest das „sehr gut“ als Lob der Ordnung, in der alles zusammenpasst. <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> sieht darin den Maßstab, an dem das Böse später nur als Mangel erscheint. <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> betont, dass Gott den Menschen zuerst versorgt und dann belehrt.` } }
+  ]
+}
+];
+
+
+        // ==========================================
+        // ZUSTAND & STEUERUNG
+        // ==========================================
+        let activeFilters = { greek: true, history: true, fathers: true };
+        const CHAPTER = 1;
+        const NOTES_KEY = 'gen' + CHAPTER + '_notes';
+        let userNotes = {};
+        try { userNotes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}'); } catch (e) {}
+
+        function renderStudy() {
+            const container = document.getElementById('study-container');
+            container.innerHTML = '';
+
+            studySections.forEach(section => {
+                const sectionEl = document.createElement('section');
+                sectionEl.id = section.id;
+                sectionEl.className = 'folio-page rounded-2xl border border-parchment-300 overflow-hidden scroll-mt-16';
+
+                let html = `
+                    <div class="bg-parchment-100/90 px-5 sm:px-8 py-5 border-b border-parchment-300">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <h3 class="font-display text-2xl sm:text-3xl font-bold text-burgundy-900">
+                                ${section.sectionTitle}
+                            </h3>
+                            <span class="font-sans text-xs font-semibold tracking-wider uppercase px-2.5 py-1 rounded bg-parchment-200 text-parchment-900 border border-parchment-300">
+                                ${section.sectionRange}
+                            </span>
+                        </div>
+                        <p class="font-serif italic text-stone-700 text-base mt-1.5">
+                            ${section.sectionIntro}
+                        </p>
+                    </div>
+                    <div class="divide-y divide-parchment-200">
+                `;
+
+                section.blocks.forEach((block, idx) => {
+                    const blockKey = `${section.id}-${idx}`;
+                    const savedNote = userNotes[blockKey] || '';
+
+                    let commentaryParts = [];
+                    if (activeFilters.history && block.commentary.history) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-amber-700/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-amber-800 block mb-0.5">Historischer & Jüdischer Kontext</span>
+                                <div class="text-stone-800">${block.commentary.history}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.greek && block.commentary.greek) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-sky-800/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-sky-900 block mb-0.5">Hebräischer Urtext & Wortbedeutung</span>
+                                <div class="text-stone-800">${block.commentary.greek}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.fathers && block.commentary.fathers) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-burgundy-800/70">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-800 block mb-0.5">Kirchenväter & Alte Ausleger</span>
+                                <div class="text-stone-800">${block.commentary.fathers}</div>
+                            </div>
+                        `);
+                    }
+
+                    const commentaryHtml = commentaryParts.length > 0
+                        ? `<div class="space-y-3.5 font-serif italic text-[15.5px] sm:text-base leading-relaxed">${commentaryParts.join('')}</div>`
+                        : `<div class="font-sans text-xs text-stone-400 italic">Alle Kommentar-Ebenen sind ausgeblendet.</div>`;
+
+                    html += `
+                        <div class="p-5 sm:p-8 bg-parchment-50 max-w-4xl mx-auto">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-700">
+                                    Genesis ${CHAPTER},${block.verses}
+                                </span>
+                                <button onclick="toggleNoteBox('${blockKey}')" class="text-xs font-sans text-stone-400 hover:text-burgundy-800 flex items-center gap-1 transition no-print">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                </button>
+                            </div>
+                            <p class="font-serif text-xl sm:text-[21px] leading-[1.8] text-parchment-900 mb-5">
+                                ${block.bibleText}
+                            </p>
+                            <div class="bg-parchment-100/80 rounded-xl p-4 sm:p-5 border border-parchment-300/80">
+                                ${commentaryHtml}
+                            </div>
+                            ${renderNoteArea(blockKey, savedNote)}
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                sectionEl.innerHTML = html;
+                container.appendChild(sectionEl);
+            });
+        }
+
+        function renderNoteArea(blockKey, savedNote) {
+            const isHidden = savedNote ? '' : 'hidden';
+            return `
+                <div id="note-box-${blockKey}" class="${isHidden} mt-4 pt-3 border-t border-parchment-200 no-print">
+                    <label class="block font-sans text-[11px] font-medium text-stone-500 mb-1">Eigene Studiennotiz:</label>
+                    <textarea 
+                        onchange="saveNote('${blockKey}', this.value)"
+                        onkeyup="saveNote('${blockKey}', this.value)"
+                        rows="2" 
+                        placeholder="Deine Gedanken..."
+                        class="w-full rounded-lg bg-white border border-parchment-300 p-2 text-xs font-sans text-parchment-900 focus:outline-none focus:border-gold-600"
+                    >${savedNote}</textarea>
+                </div>
+            `;
+        }
+
+        function toggleNoteBox(blockKey) {
+            const box = document.getElementById(`note-box-${blockKey}`);
+            if (box) {
+                box.classList.toggle('hidden');
+                if (!box.classList.contains('hidden')) box.querySelector('textarea').focus();
+            }
+        }
+
+        function saveNote(blockKey, text) {
+            if (text.trim() === '') delete userNotes[blockKey];
+            else userNotes[blockKey] = text;
+            try { localStorage.setItem(NOTES_KEY, JSON.stringify(userNotes)); } catch (e) {}
+        }
+
+        function toggleFilter(type) {
+            activeFilters[type] = !activeFilters[type];
+            const btn = document.getElementById(`filter-${type}`);
+            if (activeFilters[type]) btn.classList.remove('opacity-45', 'line-through');
+            else btn.classList.add('opacity-45', 'line-through');
+            renderStudy();
+        }
+
+        function openGreek(key) {
+            const item = greekLexicon[key];
+            if (!item) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Hebräisches Original';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-sky-900/10 text-sky-900 border border-sky-800/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <div class="text-3xl font-serif font-bold text-greek-800">${item.greek}</div>
+                    <div class="text-sm font-sans text-stone-500 mt-0.5">Umschrift: <span class="italic font-medium text-stone-700">${item.translit}</span> · Wörtlich: <span class="font-medium text-stone-700">${item.literal}</span></div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${item.meaning}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Theologische Tiefe</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${item.theology}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        // Schwerpunkt-Text: Feld heißt je Kapitel anders (focusInMtN)
+        function fatherFocus(f) {
+            const k = Object.keys(f).find(x => x === 'focus' || x.startsWith('focusIn'));
+            return k ? f[k] : '';
+        }
+
+        function openFather(key) {
+            const father = churchFathers[key];
+            if (!father) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Ausleger / Patristik';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-red-900/10 text-burgundy-900 border border-red-900/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <h3 class="text-2xl font-display font-bold text-burgundy-900">${father.name}</h3>
+                    <div class="text-xs font-sans text-stone-600 mt-0.5">${father.dates} · ${father.role}</div>
+                    ${father.classificationNote ? `<p class="text-xs font-sans text-burgundy-800 mt-1.5 font-medium">${father.classificationNote}</p>` : ''}
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Biografie & Einordnung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${father.bio}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-gold-700 mb-1">Schwerpunkt in Gen ${CHAPTER}</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${fatherFocus(father)}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openGlossaryModal() {
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Lexikon & Kirchenväter';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-amber-900/10 text-amber-900 border border-amber-800/30';
+            
+            let greekList = Object.entries(greekLexicon).map(([k, v]) => `
+                <button onclick="openGreek('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-sky-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-serif font-bold text-greek-800 text-base">${v.greek}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${v.translit}</span>
+                </button>
+            `).join('');
+
+            let fathersList = Object.entries(churchFathers).map(([k, f]) => `
+                <button onclick="openFather('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-amber-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-display font-bold text-burgundy-900 text-base">${f.name}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${f.dates} · ${f.role}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('modal-body').innerHTML = `
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-sky-900 mb-2">Hebräische Begriffe</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${greekList}</div>
+                </div>
+                <div class="pt-3 border-t border-parchment-200">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Kirchenväter & Ausleger</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${fathersList}</div>
+                </div>
+            `;
+            showModal();
+        }
+
+        function showModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeModalOnBackdrop(e) {
+            if (e.target.id === 'detail-modal') closeModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderStudy);
+    </script>
+</body>
+</html>
