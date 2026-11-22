@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis 3 – Interaktive Studienausgabe (Hebräisch, Historie & Auslegung)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+/* ===== Gemeinsames Theme-Skript für alle Kapitel ===== */
+/* Einbinden direkt NACH dem Tailwind-CDN-Skript im <head>. Ersetzt den alten tailwind.config-Block. */
+
+(function () {
+    // 1) Theme sofort setzen (vor dem ersten Rendern, kein Aufblitzen)
+    try {
+        var t = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (t === 'dark' || (!t && prefersDark)) document.documentElement.classList.add('dark');
+    } catch (e) {}
+
+    // 2) Tailwind-Konfiguration: Farben laufen über CSS-Variablen aus theme.css
+    if (window.tailwind) {
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif']
+                    },
+                    colors: {
+                        parchment: {
+                            50: 'rgb(var(--parchment-50) / <alpha-value>)',
+                            100: 'rgb(var(--parchment-100) / <alpha-value>)',
+                            200: 'rgb(var(--parchment-200) / <alpha-value>)',
+                            300: 'rgb(var(--parchment-300) / <alpha-value>)',
+                            800: 'rgb(var(--parchment-800) / <alpha-value>)',
+                            900: 'rgb(var(--parchment-900) / <alpha-value>)'
+                        },
+                        burgundy: {
+                            700: 'rgb(var(--burgundy-700) / <alpha-value>)',
+                            800: 'rgb(var(--burgundy-800) / <alpha-value>)',
+                            900: 'rgb(var(--burgundy-900) / <alpha-value>)'
+                        },
+                        gold: {
+                            600: 'rgb(var(--gold-600) / <alpha-value>)',
+                            700: 'rgb(var(--gold-700) / <alpha-value>)'
+                        },
+                        greek: {
+                            50: 'rgb(var(--greek-50) / <alpha-value>)',
+                            700: 'rgb(var(--greek-700) / <alpha-value>)',
+                            800: 'rgb(var(--greek-800) / <alpha-value>)'
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    // 3) Umschalten
+    function isDark() {
+        return document.documentElement.classList.contains('dark');
+    }
+    function applyTheme(dark) {
+        document.documentElement.classList.toggle('dark', dark);
+        var btn = document.getElementById('theme-toggle-float');
+        if (btn) btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    }
+    window.toggleTheme = function () {
+        var next = !isDark();
+        applyTheme(next);
+        try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch (e) {}
+    };
+
+    // 4) Systemeinstellung live verfolgen, solange keine manuelle Wahl gespeichert ist
+    if (window.matchMedia) {
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        var onChange = function (e) {
+            var stored = null;
+            try { stored = localStorage.getItem('theme'); } catch (err) {}
+            if (!stored) applyTheme(e.matches);
+        };
+        if (mq.addEventListener) mq.addEventListener('change', onChange);
+        else if (mq.addListener) mq.addListener(onChange);
+    }
+
+    // 5) Schwebenden Umschalt-Button einfügen
+    document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.createElement('button');
+        btn.id = 'theme-toggle-float';
+        btn.type = 'button';
+        btn.className = 'no-print';
+        btn.title = 'Hell/Dunkel umschalten';
+        btn.setAttribute('aria-label', 'Dunkelmodus umschalten');
+        btn.setAttribute('aria-pressed', isDark() ? 'true' : 'false');
+        btn.onclick = window.toggleTheme;
+        btn.innerHTML =
+            '<svg class="icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>' +
+            '<svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>';
+        document.body.appendChild(btn);
+    });
+})();
+
+    </script>
+    <style>
+        body {
+            background-color: #F7F3E8;
+            color: #262018;
+            background-image: radial-gradient(#DFD2B5 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+
+        .folio-page {
+            background-color: #FCFBF7;
+            box-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+        }
+
+        .greek-term {
+            border-bottom: 1.5px dotted #1E4E79;
+            color: #15395B;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .greek-term:hover {
+            background-color: #E2ECF5;
+            border-bottom-style: solid;
+        }
+
+        .father-link {
+            color: #7C2D12;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px dashed #7C2D12;
+            transition: color 0.15s ease;
+        }
+        .father-link:hover {
+            color: #B48327;
+            border-bottom-color: #B48327;
+        }
+
+        .verse-num {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #8F6519;
+            vertical-align: super;
+            margin-right: 2px;
+            user-select: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F3E8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C3A3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B48327;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .folio-page { box-shadow: none; }
+        }
+    </style>
+    <style>
+/* ===== Gemeinsamer Dark Mode für alle Kapitel ===== */
+/* Einbinden NACH dem <style>-Block der Seite, damit diese Regeln die alten Farbwerte überschreiben. */
+
+:root {
+    --parchment-50: 252 251 247;
+    --parchment-100: 247 243 232;
+    --parchment-200: 239 231 212;
+    --parchment-300: 223 210 181;
+    --parchment-800: 61 53 41;
+    --parchment-900: 38 32 24;
+    --burgundy-700: 124 45 18;
+    --burgundy-800: 101 34 20;
+    --burgundy-900: 74 22 13;
+    --gold-600: 180 131 39;
+    --gold-700: 143 101 25;
+    --greek-50: 240 245 249;
+    --greek-700: 30 78 121;
+    --greek-800: 21 57 91;
+
+    --body-bg: #F7F3E8;
+    --body-fg: #262018;
+    --body-dot: #DFD2B5;
+    --folio-bg: #FCFBF7;
+    --folio-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+    --greek-term-fg: #15395B;
+    --greek-term-border: #1E4E79;
+    --greek-term-hover: #E2ECF5;
+    --father-fg: #7C2D12;
+    --father-hover: #B48327;
+    --verse-num: #8F6519;
+    --scroll-track: #F7F3E8;
+    --scroll-thumb: #D4C3A3;
+    --scroll-thumb-hover: #B48327;
+}
+
+:root.dark {
+    color-scheme: dark;
+
+    --parchment-50: 28 24 19;
+    --parchment-100: 36 31 25;
+    --parchment-200: 46 40 32;
+    --parchment-300: 70 60 47;
+    --parchment-800: 217 207 184;
+    --parchment-900: 238 231 214;
+    --burgundy-700: 224 145 122;
+    --burgundy-800: 232 168 146;
+    --burgundy-900: 240 190 170;
+    --gold-600: 212 166 74;
+    --gold-700: 224 184 96;
+    --greek-50: 26 36 48;
+    --greek-700: 127 178 224;
+    --greek-800: 166 203 238;
+
+    --body-bg: #14110D;
+    --body-fg: #E8E0CF;
+    --body-dot: #2A241C;
+    --folio-bg: #1C1813;
+    --folio-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.55), 0 0 1px 1px rgba(212, 166, 74, 0.22);
+    --greek-term-fg: #A6CBEE;
+    --greek-term-border: #7FB2E0;
+    --greek-term-hover: #1F3045;
+    --father-fg: #E8A892;
+    --father-hover: #E0B860;
+    --verse-num: #D4A64A;
+    --scroll-track: #14110D;
+    --scroll-thumb: #4A4132;
+    --scroll-thumb-hover: #D4A64A;
+}
+
+/* Bestehende Klassen auf Variablen umstellen (überschreibt die festen Werte der Seite) */
+body {
+    background-color: var(--body-bg);
+    color: var(--body-fg);
+    background-image: radial-gradient(var(--body-dot) 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+.folio-page { background-color: var(--folio-bg); box-shadow: var(--folio-shadow); }
+.greek-term { border-bottom-color: var(--greek-term-border); color: var(--greek-term-fg); }
+.greek-term:hover { background-color: var(--greek-term-hover); }
+.father-link { color: var(--father-fg); border-bottom-color: var(--father-fg); }
+.father-link:hover { color: var(--father-hover); border-bottom-color: var(--father-hover); }
+.verse-num { color: var(--verse-num); }
+::-webkit-scrollbar-track { background: var(--scroll-track); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+
+/* Overrides für feste Tailwind-Standardfarben */
+.dark ::selection { background: rgba(212, 166, 74, 0.35); color: #fff; }
+
+.dark .bg-burgundy-800 { background-color: #7C2D12; color: #fff; }
+.dark .hover\:bg-burgundy-900:hover { background-color: #933818; }
+
+.dark .text-stone-400 { color: #8F8575; }
+.dark .text-stone-500 { color: #A39A89; }
+.dark .text-stone-600 { color: #B8AF9D; }
+.dark .text-stone-700 { color: #CFC7B5; }
+.dark .text-stone-800 { color: #E3DCCB; }
+.dark .hover\:text-stone-900:hover { color: #FFFFFF; }
+
+.dark .text-sky-900 { color: #9CC6EE; }
+.dark .text-amber-900,
+.dark .text-amber-800 { color: #E6BF78; }
+.dark .text-red-950 { color: #F0B8A8; }
+.dark .border-sky-800\/30 { border-color: rgba(127, 178, 224, 0.4); }
+.dark .border-amber-800\/30 { border-color: rgba(224, 184, 96, 0.4); }
+.dark .border-red-900\/30 { border-color: rgba(232, 168, 146, 0.4); }
+.dark .border-amber-700\/60 { border-color: rgba(224, 184, 96, 0.6); }
+.dark .border-sky-800\/60 { border-color: rgba(127, 178, 224, 0.6); }
+
+.dark .bg-white { background-color: #1A1611; }
+.dark .hover\:bg-sky-50:hover { background-color: #1B2733; }
+.dark .hover\:bg-amber-50:hover { background-color: #2A2214; }
+.dark textarea::placeholder { color: #8F8575; }
+
+/* Schwebender Umschalt-Button (wird von theme.js eingefügt) */
+#theme-toggle-float {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 40;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    cursor: pointer;
+    background-color: rgb(var(--parchment-50));
+    color: rgb(var(--gold-700));
+    border: 1px solid rgb(var(--parchment-300));
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    transition: background-color 0.2s ease;
+}
+#theme-toggle-float:hover { background-color: rgb(var(--parchment-200)); }
+#theme-toggle-float svg { width: 1.2rem; height: 1.2rem; }
+#theme-toggle-float .icon-sun { display: none; }
+.dark #theme-toggle-float .icon-sun { display: block; }
+.dark #theme-toggle-float .icon-moon { display: none; }
+
+@media print {
+    #theme-toggle-float { display: none !important; }
+    body { background: white; color: #262018; background-image: none; }
+    .folio-page { box-shadow: none; }
+}
+
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-amber-200/60">
+    <!-- Schmale Kopfleiste: Titel + Ebenen-Schalter -->
+    <header class="sticky top-0 z-30 bg-parchment-100/95 backdrop-blur-md border-b border-parchment-300 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
+            <h1 class="font-display text-lg sm:text-xl font-bold text-parchment-900 tracking-tight">
+                Genesis Kapitel 3
+            </h1>
+            <div class="flex flex-wrap items-center gap-1.5 text-xs font-sans">
+                <button onclick="toggleFilter('greek')" id="filter-greek" class="filter-chip active px-2.5 py-1 rounded-full border border-sky-800/30 bg-sky-900/10 text-sky-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-sky-700"></span> Hebräisch
+                </button>
+                <button onclick="toggleFilter('history')" id="filter-history" class="filter-chip active px-2.5 py-1 rounded-full border border-amber-800/30 bg-amber-900/10 text-amber-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-amber-700"></span> Historie
+                </button>
+                <button onclick="toggleFilter('fathers')" id="filter-fathers" class="filter-chip active px-2.5 py-1 rounded-full border border-red-900/30 bg-red-900/10 text-red-950 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-burgundy-800"></span> Kirchenväter
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Haupt-Container (Buchseite / Folio) -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+
+        <!-- Obere Kapitel-Navigation direkt über dem Einführungskasten -->
+        <nav aria-label="Obere Kapitel-Navigation" class="mb-6 pb-4 border-b border-parchment-300 flex items-center justify-between no-print">
+            <a href="genesis-2.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kapitel 2</a>
+            <a href="index.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Kapitel 3</a>
+            <a href="genesis-4.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 4 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+        
+        <!-- Einführungskasten -->
+        <div class="folio-page rounded-xl p-5 sm:p-7 mb-8 border border-parchment-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-parchment-200 pb-4 mb-4">
+                <div>
+                    <span class="text-xs font-sans uppercase tracking-widest text-gold-700 font-semibold">Der Fall (Gen 3)</span>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-parchment-900 mt-0.5">
+                        Schlange, Fall, Urteil und Vertreibung aus dem Garten
+                    </h2>
+                </div>
+                <div class="text-xs font-sans text-stone-600 bg-parchment-100 px-3.5 py-2 rounded-lg border border-parchment-300">
+                    <strong class="text-parchment-900">Tipp:</strong> Klicke auf <span class="greek-term">blaue Begriffe</span> für den hebräischen Urtext oder auf <span class="father-link">Ausleger-Namen</span> für Kommentare.
+                </div>
+            </div>
+            <p class="font-serif text-base sm:text-lg text-stone-700 leading-relaxed">
+                Die Schlange fragt nach Gottes Wort, und die Menschen essen von der verbotenen Frucht. Gott ruft sie, hört ihre Entschuldigungen und spricht Urteile, bekleidet sie aber selbst und weist sie dann aus dem Garten. In V. 15 steht die erste Verheißung, die die christliche Auslegung auf Christus bezieht.
+            </p>
+        </div>
+
+
+        <!-- Dynamisch gerenderte Bibelabschnitte -->
+        <div id="study-container" class="space-y-10">
+            <!-- Inhalte werden über JavaScript aufgebaut -->
+        </div>
+
+        <!-- Kapitel-Navigation am Ende -->
+        <nav aria-label="Kapitel-Navigation" class="mt-12 pt-6 border-t border-parchment-300 flex items-center justify-between no-print">
+            <a href="genesis-2.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kapitel 2</a>
+            <a href="index.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Kapitel 3</a>
+            <a href="genesis-4.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 4 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12 border-t border-parchment-300 text-center text-xs font-sans text-stone-600">
+        <p class="font-serif italic text-sm text-parchment-800 mb-1">
+            „Und Gott, der HERR, rief den Menschen und sprach zu ihm: Wo bist du?“ (1. Mose 3,9)
+        </p>
+        <p>Interaktive Studienbibel · Hebräischer Grundtext (Masoretischer Text), historische Realienkunde &amp; alte Auslegung.</p>
+    </footer>
+
+    <!-- Modal / Detail-Karte -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/60 backdrop-blur-xs p-4" onclick="closeModalOnBackdrop(event)">
+        <div class="bg-parchment-50 border border-parchment-300 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden transform transition-all">
+            <div id="modal-header" class="px-6 py-4 bg-parchment-100 border-b border-parchment-300 flex items-center justify-between">
+                <span id="modal-badge" class="text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded"></span>
+                <button onclick="closeModal()" class="text-stone-500 hover:text-stone-900 p-1 rounded-lg hover:bg-parchment-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 font-serif text-parchment-900 space-y-4 max-h-[75vh] overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // INHALT: MATTHÄUS 3
+        // ==========================================
+        const greekLexicon = {
+  arum: { greek: `עָרוּם`, translit: `ʿārûm`, literal: `listig, klug`,
+    meaning: `Wortspiel mit 2,25: Die Menschen sind „nackt“ (<em>ʿărûmmîm</em>), die Schlange ist „listig“ (<em>ʿārûm</em>). Das Wort ist neutral und kann „klug“ (Spr 12,16) oder „verschlagen“ heißen.`,
+    theology: `Der Erzähler stellt Klugheit und Nacktheit nebeneinander. Die Schlange nutzt ihre Klugheit gegen Gottes Wort.` },
+  nachash: { greek: `נָחָשׁ`, translit: `nāḥāš`, literal: `Schlange`,
+    meaning: `Die Schlange wird als eines der „Tiere des Feldes“ vorgestellt. Der Text nennt sie nicht Satan; diese Gleichsetzung stammt aus späterer Überlieferung (Weish 2,24; Offb 12,9).`,
+    theology: `Das Böse tritt von außen heran und spricht in der Sprache der Frömmigkeit, mit der Frage „Hat Gott wirklich gesagt?“.` },
+  daat: { greek: `דַּעַת טוֹב וָרָע`, translit: `daʿat ṭôb wārāʿ`, literal: `Erkenntnis von Gut und Böse`,
+    meaning: `„Erkennen“ (<em>yāḏaʿ</em>) umfasst Wissen und Erfahrung. Die Wendung kann das Ganze der Erkenntnis meinen (V. 5: „wie Gott“) oder die sittliche Selbstbestimmung. Die Auslegung ist umstritten.`,
+    theology: `Der Mensch will selbst über Gut und Böse bestimmen. Damit löst er sich von Gott, ohne die Güte zu erlangen, die er sucht.` },
+  arumim: { greek: `עֵירֹם`, translit: `ʿêrōm`, literal: `nackt`,
+    meaning: `In 2,25 sind beide „nackt und schämen sich nicht“. Nun erkennen sie ihre Nacktheit (V. 7) und fürchten sich (V. 10). <em>ʿÊrōm</em> bedeutet auch „bloß, schutzlos“.`,
+    theology: `Scham ist die erste Folge des Falls. Die Beziehung zu Gott und zueinander ist gestört; Gott selbst bekleidet die Menschen (V. 21).` },
+  arur: { greek: `אָרוּר`, translit: `ʾārûr`, literal: `verflucht`,
+    meaning: `Das Wort steht für den Fluch, der den Menschen aus dem Segensraum ausschließt. Gott verflucht die Schlange (V. 14) und den Erdboden (V. 17), nicht aber den Menschen selbst.`,
+    theology: `Die Folgen treffen Mensch und Schöpfung. Der Fluch trifft den Boden, aber der Mensch bleibt Gottes Geschöpf und wird versorgt.` },
+  zera: { greek: `זֶרַע`, translit: `zeraʿ`, literal: `Same, Nachkommenschaft`,
+    meaning: `Das Wort ist ein Sammelbegriff („Nachkommen“) und steht im Singular für eine Gruppe oder einen einzelnen Nachkommen. In V. 15 spricht Gott von der Feindschaft zwischen dem Samen der Schlange und dem der Frau.`,
+    theology: `Die Tradition hat V. 15 als <em>Protoevangelium</em> („erste Heilsbotschaft“) gedeutet, mit Blick auf Christus; die jüdische Auslegung liest den Vers meist als Beschreibung des dauernden Kampfes zwischen Mensch und Schlange.` }
+};
+
+        const churchFathers = {
+  irenaeus: { name: `Irenäus von Lyon`, dates: `ca. 135–202`, role: `Bischof von Lyon`,
+    bio: `Seine Schrift „Gegen die Häresien“ deutet den Fall im Licht der Menschwerdung.`,
+    focusInGen3: `Er liest Adam als Gegenbild zu Christus: Was durch den Ungehorsam des Ersten verloren ging, wird durch den Gehorsam des Zweiten zurückgewonnen („Rekapitulation“).` },
+  chrysostomus: { name: `Johannes Chrysostomus`, dates: `ca. 349–407`, role: `Bischof von Konstantinopel, Prediger`,
+    bio: `Seine Homilien zur Genesis (Hom. 16–18) legen die Fallerzählung Vers für Vers aus.`,
+    focusInGen3: `Er betont, dass Gott nicht zornig, sondern fragend und barmherzig auf den Fall antwortet, und sieht in den Fellkleidern Gottes Fürsorge.` },
+  augustinus: { name: `Augustinus von Hippo`, dates: `354–430`, role: `Bischof und Kirchenlehrer`,
+    bio: `Er schrieb in „De Genesi ad litteram“ (Buch XI) und im „Gottesstaat“ (Buch XIV) über den Fall.`,
+    focusInGen3: `Er sieht den Ursprung der Sünde im Stolz, der Gott gleich sein will, und entwickelt daraus die Lehre von der Erbsünde. Die Schlange deutet er als Werkzeug des Teufels.` },
+  ambrosius: { name: `Ambrosius von Mailand`, dates: `ca. 339–397`, role: `Bischof von Mailand`,
+    bio: `In „De paradiso“ legt er Gen 3 geistlich aus.`,
+    focusInGen3: `Er liest die Schlange als Bild der Lust, die über die Frau zum Mann kommt, und betont, dass der Mensch durch Gottes Gnade Hoffnung behält.` },
+  raschi: { name: `Raschi (Rabbi Schlomo Jizchaki)`, dates: `1040–1105`, role: `Rabbiner und Bibelkommentator in Troyes`,
+    bio: `Sein Kommentar verbindet Wortsinn mit Midraschim.`,
+    focusInGen3: `Er nimmt das Wortspiel <em>ʿārûm / ʿărûmmîm</em> auf und erklärt, dass die Schlange den Menschen mit Neid und List verführte. Zu V. 15 spricht er vom andauernden Kampf, der aber bei Wachsamkeit zum Sieg führen kann.` }
+};
+
+        const studySections = [
+{
+  id: `fall`, sectionTitle: `Die Verführung und der Fall`, sectionRange: `Gen 3,1–7`,
+  sectionIntro: `Die Schlange stellt die Frage nach Gottes Wort. Frau und Mann essen von der verbotenen Frucht und erkennen ihre Nacktheit.`,
+  blocks: [
+  { verses: `1–5`,
+    bibleText: `<span class="verse-num">1</span>Und die <span class="greek-term" onclick="openGreek('nachash')">Schlange</span> war <span class="greek-term" onclick="openGreek('arum')">listiger</span> als alle Tiere des Feldes, die Gott, der HERR, gemacht hatte; und sie sprach zu der Frau: Hat Gott wirklich gesagt: Ihr sollt nicht essen von allen Bäumen des Gartens? <span class="verse-num">2</span>Da sprach die Frau zur Schlange: Von der Frucht der Bäume des Gartens essen wir; <span class="verse-num">3</span>aber von der Frucht des Baumes, der mitten im Garten ist, hat Gott gesagt: Davon sollt ihr nicht essen und sie nicht berühren, damit ihr nicht sterbt. <span class="verse-num">4</span>Da sprach die Schlange zur Frau: Ihr werdet keineswegs sterben; <span class="verse-num">5</span>sondern Gott weiß, dass an dem Tag, da ihr davon esst, eure Augen aufgetan werden und ihr sein werdet wie Gott, erkennend <span class="greek-term" onclick="openGreek('daat')">Gut und Böse</span>.`,
+    commentary: {
+      history: `Die Schlange stand im Alten Orient für Weisheit, Fruchtbarkeit und Unsterblichkeit (vgl. die Gilgamesch-Erzählung, in der eine Schlange dem Helden die Pflanze des Lebens raubt). Die Bibel macht sie zum Geschöpf. Die Frau fügt dem Gebot ein „nicht berühren“ hinzu (V. 3), das in 2,17 fehlt; die Auslegung sieht darin eine Verschärfung oder ein Zeichen der Unsicherheit.`,
+      greek: `Die Schlange beginnt mit einer Frage, die Gottes Wort umkehrt: „Hat Gott wirklich gesagt?“ Sie verschweigt Gottes Gabe („von jedem Baum“). Der Gottesname <em>JHWH</em> fehlt in ihrer Rede; sie sagt nur „Gott“ (<em>ʾĕlōhîm</em>), und die Frau folgt ihr darin. Die Verheißung „wie Gott“ ist halbwahr: Die Erkenntnis kommt, aber anders, als sie sagt.`,
+      fathers: `<span class="father-link" onclick="openFather('augustinus')">Augustinus</span> sieht den Anfang der Sünde im Stolz, der Gott gleich sein will. <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> weist darauf hin, dass die Schlange mit einer Frage beginnt und das Vertrauen aushöhlt. <span class="father-link" onclick="openFather('raschi')">Raschi</span> liest die Schlange als neidisch, weil sie die Frau für sich haben wollte.` } },
+  { verses: `6–7`,
+    bibleText: `<span class="verse-num">6</span>Und die Frau sah, dass der Baum gut zur Speise und dass er eine Lust für die Augen und dass der Baum begehrenswert war, Einsicht zu geben; und sie nahm von seiner Frucht und aß; und sie gab auch ihrem Mann bei ihr, und er aß. <span class="verse-num">7</span>Da wurden ihrer beider Augen aufgetan, und sie erkannten, dass sie <span class="greek-term" onclick="openGreek('arumim')">nackt</span> waren; und sie hefteten Feigenblätter zusammen und machten sich Schürzen.`,
+    commentary: {
+      history: `Das Wort „Frucht“ ist nicht näher bezeichnet; die Apfel-Tradition stammt aus der lateinischen Übersetzung (<em>malum</em> heißt „Böses“ und „Apfel“). Die dreifache Beschreibung (gut zur Speise, schön, begehrenswert) erinnert an das Gerede der Schlange. Dass der Mann „bei ihr“ war (V. 6), deutet darauf hin, dass er das Gespräch hörte und schwieg.`,
+      greek: `Die Verben des Sehens und Nehmens folgen einander schnell: sie sah, sie nahm, sie aß, sie gab, er aß. Mit „die Augen wurden aufgetan“ trifft die Verheißung der Schlange ein (V. 5), aber in der Gestalt von Scham. <em>ʿêrōm</em> wiederholt das Wort aus 2,25 mit umgekehrtem Sinn.`,
+      fathers: `<span class="father-link" onclick="openFather('ambrosius')">Ambrosius</span> liest die Frucht als Bild der Lust, die zuerst die Sinne, dann den Verstand einnimmt. <span class="father-link" onclick="openFather('irenaeus')">Irenäus</span> sieht darin den Anfang des Ungehorsams, den Christus durch seinen Gehorsam „zusammenfasst“. <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> verweist darauf, dass der Mann nicht verführt wurde, sondern der Frau aus Verbundenheit folgte.` } }
+  ]
+},
+{
+  id: `verhoer`, sectionTitle: `Das Verhör Gottes`, sectionRange: `Gen 3,8–13`,
+  sectionIntro: `Gott ruft den Menschen. Er stellt Fragen, und die Menschen schieben die Schuld weiter.`,
+  blocks: [
+  { verses: `8–13`,
+    bibleText: `<span class="verse-num">8</span>Und sie hörten die Stimme Gottes, des HERRN, der im Garten wandelte bei der Kühle des Tages; und der Mensch und seine Frau versteckten sich vor dem Angesicht Gottes, des HERRN, mitten unter den Bäumen des Gartens. <span class="verse-num">9</span>Und Gott, der HERR, rief den Menschen und sprach zu ihm: Wo bist du? <span class="verse-num">10</span>Und er sprach: Ich hörte deine Stimme im Garten und fürchtete mich, denn ich bin nackt, und ich versteckte mich. <span class="verse-num">11</span>Und er sprach: Wer hat dir gesagt, dass du nackt bist? Hast du etwa von dem Baum gegessen, von dem ich dir geboten habe, nicht davon zu essen? <span class="verse-num">12</span>Und der Mensch sprach: Die Frau, die du mir beigegeben hast, sie gab mir von dem Baum, und ich aß. <span class="verse-num">13</span>Und Gott, der HERR, sprach zu der Frau: Was hast du da getan! Und die Frau sprach: Die Schlange hat mich getäuscht, und ich aß.`,
+    commentary: {
+      history: `„Bei der Kühle des Tages“ meint den Abendwind. Die Szene zeigt Gott als Gast im Garten, der den Menschen aufsucht. Das Verhör folgt dem Ablauf eines Rechtsverfahrens: Fragen, Geständnis, Urteil. Jede Antwort gibt die Schuld weiter, vom Mann an die Frau (und indirekt an Gott: „die du mir beigegeben hast“) und von der Frau an die Schlange.`,
+      greek: `Die Frage „Wo bist du?“ (<em>ʾayyekkâ</em>) ist keine Suche nach Auskunft, sondern ein Ruf in die Beziehung. Der Mensch antwortet mit Angst statt Schuldbekenntnis. Die Frau sagt „getäuscht“ (<em>hiššîʾanî</em>); die Antwort ist wahr, entlastet sie aber nicht ganz.`,
+      fathers: `<span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> sieht in Gottes Fragen die Geduld eines Vaters, der dem Menschen Raum zum Bekenntnis lässt. <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> tadelt, dass die beiden statt zu bekennen entschuldigen. <span class="father-link" onclick="openFather('raschi')">Raschi</span> liest „Wo bist du?“ als Eröffnung, mit der Gott ein Gespräch beginnt, ohne anzuklagen.` } }
+  ]
+},
+{
+  id: `urteil`, sectionTitle: `Das Urteil und die Vertreibung`, sectionRange: `Gen 3,14–24`,
+  sectionIntro: `Gott spricht Urteile über Schlange, Frau und Mann und bekleidet sie. Dann werden die Menschen aus dem Garten gewiesen.`,
+  blocks: [
+  { verses: `14–19`,
+    bibleText: `<span class="verse-num">14</span>Da sprach Gott, der HERR, zu der Schlange: Weil du dies getan hast, sollst du <span class="greek-term" onclick="openGreek('arur')">verflucht</span> sein unter allem Vieh und unter allen Tieren des Feldes; auf deinem Bauch sollst du kriechen und Staub fressen alle Tage deines Lebens. <span class="verse-num">15</span>Und ich werde Feindschaft setzen zwischen dir und der Frau und zwischen deinem <span class="greek-term" onclick="openGreek('zera')">Samen</span> und ihrem Samen; er wird dir den Kopf zertreten, und du wirst ihm die Ferse zertreten. <span class="verse-num">16</span>Zu der Frau sprach er: Ich werde die Mühsal deiner Schwangerschaft sehr mehren; mit Schmerzen sollst du Kinder gebären; und nach deinem Mann wird dein Verlangen sein, er aber wird über dich herrschen. <span class="verse-num">17</span>Und zu Adam sprach er: Weil du auf die Stimme deiner Frau gehört und gegessen hast von dem Baum, von dem ich dir geboten habe: Du sollst nicht davon essen!, so sei der Erdboden verflucht um deinetwillen; mit Mühsal sollst du davon essen alle Tage deines Lebens; <span class="verse-num">18</span>und Dornen und Disteln wird er dir sprossen lassen, und du wirst das Kraut des Feldes essen. <span class="verse-num">19</span>Im Schweiße deines Angesichts sollst du dein Brot essen, bis du zum Erdboden zurückkehrst, denn von ihm bist du genommen; denn Staub bist du, und zum Staub wirst du zurückkehren.`,
+    commentary: {
+      history: `Der Spruch über die Schlange erklärt, warum Schlangen kriechen und gefürchtet sind. V. 15 ist seit dem Neuen Testament oft auf Christus bezogen (<em>Protoevangelium</em>, vgl. Röm 16,20; Offb 12); die LXX nennt den Nachkommen „er“, während die lateinische Übersetzung „sie“ las. Die Fluchworte benennen Mühe in Familie und Arbeit (Geburt, Ackerbau), nicht Strafen, die erst später gedacht waren.`,
+      greek: `Fluch (<em>ʾārûr</em>) trifft die Schlange und den Boden, aber nicht Mann und Frau; sie behalten den Segen von 1,28. Das „Verlangen“ der Frau (<em>tĕšûqâ</em>) und die „Herrschaft“ des Mannes (V. 16) beschreiben die gestörte Beziehung, nicht einen Auftrag Gottes. Das Wort steht in 4,7 ähnlich.`,
+      fathers: `<span class="father-link" onclick="openFather('irenaeus')">Irenäus</span> liest V. 15 als erste Verheißung des Sieges Christi. <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> sieht in den Strafen die Folge der Sünde, die alle Menschen betrifft. <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> betont, dass Gott den Menschen nicht verflucht, sondern ihm die Arbeit als Heilmittel gibt. <span class="father-link" onclick="openFather('raschi')">Raschi</span> verbindet die Feindschaft mit dem andauernden Kampf des Menschen gegen die Schlange.` } },
+  { verses: `20–24`,
+    bibleText: `<span class="verse-num">20</span>Und der Mensch gab seiner Frau den Namen Eva, denn sie wurde die Mutter alles Lebendigen. <span class="verse-num">21</span>Und Gott, der HERR, machte Adam und seiner Frau Kleider aus Fell und bekleidete sie. <span class="verse-num">22</span>Und Gott, der HERR, sprach: Siehe, der Mensch ist geworden wie einer von uns, zu erkennen Gutes und Böses; und nun, dass er nicht seine Hand ausstrecke und auch vom Baum des Lebens nehme und esse und ewig lebe! <span class="verse-num">23</span>Und Gott, der HERR, schickte ihn aus dem Garten Eden hinaus, den Erdboden zu bebauen, von dem er genommen war. <span class="verse-num">24</span>Und er trieb den Menschen aus und ließ östlich vom Garten Eden die Cherubim sich lagern und die Flamme des zuckenden Schwertes, den Weg zum Baum des Lebens zu bewachen.`,
+    commentary: {
+      history: `„Eva“ (<em>ḥawwâ</em>) hängt mit <em>ḥāyâ</em>, „leben“, zusammen. Die Cherubim bewachen auch Tempel und Bundeslade (Ex 25,18–22; 1 Kön 6,23–28); der Eingang im Osten erinnert an den Eingang des Heiligtums. Die Felle setzen voraus, dass Tiere getötet wurden; die Auslegung sieht darin Gottes Sorge oder ein Vorzeichen des Opfers.`,
+      greek: `Das „wie einer von uns“ (V. 22) greift das „Lasst uns“ von 1,26 auf. Gott „schickte aus“ (<em>šillĕḥô</em>) und „trieb aus“ (<em>gēreš</em>); die Vertreibung schützt den Menschen vor einem Leben in Sünde ohne Ende. Mit dem bebauten Erdboden endet der Abschnitt, mit dem er begann (2,5.15).`,
+      fathers: `<span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> sieht in den Fellkleidern ein Zeichen der Fürsorge. <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> deutet die Vertreibung als gerechtes Urteil und zugleich als Anfang des Weges zur Gnade. <span class="father-link" onclick="openFather('ambrosius')">Ambrosius</span> verbindet die Cherubim mit dem Kreuz, das den Weg zum Leben wieder öffnet. <span class="father-link" onclick="openFather('irenaeus')">Irenäus</span> lehrt, dass Gott dem Menschen den Tod als Grenze gesetzt hat, damit die Sünde nicht unsterblich bleibt.` } }
+  ]
+}
+];
+
+
+        // ==========================================
+        // ZUSTAND & STEUERUNG
+        // ==========================================
+        let activeFilters = { greek: true, history: true, fathers: true };
+        const CHAPTER = 3;
+        const NOTES_KEY = 'gen' + CHAPTER + '_notes';
+        let userNotes = {};
+        try { userNotes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}'); } catch (e) {}
+
+        function renderStudy() {
+            const container = document.getElementById('study-container');
+            container.innerHTML = '';
+
+            studySections.forEach(section => {
+                const sectionEl = document.createElement('section');
+                sectionEl.id = section.id;
+                sectionEl.className = 'folio-page rounded-2xl border border-parchment-300 overflow-hidden scroll-mt-16';
+
+                let html = `
+                    <div class="bg-parchment-100/90 px-5 sm:px-8 py-5 border-b border-parchment-300">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <h3 class="font-display text-2xl sm:text-3xl font-bold text-burgundy-900">
+                                ${section.sectionTitle}
+                            </h3>
+                            <span class="font-sans text-xs font-semibold tracking-wider uppercase px-2.5 py-1 rounded bg-parchment-200 text-parchment-900 border border-parchment-300">
+                                ${section.sectionRange}
+                            </span>
+                        </div>
+                        <p class="font-serif italic text-stone-700 text-base mt-1.5">
+                            ${section.sectionIntro}
+                        </p>
+                    </div>
+                    <div class="divide-y divide-parchment-200">
+                `;
+
+                section.blocks.forEach((block, idx) => {
+                    const blockKey = `${section.id}-${idx}`;
+                    const savedNote = userNotes[blockKey] || '';
+
+                    let commentaryParts = [];
+                    if (activeFilters.history && block.commentary.history) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-amber-700/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-amber-800 block mb-0.5">Historischer & Jüdischer Kontext</span>
+                                <div class="text-stone-800">${block.commentary.history}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.greek && block.commentary.greek) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-sky-800/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-sky-900 block mb-0.5">Hebräischer Urtext & Wortbedeutung</span>
+                                <div class="text-stone-800">${block.commentary.greek}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.fathers && block.commentary.fathers) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-burgundy-800/70">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-800 block mb-0.5">Kirchenväter & Alte Ausleger</span>
+                                <div class="text-stone-800">${block.commentary.fathers}</div>
+                            </div>
+                        `);
+                    }
+
+                    const commentaryHtml = commentaryParts.length > 0
+                        ? `<div class="space-y-3.5 font-serif italic text-[15.5px] sm:text-base leading-relaxed">${commentaryParts.join('')}</div>`
+                        : `<div class="font-sans text-xs text-stone-400 italic">Alle Kommentar-Ebenen sind ausgeblendet.</div>`;
+
+                    html += `
+                        <div class="p-5 sm:p-8 bg-parchment-50 max-w-4xl mx-auto">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-700">
+                                    Genesis ${CHAPTER},${block.verses}
+                                </span>
+                                <button onclick="toggleNoteBox('${blockKey}')" class="text-xs font-sans text-stone-400 hover:text-burgundy-800 flex items-center gap-1 transition no-print">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                </button>
+                            </div>
+                            <p class="font-serif text-xl sm:text-[21px] leading-[1.8] text-parchment-900 mb-5">
+                                ${block.bibleText}
+                            </p>
+                            <div class="bg-parchment-100/80 rounded-xl p-4 sm:p-5 border border-parchment-300/80">
+                                ${commentaryHtml}
+                            </div>
+                            ${renderNoteArea(blockKey, savedNote)}
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                sectionEl.innerHTML = html;
+                container.appendChild(sectionEl);
+            });
+        }
+
+        function renderNoteArea(blockKey, savedNote) {
+            const isHidden = savedNote ? '' : 'hidden';
+            return `
+                <div id="note-box-${blockKey}" class="${isHidden} mt-4 pt-3 border-t border-parchment-200 no-print">
+                    <label class="block font-sans text-[11px] font-medium text-stone-500 mb-1">Eigene Studiennotiz:</label>
+                    <textarea 
+                        onchange="saveNote('${blockKey}', this.value)"
+                        onkeyup="saveNote('${blockKey}', this.value)"
+                        rows="2" 
+                        placeholder="Deine Gedanken..."
+                        class="w-full rounded-lg bg-white border border-parchment-300 p-2 text-xs font-sans text-parchment-900 focus:outline-none focus:border-gold-600"
+                    >${savedNote}</textarea>
+                </div>
+            `;
+        }
+
+        function toggleNoteBox(blockKey) {
+            const box = document.getElementById(`note-box-${blockKey}`);
+            if (box) {
+                box.classList.toggle('hidden');
+                if (!box.classList.contains('hidden')) box.querySelector('textarea').focus();
+            }
+        }
+
+        function saveNote(blockKey, text) {
+            if (text.trim() === '') delete userNotes[blockKey];
+            else userNotes[blockKey] = text;
+            try { localStorage.setItem(NOTES_KEY, JSON.stringify(userNotes)); } catch (e) {}
+        }
+
+        function toggleFilter(type) {
+            activeFilters[type] = !activeFilters[type];
+            const btn = document.getElementById(`filter-${type}`);
+            if (activeFilters[type]) btn.classList.remove('opacity-45', 'line-through');
+            else btn.classList.add('opacity-45', 'line-through');
+            renderStudy();
+        }
+
+        function openGreek(key) {
+            const item = greekLexicon[key];
+            if (!item) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Hebräisches Original';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-sky-900/10 text-sky-900 border border-sky-800/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <div class="text-3xl font-serif font-bold text-greek-800">${item.greek}</div>
+                    <div class="text-sm font-sans text-stone-500 mt-0.5">Umschrift: <span class="italic font-medium text-stone-700">${item.translit}</span> · Wörtlich: <span class="font-medium text-stone-700">${item.literal}</span></div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${item.meaning}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Theologische Tiefe</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${item.theology}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        // Schwerpunkt-Text: Feld heißt je Kapitel anders (focusInMtN)
+        function fatherFocus(f) {
+            const k = Object.keys(f).find(x => x === 'focus' || x.startsWith('focusIn'));
+            return k ? f[k] : '';
+        }
+
+        function openFather(key) {
+            const father = churchFathers[key];
+            if (!father) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Ausleger / Patristik';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-red-900/10 text-burgundy-900 border border-red-900/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <h3 class="text-2xl font-display font-bold text-burgundy-900">${father.name}</h3>
+                    <div class="text-xs font-sans text-stone-600 mt-0.5">${father.dates} · ${father.role}</div>
+                    ${father.classificationNote ? `<p class="text-xs font-sans text-burgundy-800 mt-1.5 font-medium">${father.classificationNote}</p>` : ''}
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Biografie & Einordnung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${father.bio}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-gold-700 mb-1">Schwerpunkt in Gen ${CHAPTER}</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${fatherFocus(father)}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openGlossaryModal() {
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Lexikon & Kirchenväter';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-amber-900/10 text-amber-900 border border-amber-800/30';
+            
+            let greekList = Object.entries(greekLexicon).map(([k, v]) => `
+                <button onclick="openGreek('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-sky-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-serif font-bold text-greek-800 text-base">${v.greek}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${v.translit}</span>
+                </button>
+            `).join('');
+
+            let fathersList = Object.entries(churchFathers).map(([k, f]) => `
+                <button onclick="openFather('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-amber-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-display font-bold text-burgundy-900 text-base">${f.name}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${f.dates} · ${f.role}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('modal-body').innerHTML = `
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-sky-900 mb-2">Hebräische Begriffe</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${greekList}</div>
+                </div>
+                <div class="pt-3 border-t border-parchment-200">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Kirchenväter & Ausleger</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${fathersList}</div>
+                </div>
+            `;
+            showModal();
+        }
+
+        function showModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeModalOnBackdrop(e) {
+            if (e.target.id === 'detail-modal') closeModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderStudy);
+    </script>
+</body>
+</html>

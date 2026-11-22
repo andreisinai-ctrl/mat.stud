@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis 5 – Interaktive Studienausgabe (Hebräisch, Historie & Auslegung)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+/* ===== Gemeinsames Theme-Skript für alle Kapitel ===== */
+/* Einbinden direkt NACH dem Tailwind-CDN-Skript im <head>. Ersetzt den alten tailwind.config-Block. */
+
+(function () {
+    // 1) Theme sofort setzen (vor dem ersten Rendern, kein Aufblitzen)
+    try {
+        var t = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (t === 'dark' || (!t && prefersDark)) document.documentElement.classList.add('dark');
+    } catch (e) {}
+
+    // 2) Tailwind-Konfiguration: Farben laufen über CSS-Variablen aus theme.css
+    if (window.tailwind) {
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif']
+                    },
+                    colors: {
+                        parchment: {
+                            50: 'rgb(var(--parchment-50) / <alpha-value>)',
+                            100: 'rgb(var(--parchment-100) / <alpha-value>)',
+                            200: 'rgb(var(--parchment-200) / <alpha-value>)',
+                            300: 'rgb(var(--parchment-300) / <alpha-value>)',
+                            800: 'rgb(var(--parchment-800) / <alpha-value>)',
+                            900: 'rgb(var(--parchment-900) / <alpha-value>)'
+                        },
+                        burgundy: {
+                            700: 'rgb(var(--burgundy-700) / <alpha-value>)',
+                            800: 'rgb(var(--burgundy-800) / <alpha-value>)',
+                            900: 'rgb(var(--burgundy-900) / <alpha-value>)'
+                        },
+                        gold: {
+                            600: 'rgb(var(--gold-600) / <alpha-value>)',
+                            700: 'rgb(var(--gold-700) / <alpha-value>)'
+                        },
+                        greek: {
+                            50: 'rgb(var(--greek-50) / <alpha-value>)',
+                            700: 'rgb(var(--greek-700) / <alpha-value>)',
+                            800: 'rgb(var(--greek-800) / <alpha-value>)'
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    // 3) Umschalten
+    function isDark() {
+        return document.documentElement.classList.contains('dark');
+    }
+    function applyTheme(dark) {
+        document.documentElement.classList.toggle('dark', dark);
+        var btn = document.getElementById('theme-toggle-float');
+        if (btn) btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    }
+    window.toggleTheme = function () {
+        var next = !isDark();
+        applyTheme(next);
+        try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch (e) {}
+    };
+
+    // 4) Systemeinstellung live verfolgen, solange keine manuelle Wahl gespeichert ist
+    if (window.matchMedia) {
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        var onChange = function (e) {
+            var stored = null;
+            try { stored = localStorage.getItem('theme'); } catch (err) {}
+            if (!stored) applyTheme(e.matches);
+        };
+        if (mq.addEventListener) mq.addEventListener('change', onChange);
+        else if (mq.addListener) mq.addListener(onChange);
+    }
+
+    // 5) Schwebenden Umschalt-Button einfügen
+    document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.createElement('button');
+        btn.id = 'theme-toggle-float';
+        btn.type = 'button';
+        btn.className = 'no-print';
+        btn.title = 'Hell/Dunkel umschalten';
+        btn.setAttribute('aria-label', 'Dunkelmodus umschalten');
+        btn.setAttribute('aria-pressed', isDark() ? 'true' : 'false');
+        btn.onclick = window.toggleTheme;
+        btn.innerHTML =
+            '<svg class="icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>' +
+            '<svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>';
+        document.body.appendChild(btn);
+    });
+})();
+
+    </script>
+    <style>
+        body {
+            background-color: #F7F3E8;
+            color: #262018;
+            background-image: radial-gradient(#DFD2B5 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+
+        .folio-page {
+            background-color: #FCFBF7;
+            box-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+        }
+
+        .greek-term {
+            border-bottom: 1.5px dotted #1E4E79;
+            color: #15395B;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .greek-term:hover {
+            background-color: #E2ECF5;
+            border-bottom-style: solid;
+        }
+
+        .father-link {
+            color: #7C2D12;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px dashed #7C2D12;
+            transition: color 0.15s ease;
+        }
+        .father-link:hover {
+            color: #B48327;
+            border-bottom-color: #B48327;
+        }
+
+        .verse-num {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #8F6519;
+            vertical-align: super;
+            margin-right: 2px;
+            user-select: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F3E8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C3A3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B48327;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .folio-page { box-shadow: none; }
+        }
+    </style>
+    <style>
+/* ===== Gemeinsamer Dark Mode für alle Kapitel ===== */
+/* Einbinden NACH dem <style>-Block der Seite, damit diese Regeln die alten Farbwerte überschreiben. */
+
+:root {
+    --parchment-50: 252 251 247;
+    --parchment-100: 247 243 232;
+    --parchment-200: 239 231 212;
+    --parchment-300: 223 210 181;
+    --parchment-800: 61 53 41;
+    --parchment-900: 38 32 24;
+    --burgundy-700: 124 45 18;
+    --burgundy-800: 101 34 20;
+    --burgundy-900: 74 22 13;
+    --gold-600: 180 131 39;
+    --gold-700: 143 101 25;
+    --greek-50: 240 245 249;
+    --greek-700: 30 78 121;
+    --greek-800: 21 57 91;
+
+    --body-bg: #F7F3E8;
+    --body-fg: #262018;
+    --body-dot: #DFD2B5;
+    --folio-bg: #FCFBF7;
+    --folio-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+    --greek-term-fg: #15395B;
+    --greek-term-border: #1E4E79;
+    --greek-term-hover: #E2ECF5;
+    --father-fg: #7C2D12;
+    --father-hover: #B48327;
+    --verse-num: #8F6519;
+    --scroll-track: #F7F3E8;
+    --scroll-thumb: #D4C3A3;
+    --scroll-thumb-hover: #B48327;
+}
+
+:root.dark {
+    color-scheme: dark;
+
+    --parchment-50: 28 24 19;
+    --parchment-100: 36 31 25;
+    --parchment-200: 46 40 32;
+    --parchment-300: 70 60 47;
+    --parchment-800: 217 207 184;
+    --parchment-900: 238 231 214;
+    --burgundy-700: 224 145 122;
+    --burgundy-800: 232 168 146;
+    --burgundy-900: 240 190 170;
+    --gold-600: 212 166 74;
+    --gold-700: 224 184 96;
+    --greek-50: 26 36 48;
+    --greek-700: 127 178 224;
+    --greek-800: 166 203 238;
+
+    --body-bg: #14110D;
+    --body-fg: #E8E0CF;
+    --body-dot: #2A241C;
+    --folio-bg: #1C1813;
+    --folio-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.55), 0 0 1px 1px rgba(212, 166, 74, 0.22);
+    --greek-term-fg: #A6CBEE;
+    --greek-term-border: #7FB2E0;
+    --greek-term-hover: #1F3045;
+    --father-fg: #E8A892;
+    --father-hover: #E0B860;
+    --verse-num: #D4A64A;
+    --scroll-track: #14110D;
+    --scroll-thumb: #4A4132;
+    --scroll-thumb-hover: #D4A64A;
+}
+
+/* Bestehende Klassen auf Variablen umstellen (überschreibt die festen Werte der Seite) */
+body {
+    background-color: var(--body-bg);
+    color: var(--body-fg);
+    background-image: radial-gradient(var(--body-dot) 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+.folio-page { background-color: var(--folio-bg); box-shadow: var(--folio-shadow); }
+.greek-term { border-bottom-color: var(--greek-term-border); color: var(--greek-term-fg); }
+.greek-term:hover { background-color: var(--greek-term-hover); }
+.father-link { color: var(--father-fg); border-bottom-color: var(--father-fg); }
+.father-link:hover { color: var(--father-hover); border-bottom-color: var(--father-hover); }
+.verse-num { color: var(--verse-num); }
+::-webkit-scrollbar-track { background: var(--scroll-track); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+
+/* Overrides für feste Tailwind-Standardfarben */
+.dark ::selection { background: rgba(212, 166, 74, 0.35); color: #fff; }
+
+.dark .bg-burgundy-800 { background-color: #7C2D12; color: #fff; }
+.dark .hover\:bg-burgundy-900:hover { background-color: #933818; }
+
+.dark .text-stone-400 { color: #8F8575; }
+.dark .text-stone-500 { color: #A39A89; }
+.dark .text-stone-600 { color: #B8AF9D; }
+.dark .text-stone-700 { color: #CFC7B5; }
+.dark .text-stone-800 { color: #E3DCCB; }
+.dark .hover\:text-stone-900:hover { color: #FFFFFF; }
+
+.dark .text-sky-900 { color: #9CC6EE; }
+.dark .text-amber-900,
+.dark .text-amber-800 { color: #E6BF78; }
+.dark .text-red-950 { color: #F0B8A8; }
+.dark .border-sky-800\/30 { border-color: rgba(127, 178, 224, 0.4); }
+.dark .border-amber-800\/30 { border-color: rgba(224, 184, 96, 0.4); }
+.dark .border-red-900\/30 { border-color: rgba(232, 168, 146, 0.4); }
+.dark .border-amber-700\/60 { border-color: rgba(224, 184, 96, 0.6); }
+.dark .border-sky-800\/60 { border-color: rgba(127, 178, 224, 0.6); }
+
+.dark .bg-white { background-color: #1A1611; }
+.dark .hover\:bg-sky-50:hover { background-color: #1B2733; }
+.dark .hover\:bg-amber-50:hover { background-color: #2A2214; }
+.dark textarea::placeholder { color: #8F8575; }
+
+/* Schwebender Umschalt-Button (wird von theme.js eingefügt) */
+#theme-toggle-float {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 40;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    cursor: pointer;
+    background-color: rgb(var(--parchment-50));
+    color: rgb(var(--gold-700));
+    border: 1px solid rgb(var(--parchment-300));
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    transition: background-color 0.2s ease;
+}
+#theme-toggle-float:hover { background-color: rgb(var(--parchment-200)); }
+#theme-toggle-float svg { width: 1.2rem; height: 1.2rem; }
+#theme-toggle-float .icon-sun { display: none; }
+.dark #theme-toggle-float .icon-sun { display: block; }
+.dark #theme-toggle-float .icon-moon { display: none; }
+
+@media print {
+    #theme-toggle-float { display: none !important; }
+    body { background: white; color: #262018; background-image: none; }
+    .folio-page { box-shadow: none; }
+}
+
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-amber-200/60">
+    <!-- Schmale Kopfleiste: Titel + Ebenen-Schalter -->
+    <header class="sticky top-0 z-30 bg-parchment-100/95 backdrop-blur-md border-b border-parchment-300 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
+            <h1 class="font-display text-lg sm:text-xl font-bold text-parchment-900 tracking-tight">
+                Genesis Kapitel 5
+            </h1>
+            <div class="flex flex-wrap items-center gap-1.5 text-xs font-sans">
+                <button onclick="toggleFilter('greek')" id="filter-greek" class="filter-chip active px-2.5 py-1 rounded-full border border-sky-800/30 bg-sky-900/10 text-sky-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-sky-700"></span> Hebräisch
+                </button>
+                <button onclick="toggleFilter('history')" id="filter-history" class="filter-chip active px-2.5 py-1 rounded-full border border-amber-800/30 bg-amber-900/10 text-amber-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-amber-700"></span> Historie
+                </button>
+                <button onclick="toggleFilter('fathers')" id="filter-fathers" class="filter-chip active px-2.5 py-1 rounded-full border border-red-900/30 bg-red-900/10 text-red-950 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-burgundy-800"></span> Kirchenväter
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Haupt-Container (Buchseite / Folio) -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+
+        <!-- Obere Kapitel-Navigation direkt über dem Einführungskasten -->
+        <nav aria-label="Obere Kapitel-Navigation" class="mb-6 pb-4 border-b border-parchment-300 flex items-center justify-between no-print">
+            <a href="genesis-4.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kapitel 4</a>
+            <a href="index.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Kapitel 5</a>
+            <a href="genesis-6.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 6 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+        
+        <!-- Einführungskasten -->
+        <div class="folio-page rounded-xl p-5 sm:p-7 mb-8 border border-parchment-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-parchment-200 pb-4 mb-4">
+                <div>
+                    <span class="text-xs font-sans uppercase tracking-widest text-gold-700 font-semibold">Die Geschlechter vor der Flut (Gen 5)</span>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-parchment-900 mt-0.5">
+                        Von Adam bis Noach
+                    </h2>
+                </div>
+                <div class="text-xs font-sans text-stone-600 bg-parchment-100 px-3.5 py-2 rounded-lg border border-parchment-300">
+                    <strong class="text-parchment-900">Tipp:</strong> Klicke auf <span class="greek-term">blaue Begriffe</span> für den hebräischen Urtext oder auf <span class="father-link">Ausleger-Namen</span> für Kommentare.
+                </div>
+            </div>
+            <p class="font-serif text-base sm:text-lg text-stone-700 leading-relaxed">
+                Das Kapitel ist ein Stammbaum mit zehn Gliedern von Adam bis Noach. Die Formel „und er starb“ wiederholt sich, nur Henoch, der mit Gott wandelte, wird entrückt. Lamech gibt seinem Sohn Noach den Namen „Trost“ und bereitet damit die Flutgeschichte vor.
+            </p>
+        </div>
+
+
+        <!-- Dynamisch gerenderte Bibelabschnitte -->
+        <div id="study-container" class="space-y-10">
+            <!-- Inhalte werden über JavaScript aufgebaut -->
+        </div>
+
+        <!-- Kapitel-Navigation am Ende -->
+        <nav aria-label="Kapitel-Navigation" class="mt-12 pt-6 border-t border-parchment-300 flex items-center justify-between no-print">
+            <a href="genesis-4.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kapitel 4</a>
+            <a href="index.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Kapitel 5</a>
+            <a href="genesis-6.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 6 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12 border-t border-parchment-300 text-center text-xs font-sans text-stone-600">
+        <p class="font-serif italic text-sm text-parchment-800 mb-1">
+            „Und Henoch wandelte mit Gott, und er war nicht mehr, denn Gott nahm ihn.“ (1. Mose 5,24)
+        </p>
+        <p>Interaktive Studienbibel · Hebräischer Grundtext (Masoretischer Text), historische Realienkunde &amp; alte Auslegung.</p>
+    </footer>
+
+    <!-- Modal / Detail-Karte -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/60 backdrop-blur-xs p-4" onclick="closeModalOnBackdrop(event)">
+        <div class="bg-parchment-50 border border-parchment-300 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden transform transition-all">
+            <div id="modal-header" class="px-6 py-4 bg-parchment-100 border-b border-parchment-300 flex items-center justify-between">
+                <span id="modal-badge" class="text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded"></span>
+                <button onclick="closeModal()" class="text-stone-500 hover:text-stone-900 p-1 rounded-lg hover:bg-parchment-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 font-serif text-parchment-900 space-y-4 max-h-[75vh] overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // INHALT: MATTHÄUS 5
+        // ==========================================
+        const greekLexicon = {
+  toledot: { greek: `סֵפֶר תּוֹלְדֹת`, translit: `sēfer tôlĕdōt`, literal: `Buch der Geschlechter / Entstehungsgeschichte`,
+    meaning: `<em>Tôlĕdōt</em> („Zeugungen, Geschlechterfolge“) gliedert das Buch Genesis (2,4; 5,1; 6,9; 10,1; 11,10; 11,27; 25,12.19; 36,1; 37,2). Hier heißt es „Buch“, was ein schriftliches Verzeichnis nahelegt.`,
+    theology: `Die Genealogie verbindet Schöpfung und Flut. Sie zeigt, dass der Segen von Gen 1,28 durch die Generationen weitergegeben wird.` },
+  demut: { greek: `בִּדְמוּת אֱלֹהִים`, translit: `bidmût ʾĕlōhîm`, literal: `im Gleichnis Gottes`,
+    meaning: `Die Wendung steht in V. 1 und greift 1,26–27 auf. In V. 3 gibt Adam den Gedanken weiter: Set wird „nach seinem Bilde, ihm ähnlich“ gezeugt. Das Bild Gottes bleibt erhalten, auch nach dem Fall.`,
+    theology: `Das Gottesbild geht von Generation zu Generation weiter. Es wird nicht im Fall ausgelöscht, sondern von Eltern an Kinder weitergegeben.` },
+  vayamot: { greek: `וַיָּמֹת`, translit: `wayyāmōt`, literal: `und er starb`,
+    meaning: `Der Refrain „und er starb“ schließt jede Lebensbeschreibung außer der Henochs. Das Wort erinnert an die Drohung in 2,17 („du musst sterben“).`,
+    theology: `Der Tod bleibt Folge des Falls, auch wenn die Menschen sehr alt werden. Die Genealogie bestätigt Gottes Wort.` },
+  henoch: { greek: `וַיִּתְהַלֵּךְ חֲנוֹךְ אֶת־הָאֱלֹהִים`, translit: `wayyithallēḵ ḥănôḵ ʾet-hāʾĕlōhîm`, literal: `und Henoch wandelte mit Gott`,
+    meaning: `Das Verb steht in der Form „sich bewegen, wandeln“ und bezeichnet die dauernde Gemeinschaft mit Gott. Gleiches wird von Noach gesagt (6,9). Henoch „war nicht mehr, denn Gott nahm ihn“ (V. 24).`,
+    theology: `Henoch entgeht dem Tod und wird zum Bild für die Nähe Gottes, die den Tod überwindet (vgl. Hebr 11,5; Sir 44,16).` },
+  lamech: { greek: `נֹחַ / נִחֲמֵנוּ`, translit: `nōaḥ / yĕnaḥămēnû`, literal: `Noach / er wird uns trösten`,
+    meaning: `Lamech spricht bei der Namengebung: „Dieser wird uns trösten (<em>yĕnaḥămēnû</em>) von unserer Arbeit.“ Der Name <em>Nōaḥ</em> klingt an <em>nāḥam</em> („trösten, aufatmen“) an.`,
+    theology: `Der Trost bezieht sich auf die Mühsal des verfluchten Erdbodens (3,17). Das Wortspiel bereitet die Erzählung von der Flut vor, in der Noach die Erde „aufatmen“ lässt (8,21).` },
+  elohim: { greek: `לָקַח אֹתוֹ אֱלֹהִים`, translit: `lāqaḥ ʾōtô ʾĕlōhîm`, literal: `Gott nahm ihn`,
+    meaning: `„Nehmen“ (<em>lāqaḥ</em>) steht für das Entrücken, das auch Elia widerfährt (2 Kön 2,3–10) und von Gott für die Frommen erwartet wird (Ps 49,16; 73,24).`,
+    theology: `Henoch wird nicht dem Tod überlassen. Das Wort bereitet den Glauben an ein Leben bei Gott über den Tod hinaus vor.` }
+};
+
+        const churchFathers = {
+  chrysostomus: { name: `Johannes Chrysostomus`, dates: `ca. 349–407`, role: `Bischof von Konstantinopel, Prediger`,
+    bio: `Seine Homilien zur Genesis (Hom. 21–22) behandeln auch die Geschlechterfolge.`,
+    focusInGen5: `Er sieht in der Genealogie das Zeugnis, dass der Tod regiert und der Mensch vergänglich bleibt, und hebt Henoch als Vorbild eines Lebens mit Gott hervor.` },
+  augustinus: { name: `Augustinus von Hippo`, dates: `354–430`, role: `Bischof und Kirchenlehrer`,
+    bio: `Im „Gottesstaat“ (Buch XV) setzt er sich mit dem hohen Alter der Vorfahren auseinander.`,
+    focusInGen5: `Er verteidigt die Lebensalter als wörtlich, verweist auf die Zahlenunterschiede in den Handschriften und sieht in Henoch ein Vorzeichen der Entrückung und der künftigen Auferstehung.` },
+  ambrosius: { name: `Ambrosius von Mailand`, dates: `ca. 339–397`, role: `Bischof von Mailand`,
+    bio: `Er schrieb über das Verhältnis von Tod und Leben, unter anderem in „De bono mortis“.`,
+    focusInGen5: `Er liest die Entrückung Henochs als Zeichen, dass der Tod nicht das letzte Wort hat, und das Wandeln mit Gott als Beispiel für den Weg des Glaubens.` },
+  hieronymus: { name: `Hieronymus`, dates: `ca. 347–420`, role: `Gelehrter, Bibelübersetzer (Vulgata)`,
+    bio: `In den „Hebräischen Fragen zur Genesis“ bespricht er Namen und Zahlen.`,
+    focusInGen5: `Er erklärt die Namen der Urväter und vergleicht die Zahlen des hebräischen Textes mit denen der Septuaginta, die voneinander abweichen.` },
+  raschi: { name: `Raschi (Rabbi Schlomo Jizchaki)`, dates: `1040–1105`, role: `Rabbiner und Bibelkommentator in Troyes`,
+    bio: `Sein Kommentar verbindet Wortsinn mit Midraschim.`,
+    focusInGen5: `Zu V. 24 bemerkt er, dass Henoch leicht von der Sünde abzubringen war und Gott ihn früh nahm; er stützt sich dabei auf eine rabbinische Überlieferung. Zu V. 29 verbindet er den Namen Noach mit dem Trost nach dem Fluch über den Boden.` }
+};
+
+        const studySections = [
+{
+  id: `adam-set`, sectionTitle: `Von Adam bis Henoch`, sectionRange: `Gen 5,1–24`,
+  sectionIntro: `Mit dem „Buch der Geschlechter Adams“ beginnt die Genealogie der Sethiten. Zehn Namen verbinden Adam mit Noach; durch alle klingt der Refrain „und er starb“, nur bei Henoch nicht.`,
+  blocks: [
+  { verses: `1–8`,
+    bibleText: `<span class="verse-num">1</span>Dies ist das <span class="greek-term" onclick="openGreek('toledot')">Buch der Geschlechter</span> Adams. An dem Tag, da Gott den Menschen schuf, machte er ihn im <span class="greek-term" onclick="openGreek('demut')">Gleichnis Gottes</span>. <span class="verse-num">2</span>Als Mann und Frau schuf er sie, und er segnete sie und gab ihnen den Namen Mensch, an dem Tag, da sie geschaffen wurden. <span class="verse-num">3</span>Und Adam lebte 130 Jahre und zeugte einen Sohn, ihm ähnlich, nach seinem Bilde, und gab ihm den Namen Set. <span class="verse-num">4</span>Und die Tage Adams, nachdem er Set gezeugt hatte, waren 800 Jahre; und er zeugte Söhne und Töchter. <span class="verse-num">5</span>Und alle Tage Adams, die er lebte, waren 930 Jahre; <span class="greek-term" onclick="openGreek('vayamot')">und er starb</span>. <span class="verse-num">6</span>Und Set lebte 105 Jahre und zeugte Enosch. <span class="verse-num">7</span>Und Set lebte, nachdem er Enosch gezeugt hatte, 807 Jahre und zeugte Söhne und Töchter. <span class="verse-num">8</span>Und alle Tage Sets waren 912 Jahre; und er starb.`,
+    commentary: {
+      history: `Das Kapitel gehört zur Priesterschrift und knüpft an Gen 1 an („Gleichnis Gottes“, „Mann und Frau“, „segnete“). Die hohen Lebensalter haben Parallelen in der sumerischen Königsliste, in der die Herrscher vor der Flut zehntausende Jahre regieren; die Bibel zeigt mit niedrigeren Zahlen die abnehmende Lebenskraft. Hebräischer Text, Septuaginta und Samaritanischer Pentateuch haben abweichende Zahlen.`,
+      greek: `Die Formel besteht aus festen Gliedern: Lebensalter bei der Zeugung, Restjahre, Gesamtalter, „und er starb“. Das Wort „Bild“ (<em>ṣelem</em>) taucht hier wieder auf (V. 3) und zeigt, dass das Gottesbild nach dem Fall in den Menschen bleibt. Set wird ihm „ähnlich“ gezeugt wie Adam Gott.`,
+      fathers: `<span class="father-link" onclick="openFather('augustinus')">Augustinus</span> sieht in V. 3 die Weitergabe des Bildes und der Sterblichkeit. <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> erkennt im Refrain das Urteil über den Menschen, der nicht ewig lebt. <span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> verweist auf die abweichenden Zahlen von Hebräer und Septuaginta.` } },
+  { verses: `9–20`,
+    bibleText: `<span class="verse-num">9</span>Und Enosch lebte 90 Jahre und zeugte Kenan. <span class="verse-num">10</span>Und Enosch lebte, nachdem er Kenan gezeugt hatte, 815 Jahre und zeugte Söhne und Töchter. <span class="verse-num">11</span>Und alle Tage Enoschs waren 905 Jahre; und er starb. <span class="verse-num">12</span>Und Kenan lebte 70 Jahre und zeugte Mahalalel. <span class="verse-num">13</span>Und Kenan lebte, nachdem er Mahalalel gezeugt hatte, 840 Jahre und zeugte Söhne und Töchter. <span class="verse-num">14</span>Und alle Tage Kenans waren 910 Jahre; und er starb. <span class="verse-num">15</span>Und Mahalalel lebte 65 Jahre und zeugte Jered. <span class="verse-num">16</span>Und Mahalalel lebte, nachdem er Jered gezeugt hatte, 830 Jahre und zeugte Söhne und Töchter. <span class="verse-num">17</span>Und alle Tage Mahalalels waren 895 Jahre; und er starb. <span class="verse-num">18</span>Und Jered lebte 162 Jahre und zeugte Henoch. <span class="verse-num">19</span>Und Jered lebte, nachdem er Henoch gezeugt hatte, 800 Jahre und zeugte Söhne und Töchter. <span class="verse-num">20</span>Und alle Tage Jereds waren 962 Jahre; und er starb.`,
+    commentary: {
+      history: `Die Namensfolge Enosch (Mensch), Kenan, Mahalalel („Lobpreis Gottes“) und Jered („Herabstieg“) ist in der Forschung mit der Linie Kains aus 4,17–18 verglichen worden (Henoch, Irad, Mehujael, Metuschael, Lamech); die Ähnlichkeiten werden auf eine gemeinsame Überlieferung zurückgeführt. Die Zahlen sind nicht dazu gedacht, die Zeit seit Adam zu berechnen.`,
+      greek: `Der Refrain „und er starb“ (<em>wayyāmōt</em>) steht bei jedem. Die Liste hat keine Erzählung, wirkt aber wie ein Kontrapunkt zum Segen von 1,28: Fruchtbarkeit setzt sich fort, der Tod ebenso.`,
+      fathers: `<span class="father-link" onclick="openFather('augustinus')">Augustinus</span> betont, dass die Genealogie die zwei Linien der Menschheit begleitet und der Tod beide trifft. <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> liest den Refrain als Mahnung, dass das Leben vergänglich ist. <span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> übersetzt die Namen der Vorfahren und erläutert ihre Bedeutung.` } },
+  { verses: `21–24`,
+    bibleText: `<span class="verse-num">21</span>Und Henoch lebte 65 Jahre und zeugte Metuschelach. <span class="verse-num">22</span>Und Henoch <span class="greek-term" onclick="openGreek('henoch')">wandelte mit Gott</span>, nachdem er Metuschelach gezeugt hatte, 300 Jahre und zeugte Söhne und Töchter. <span class="verse-num">23</span>Und alle Tage Henochs waren 365 Jahre. <span class="verse-num">24</span>Und Henoch wandelte mit Gott, und er war nicht mehr, denn <span class="greek-term" onclick="openGreek('elohim')">Gott nahm ihn</span>.`,
+    commentary: {
+      history: `Henoch ist der siebte von Adam an und steht in der Mitte der Liste. Seine 365 Lebensjahre entsprechen den Tagen eines Sonnenjahres. Die spätere jüdische Literatur (Henochbücher) knüpft an ihn an, und das Neue Testament zitiert ihn (Hebr 11,5; Jud 14–15). Das Entrücken zu Gott ist eine Ausnahme in der Reihe der Toten.`,
+      greek: `Hier fehlt der Refrain „und er starb“. Das Verb „wandeln“ (<em>hithallēḵ</em>, Reflexivstamm) beschreibt ein fortgesetztes Gehen mit Gott und kehrt in 6,9 bei Noach wieder. „Er war nicht mehr“ (<em>wĕʾênennû</em>) meint, dass man ihn nicht fand; Hebr 11,5 liest daraus, dass er den Tod nicht sah.`,
+      fathers: `<span class="father-link" onclick="openFather('ambrosius')">Ambrosius</span> liest Henoch als Beispiel eines Lebens, das Gott gefällt, und als Zeichen der kommenden Auferstehung. <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> verbindet die Entrückung Henochs mit der Verheißung des ewigen Lebens. <span class="father-link" onclick="openFather('raschi')">Raschi</span> verweist auf die Überlieferung, nach der Gott Henoch früh nahm, damit er nicht in Sünde falle.` } }
+  ]
+},
+{
+  id: `noach`, sectionTitle: `Von Metuschelach bis Noach`, sectionRange: `Gen 5,25–32`,
+  sectionIntro: `Die Reihe führt über Metuschelach und Lamech zu Noach. Lamech gibt seinem Sohn einen Namen, der Trost von der Mühsal verspricht, und leitet so die Flutgeschichte ein.`,
+  blocks: [
+  { verses: `25–32`,
+    bibleText: `<span class="verse-num">25</span>Und Metuschelach lebte 187 Jahre und zeugte Lamech. <span class="verse-num">26</span>Und Metuschelach lebte, nachdem er Lamech gezeugt hatte, 782 Jahre und zeugte Söhne und Töchter. <span class="verse-num">27</span>Und alle Tage Metuschelachs waren 969 Jahre; und er starb. <span class="verse-num">28</span>Und Lamech lebte 182 Jahre und zeugte einen Sohn. <span class="verse-num">29</span>Und er gab ihm den Namen Noach und sprach: Dieser wird uns <span class="greek-term" onclick="openGreek('lamech')">trösten</span> bei unserer Arbeit und bei der Mühsal unserer Hände, die vom Erdboden kommt, den der HERR verflucht hat. <span class="verse-num">30</span>Und Lamech lebte, nachdem er Noach gezeugt hatte, 595 Jahre und zeugte Söhne und Töchter. <span class="verse-num">31</span>Und alle Tage Lamechs waren 777 Jahre; und er starb. <span class="verse-num">32</span>Und Noach war 500 Jahre alt, und Noach zeugte Sem, Ham und Jafet.`,
+    commentary: {
+      history: `Metuschelach wird 969 Jahre alt, das höchste Alter der Bibel. Nach der Rechnung des hebräischen Textes stirbt er im Jahr der Flut. Der Wortlaut „Erdboden, den der HERR verflucht hat“ greift 3,17 auf. Die Zehnzahl der Namen erinnert an die zehn Könige vor der Flut bei Berossos; die sumerische Königsliste nennt acht.`,
+      greek: `Das Wortspiel in V. 29 stimmt nicht genau: <em>Nōaḥ</em> klingt an <em>nāḥam</em> („trösten“, <em>yĕnaḥămēnû</em>) an, ohne dass beide Wörter denselben Stamm haben. Dass Lamech einen Sohn „Trost“ nennt, steht im Kontrast zum Rachelied des Kainiten Lamech (4,23–24). Die Reihe endet offen mit den drei Söhnen Noachs.`,
+      fathers: `<span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> sieht im Namen Noach das Zeichen der Hoffnung des Vaters, dass die Mühsal enden wird. <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> nimmt Noach als Anfang eines neuen Abschnitts der Heilsgeschichte. <span class="father-link" onclick="openFather('raschi')">Raschi</span> deutet den Trost als Erleichterung der Landarbeit, weil Noach den Pflug einführte.` } }
+  ]
+}
+];
+
+
+        // ==========================================
+        // ZUSTAND & STEUERUNG
+        // ==========================================
+        let activeFilters = { greek: true, history: true, fathers: true };
+        const CHAPTER = 5;
+        const NOTES_KEY = 'gen' + CHAPTER + '_notes';
+        let userNotes = {};
+        try { userNotes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}'); } catch (e) {}
+
+        function renderStudy() {
+            const container = document.getElementById('study-container');
+            container.innerHTML = '';
+
+            studySections.forEach(section => {
+                const sectionEl = document.createElement('section');
+                sectionEl.id = section.id;
+                sectionEl.className = 'folio-page rounded-2xl border border-parchment-300 overflow-hidden scroll-mt-16';
+
+                let html = `
+                    <div class="bg-parchment-100/90 px-5 sm:px-8 py-5 border-b border-parchment-300">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <h3 class="font-display text-2xl sm:text-3xl font-bold text-burgundy-900">
+                                ${section.sectionTitle}
+                            </h3>
+                            <span class="font-sans text-xs font-semibold tracking-wider uppercase px-2.5 py-1 rounded bg-parchment-200 text-parchment-900 border border-parchment-300">
+                                ${section.sectionRange}
+                            </span>
+                        </div>
+                        <p class="font-serif italic text-stone-700 text-base mt-1.5">
+                            ${section.sectionIntro}
+                        </p>
+                    </div>
+                    <div class="divide-y divide-parchment-200">
+                `;
+
+                section.blocks.forEach((block, idx) => {
+                    const blockKey = `${section.id}-${idx}`;
+                    const savedNote = userNotes[blockKey] || '';
+
+                    let commentaryParts = [];
+                    if (activeFilters.history && block.commentary.history) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-amber-700/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-amber-800 block mb-0.5">Historischer & Jüdischer Kontext</span>
+                                <div class="text-stone-800">${block.commentary.history}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.greek && block.commentary.greek) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-sky-800/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-sky-900 block mb-0.5">Hebräischer Urtext & Wortbedeutung</span>
+                                <div class="text-stone-800">${block.commentary.greek}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.fathers && block.commentary.fathers) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-burgundy-800/70">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-800 block mb-0.5">Kirchenväter & Alte Ausleger</span>
+                                <div class="text-stone-800">${block.commentary.fathers}</div>
+                            </div>
+                        `);
+                    }
+
+                    const commentaryHtml = commentaryParts.length > 0
+                        ? `<div class="space-y-3.5 font-serif italic text-[15.5px] sm:text-base leading-relaxed">${commentaryParts.join('')}</div>`
+                        : `<div class="font-sans text-xs text-stone-400 italic">Alle Kommentar-Ebenen sind ausgeblendet.</div>`;
+
+                    html += `
+                        <div class="p-5 sm:p-8 bg-parchment-50 max-w-4xl mx-auto">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-700">
+                                    Genesis ${CHAPTER},${block.verses}
+                                </span>
+                                <button onclick="toggleNoteBox('${blockKey}')" class="text-xs font-sans text-stone-400 hover:text-burgundy-800 flex items-center gap-1 transition no-print">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                </button>
+                            </div>
+                            <p class="font-serif text-xl sm:text-[21px] leading-[1.8] text-parchment-900 mb-5">
+                                ${block.bibleText}
+                            </p>
+                            <div class="bg-parchment-100/80 rounded-xl p-4 sm:p-5 border border-parchment-300/80">
+                                ${commentaryHtml}
+                            </div>
+                            ${renderNoteArea(blockKey, savedNote)}
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                sectionEl.innerHTML = html;
+                container.appendChild(sectionEl);
+            });
+        }
+
+        function renderNoteArea(blockKey, savedNote) {
+            const isHidden = savedNote ? '' : 'hidden';
+            return `
+                <div id="note-box-${blockKey}" class="${isHidden} mt-4 pt-3 border-t border-parchment-200 no-print">
+                    <label class="block font-sans text-[11px] font-medium text-stone-500 mb-1">Eigene Studiennotiz:</label>
+                    <textarea 
+                        onchange="saveNote('${blockKey}', this.value)"
+                        onkeyup="saveNote('${blockKey}', this.value)"
+                        rows="2" 
+                        placeholder="Deine Gedanken..."
+                        class="w-full rounded-lg bg-white border border-parchment-300 p-2 text-xs font-sans text-parchment-900 focus:outline-none focus:border-gold-600"
+                    >${savedNote}</textarea>
+                </div>
+            `;
+        }
+
+        function toggleNoteBox(blockKey) {
+            const box = document.getElementById(`note-box-${blockKey}`);
+            if (box) {
+                box.classList.toggle('hidden');
+                if (!box.classList.contains('hidden')) box.querySelector('textarea').focus();
+            }
+        }
+
+        function saveNote(blockKey, text) {
+            if (text.trim() === '') delete userNotes[blockKey];
+            else userNotes[blockKey] = text;
+            try { localStorage.setItem(NOTES_KEY, JSON.stringify(userNotes)); } catch (e) {}
+        }
+
+        function toggleFilter(type) {
+            activeFilters[type] = !activeFilters[type];
+            const btn = document.getElementById(`filter-${type}`);
+            if (activeFilters[type]) btn.classList.remove('opacity-45', 'line-through');
+            else btn.classList.add('opacity-45', 'line-through');
+            renderStudy();
+        }
+
+        function openGreek(key) {
+            const item = greekLexicon[key];
+            if (!item) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Hebräisches Original';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-sky-900/10 text-sky-900 border border-sky-800/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <div class="text-3xl font-serif font-bold text-greek-800">${item.greek}</div>
+                    <div class="text-sm font-sans text-stone-500 mt-0.5">Umschrift: <span class="italic font-medium text-stone-700">${item.translit}</span> · Wörtlich: <span class="font-medium text-stone-700">${item.literal}</span></div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${item.meaning}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Theologische Tiefe</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${item.theology}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        // Schwerpunkt-Text: Feld heißt je Kapitel anders (focusInMtN)
+        function fatherFocus(f) {
+            const k = Object.keys(f).find(x => x === 'focus' || x.startsWith('focusIn'));
+            return k ? f[k] : '';
+        }
+
+        function openFather(key) {
+            const father = churchFathers[key];
+            if (!father) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Ausleger / Patristik';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-red-900/10 text-burgundy-900 border border-red-900/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <h3 class="text-2xl font-display font-bold text-burgundy-900">${father.name}</h3>
+                    <div class="text-xs font-sans text-stone-600 mt-0.5">${father.dates} · ${father.role}</div>
+                    ${father.classificationNote ? `<p class="text-xs font-sans text-burgundy-800 mt-1.5 font-medium">${father.classificationNote}</p>` : ''}
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Biografie & Einordnung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${father.bio}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-gold-700 mb-1">Schwerpunkt in Gen ${CHAPTER}</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${fatherFocus(father)}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openGlossaryModal() {
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Lexikon & Kirchenväter';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-amber-900/10 text-amber-900 border border-amber-800/30';
+            
+            let greekList = Object.entries(greekLexicon).map(([k, v]) => `
+                <button onclick="openGreek('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-sky-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-serif font-bold text-greek-800 text-base">${v.greek}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${v.translit}</span>
+                </button>
+            `).join('');
+
+            let fathersList = Object.entries(churchFathers).map(([k, f]) => `
+                <button onclick="openFather('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-amber-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-display font-bold text-burgundy-900 text-base">${f.name}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${f.dates} · ${f.role}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('modal-body').innerHTML = `
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-sky-900 mb-2">Hebräische Begriffe</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${greekList}</div>
+                </div>
+                <div class="pt-3 border-t border-parchment-200">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Kirchenväter & Ausleger</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${fathersList}</div>
+                </div>
+            `;
+            showModal();
+        }
+
+        function showModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeModalOnBackdrop(e) {
+            if (e.target.id === 'detail-modal') closeModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderStudy);
+    </script>
+</body>
+</html>
