@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis 37 – Studienausgabe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+/* ===== Gemeinsames Theme-Skript für alle Kapitel ===== */
+/* Einbinden direkt NACH dem Tailwind-CDN-Skript im <head>. Ersetzt den alten tailwind.config-Block. */
+
+(function () {
+    // 1) Theme sofort setzen (vor dem ersten Rendern, kein Aufblitzen)
+    try {
+        var t = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (t === 'dark' || (!t && prefersDark)) document.documentElement.classList.add('dark');
+    } catch (e) {}
+
+    // 2) Tailwind-Konfiguration: Farben laufen über CSS-Variablen aus theme.css
+    if (window.tailwind) {
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif']
+                    },
+                    colors: {
+                        parchment: {
+                            50: 'rgb(var(--parchment-50) / <alpha-value>)',
+                            100: 'rgb(var(--parchment-100) / <alpha-value>)',
+                            200: 'rgb(var(--parchment-200) / <alpha-value>)',
+                            300: 'rgb(var(--parchment-300) / <alpha-value>)',
+                            800: 'rgb(var(--parchment-800) / <alpha-value>)',
+                            900: 'rgb(var(--parchment-900) / <alpha-value>)'
+                        },
+                        burgundy: {
+                            700: 'rgb(var(--burgundy-700) / <alpha-value>)',
+                            800: 'rgb(var(--burgundy-800) / <alpha-value>)',
+                            900: 'rgb(var(--burgundy-900) / <alpha-value>)'
+                        },
+                        gold: {
+                            600: 'rgb(var(--gold-600) / <alpha-value>)',
+                            700: 'rgb(var(--gold-700) / <alpha-value>)'
+                        },
+                        greek: {
+                            50: 'rgb(var(--greek-50) / <alpha-value>)',
+                            700: 'rgb(var(--greek-700) / <alpha-value>)',
+                            800: 'rgb(var(--greek-800) / <alpha-value>)'
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    // 3) Umschalten
+    function isDark() {
+        return document.documentElement.classList.contains('dark');
+    }
+    function applyTheme(dark) {
+        document.documentElement.classList.toggle('dark', dark);
+        var btn = document.getElementById('theme-toggle-float');
+        if (btn) btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    }
+    window.toggleTheme = function () {
+        var next = !isDark();
+        applyTheme(next);
+        try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch (e) {}
+    };
+
+    // 4) Systemeinstellung live verfolgen, solange keine manuelle Wahl gespeichert ist
+    if (window.matchMedia) {
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        var onChange = function (e) {
+            var stored = null;
+            try { stored = localStorage.getItem('theme'); } catch (err) {}
+            if (!stored) applyTheme(e.matches);
+        };
+        if (mq.addEventListener) mq.addEventListener('change', onChange);
+        else if (mq.addListener) mq.addListener(onChange);
+    }
+
+    // 5) Schwebenden Umschalt-Button einfügen
+    document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.createElement('button');
+        btn.id = 'theme-toggle-float';
+        btn.type = 'button';
+        btn.className = 'no-print';
+        btn.title = 'Hell/Dunkel umschalten';
+        btn.setAttribute('aria-label', 'Dunkelmodus umschalten');
+        btn.setAttribute('aria-pressed', isDark() ? 'true' : 'false');
+        btn.onclick = window.toggleTheme;
+        btn.innerHTML =
+            '<svg class="icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>' +
+            '<svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>';
+        document.body.appendChild(btn);
+    });
+})();
+
+    </script>
+    <style>
+        body {
+            background-color: #F7F3E8;
+            color: #262018;
+            background-image: radial-gradient(#DFD2B5 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+
+        .folio-page {
+            background-color: #FCFBF7;
+            box-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+        }
+
+        .greek-term {
+            border-bottom: 1.5px dotted #1E4E79;
+            color: #15395B;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .greek-term:hover {
+            background-color: #E2ECF5;
+            border-bottom-style: solid;
+        }
+
+        .father-link {
+            color: #7C2D12;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px dashed #7C2D12;
+            transition: color 0.15s ease;
+        }
+        .father-link:hover {
+            color: #B48327;
+            border-bottom-color: #B48327;
+        }
+
+        .verse-num {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #8F6519;
+            vertical-align: super;
+            margin-right: 2px;
+            user-select: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F3E8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C3A3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B48327;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .folio-page { box-shadow: none; }
+        }
+    </style>
+    <style>
+/* ===== Gemeinsamer Dark Mode für alle Kapitel ===== */
+/* Einbinden NACH dem <style>-Block der Seite, damit diese Regeln die alten Farbwerte überschreiben. */
+
+:root {
+    --parchment-50: 252 251 247;
+    --parchment-100: 247 243 232;
+    --parchment-200: 239 231 212;
+    --parchment-300: 223 210 181;
+    --parchment-800: 61 53 41;
+    --parchment-900: 38 32 24;
+    --burgundy-700: 124 45 18;
+    --burgundy-800: 101 34 20;
+    --burgundy-900: 74 22 13;
+    --gold-600: 180 131 39;
+    --gold-700: 143 101 25;
+    --greek-50: 240 245 249;
+    --greek-700: 30 78 121;
+    --greek-800: 21 57 91;
+
+    --body-bg: #F7F3E8;
+    --body-fg: #262018;
+    --body-dot: #DFD2B5;
+    --folio-bg: #FCFBF7;
+    --folio-shadow: 0 10px 35px -5px rgba(38, 32, 24, 0.12), 0 0 1px 1px rgba(180, 131, 39, 0.25);
+    --greek-term-fg: #15395B;
+    --greek-term-border: #1E4E79;
+    --greek-term-hover: #E2ECF5;
+    --father-fg: #7C2D12;
+    --father-hover: #B48327;
+    --verse-num: #8F6519;
+    --scroll-track: #F7F3E8;
+    --scroll-thumb: #D4C3A3;
+    --scroll-thumb-hover: #B48327;
+}
+
+:root.dark {
+    color-scheme: dark;
+
+    --parchment-50: 28 24 19;
+    --parchment-100: 36 31 25;
+    --parchment-200: 46 40 32;
+    --parchment-300: 70 60 47;
+    --parchment-800: 217 207 184;
+    --parchment-900: 238 231 214;
+    --burgundy-700: 224 145 122;
+    --burgundy-800: 232 168 146;
+    --burgundy-900: 240 190 170;
+    --gold-600: 212 166 74;
+    --gold-700: 224 184 96;
+    --greek-50: 26 36 48;
+    --greek-700: 127 178 224;
+    --greek-800: 166 203 238;
+
+    --body-bg: #14110D;
+    --body-fg: #E8E0CF;
+    --body-dot: #2A241C;
+    --folio-bg: #1C1813;
+    --folio-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.55), 0 0 1px 1px rgba(212, 166, 74, 0.22);
+    --greek-term-fg: #A6CBEE;
+    --greek-term-border: #7FB2E0;
+    --greek-term-hover: #1F3045;
+    --father-fg: #E8A892;
+    --father-hover: #E0B860;
+    --verse-num: #D4A64A;
+    --scroll-track: #14110D;
+    --scroll-thumb: #4A4132;
+    --scroll-thumb-hover: #D4A64A;
+}
+
+/* Bestehende Klassen auf Variablen umstellen (überschreibt die festen Werte der Seite) */
+body {
+    background-color: var(--body-bg);
+    color: var(--body-fg);
+    background-image: radial-gradient(var(--body-dot) 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+.folio-page { background-color: var(--folio-bg); box-shadow: var(--folio-shadow); }
+.greek-term { border-bottom-color: var(--greek-term-border); color: var(--greek-term-fg); }
+.greek-term:hover { background-color: var(--greek-term-hover); }
+.father-link { color: var(--father-fg); border-bottom-color: var(--father-fg); }
+.father-link:hover { color: var(--father-hover); border-bottom-color: var(--father-hover); }
+.verse-num { color: var(--verse-num); }
+::-webkit-scrollbar-track { background: var(--scroll-track); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+
+/* Overrides für feste Tailwind-Standardfarben */
+.dark ::selection { background: rgba(212, 166, 74, 0.35); color: #fff; }
+
+.dark .bg-burgundy-800 { background-color: #7C2D12; color: #fff; }
+.dark .hover\:bg-burgundy-900:hover { background-color: #933818; }
+
+.dark .text-stone-400 { color: #8F8575; }
+.dark .text-stone-500 { color: #A39A89; }
+.dark .text-stone-600 { color: #B8AF9D; }
+.dark .text-stone-700 { color: #CFC7B5; }
+.dark .text-stone-800 { color: #E3DCCB; }
+.dark .hover\:text-stone-900:hover { color: #FFFFFF; }
+
+.dark .text-sky-900 { color: #9CC6EE; }
+.dark .text-amber-900,
+.dark .text-amber-800 { color: #E6BF78; }
+.dark .text-red-950 { color: #F0B8A8; }
+.dark .border-sky-800\/30 { border-color: rgba(127, 178, 224, 0.4); }
+.dark .border-amber-800\/30 { border-color: rgba(224, 184, 96, 0.4); }
+.dark .border-red-900\/30 { border-color: rgba(232, 168, 146, 0.4); }
+.dark .border-amber-700\/60 { border-color: rgba(224, 184, 96, 0.6); }
+.dark .border-sky-800\/60 { border-color: rgba(127, 178, 224, 0.6); }
+
+.dark .bg-white { background-color: #1A1611; }
+.dark .hover\:bg-sky-50:hover { background-color: #1B2733; }
+.dark .hover\:bg-amber-50:hover { background-color: #2A2214; }
+.dark textarea::placeholder { color: #8F8575; }
+
+/* Schwebender Umschalt-Button (wird von theme.js eingefügt) */
+#theme-toggle-float {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 40;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    cursor: pointer;
+    background-color: rgb(var(--parchment-50));
+    color: rgb(var(--gold-700));
+    border: 1px solid rgb(var(--parchment-300));
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    transition: background-color 0.2s ease;
+}
+#theme-toggle-float:hover { background-color: rgb(var(--parchment-200)); }
+#theme-toggle-float svg { width: 1.2rem; height: 1.2rem; }
+#theme-toggle-float .icon-sun { display: none; }
+.dark #theme-toggle-float .icon-sun { display: block; }
+.dark #theme-toggle-float .icon-moon { display: none; }
+
+@media print {
+    #theme-toggle-float { display: none !important; }
+    body { background: white; color: #262018; background-image: none; }
+    .folio-page { box-shadow: none; }
+}
+
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-amber-200/60">
+    <!-- Schmale Kopfleiste: Titel + Ebenen-Schalter -->
+    <header class="sticky top-0 z-30 bg-parchment-100/95 backdrop-blur-md border-b border-parchment-300 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
+            <h1 class="font-display text-lg sm:text-xl font-bold text-parchment-900 tracking-tight">
+                Genesis Kapitel 37
+            </h1>
+            <div class="flex flex-wrap items-center gap-1.5 text-xs font-sans">
+                <button onclick="toggleFilter('history')" id="filter-history" class="filter-chip active px-2.5 py-1 rounded-full border border-amber-800/30 bg-amber-800/10 text-amber-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-amber-700"></span> Historisch
+                </button>
+                <button onclick="toggleFilter('greek')" id="filter-greek" class="filter-chip active px-2.5 py-1 rounded-full border border-sky-800/30 bg-sky-800/10 text-sky-900 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-sky-800"></span> Wortherkunft
+                </button>
+                <button onclick="toggleFilter('fathers')" id="filter-fathers" class="filter-chip active px-2.5 py-1 rounded-full border border-red-900/30 bg-red-900/10 text-red-950 font-medium flex items-center gap-1 transition-all">
+                    <span class="w-2 h-2 rounded-full bg-burgundy-800"></span> Kirchenväter
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Haupt-Container (Buchseite / Folio) -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+
+        <!-- Obere Kapitel-Navigation direkt über dem Einführungskasten -->
+        <nav aria-label="Obere Kapitel-Navigation" class="mb-6 pb-4 border-b border-parchment-300 flex items-center justify-between no-print">
+            <a href="genesis-36.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kapitel 36</a>
+            <a href="index.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Kapitel 37</a>
+            <a href="genesis-38.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 38 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+        
+        <!-- Einführungskasten -->
+        <div class="folio-page rounded-xl p-5 sm:p-7 mb-8 border border-parchment-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-parchment-200 pb-4 mb-4">
+                <div>
+                    <span class="text-xs font-sans uppercase tracking-widest text-gold-700 font-semibold">Die Josefsgeschichte I (Gen 37)</span>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-parchment-900 mt-0.5">
+                        Träume, Hass der Brüder, Verkauf nach Ägypten
+                    </h2>
+                </div>
+                <div class="text-xs font-sans text-stone-600 bg-parchment-100 px-3.5 py-2 rounded-lg border border-parchment-300">
+                    <strong class="text-parchment-900">Tipp:</strong> Klicke auf <span class="greek-term">hebräische Begriffe</span> und <span class="father-link">Kirchenväter</span> für Details.
+                </div>
+            </div>
+            <p class="font-serif text-base sm:text-lg text-stone-700 leading-relaxed">
+                Mit Kapitel 37 beginnt die Josefsgeschichte, die bis zum Ende der Genesis reicht. Josef, der Lieblingssohn Jakobs, weckt durch seine Träume den Hass der Brüder, die ihn in die Grube werfen und verkaufen. Der Vater wird mit dem blutigen Leibrock getäuscht; der Name Gottes steht im ganzen Kapitel nicht, doch die Erzählung deutet schon seinen verborgenen Plan an.
+            </p>
+        </div>
+
+
+        <!-- Dynamisch gerenderte Bibelabschnitte -->
+        <div id="study-container" class="space-y-10">
+            <!-- Inhalte werden über JavaScript aufgebaut -->
+        </div>
+
+        <!-- Kapitel-Navigation am Ende -->
+        <nav aria-label="Kapitel-Navigation" class="mt-12 pt-6 border-t border-parchment-300 flex items-center justify-between no-print">
+            <a href="genesis-36.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kapitel 36</a>
+            <a href="index.html" class="px-5 py-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-900 text-parchment-50 font-sans text-xs font-semibold tracking-wider uppercase transition shadow-sm border border-gold-600/40">Kapitel 37</a>
+            <a href="genesis-38.html" class="px-4 py-2 rounded-lg bg-parchment-200 hover:bg-parchment-300 text-parchment-900 font-sans text-xs font-medium transition flex items-center gap-1.5 border border-parchment-300 shadow-sm">Kapitel 38 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+        </nav>
+
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12 border-t border-parchment-300 text-center text-xs font-sans text-stone-600">
+        <p class="font-serif italic text-sm text-parchment-800 mb-1">
+            „Siehe, da kommt jener Träumer!“ (1. Mose 37,19)
+        </p>
+        <p>Interaktive Studienbibel · historische Einordnung, hebräische Wortherkunft und Kirchenväter.</p>
+    </footer>
+
+    <!-- Modal / Detail-Karte -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-stone-950/60 backdrop-blur-xs p-4" onclick="closeModalOnBackdrop(event)">
+        <div class="bg-parchment-50 border border-parchment-300 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden transform transition-all">
+            <div id="modal-header" class="px-6 py-4 bg-parchment-100 border-b border-parchment-300 flex items-center justify-between">
+                <span id="modal-badge" class="text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded"></span>
+                <button onclick="closeModal()" class="text-stone-500 hover:text-stone-900 p-1 rounded-lg hover:bg-parchment-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 font-serif text-parchment-900 space-y-4 max-h-[75vh] overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // INHALT: GENESIS 37
+        // ==========================================
+        const greekLexicon = {
+  toledot: { greek: `תּוֹלְדוֹת`, translit: `toledot`, literal: `Zeugungen, Nachkommenschaft, Geschichte`,
+    meaning: `Das Wort leitet sich von der Wurzel für „gebären, zeugen“ ab. In der Genesis gliedert die Formel „Dies ist die Geschichte von …“ das Buch in Abschnitte (2,4; 5,1; 6,9; 11,27; 25,19; 36,1). In 37,2 eröffnet sie den letzten Abschnitt über Jakob und seine Söhne.`,
+    theology: `Obwohl die Überschrift „Geschichte Jakobs“ lautet, handelt die Erzählung fast nur von Josef: Was aus Jakobs Familie wird, entscheidet sich an dem Sohn, den die Brüder loswerden wollen.` },
+  passim: { greek: `כְּתֹנֶת פַּסִּים`, translit: `ketonet passim`, literal: `Gewand der „passim“`,
+    meaning: `Was <em>passim</em> genau meint, ist unsicher. Die griechische Bibel (LXX) denkt an ein buntes Gewand, die Vulgata ebenso; viele moderne Ausleger an ein langes, bis zu den Händen und Füßen reichendes Gewand mit Ärmeln. Dieselbe Wendung steht für das Kleid der Königstochter Tamar (2. Sam 13,18).`,
+    theology: `Gemeint ist ein Ehrenkleid, kein Arbeitsgewand. Es macht die Bevorzugung für alle sichtbar und wird deshalb später zum Beweisstück der Täuschung.` },
+  schalom: { greek: `שָׁלוֹם`, translit: `schalom`, literal: `Heil, Wohlergehen, Frieden`,
+    meaning: `Das Wort meint mehr als Abwesenheit von Streit: Unversehrtheit und Wohlergehen. In V. 4 können die Brüder Josef nicht „zum Frieden“ ansprechen, in V. 14 soll Josef nach dem <em>schalom</em> der Brüder sehen.`,
+    theology: `Dasselbe Wort steht am Anfang und am Weg des Kapitels: Der Vater schickt Josef, um nach dem Wohlergehen der Brüder zu sehen, und gerade sie haben keinen Frieden für ihn.` },
+  chalom: { greek: `חֲלוֹם`, translit: `chalom`, literal: `Traum`,
+    meaning: `Im Alten Orient gelten Träume als mögliche Mitteilungen der Gottheit; in Ägypten und Mesopotamien gab es Traumdeutungen und Traumbücher. In der Josefsgeschichte sind Träume Gottes Weg, seinen Plan anzudeuten (vgl. 40–41).`,
+    theology: `Der Name Gottes fällt in Kap. 37 nicht. Die Träume sind der einzige Hinweis darauf, dass hinter den Ereignissen mehr steht als Familienstreit.` },
+  qinne: { greek: `קִנֵּא`, translit: `qinne`, literal: `eifern, eifersüchtig sein, beneiden`,
+    meaning: `Das Verb gehört zu <em>qin’a</em>, „Eifer, Eifersucht“. Es kann auch den heiligen Eifer Gottes bezeichnen. In V. 11 ist es der Neid der Brüder auf den Bevorzugten.`,
+    theology: `Der Hass der V. 4–8 wird jetzt zum Neid. Damit ist die Gefahr benannt, die später in die Tat umschlägt.` },
+  hinneni: { greek: `הִנֵּנִי`, translit: `hinneni`, literal: `Hier bin ich`,
+    meaning: `Wörtlich: „Siehe, ich“. Es ist die Antwort der Bereitschaft, wie bei Abraham (22,1) und Mose (Ex 3,4).`,
+    theology: `Josef antwortet dem Vater ohne Zögern, obwohl der Weg zu den Brüdern gefährlich ist. So wird sein Gehorsam zum Anfang seines Leidens.` },
+  baal: { greek: `בַּעַל הַחֲלֹמוֹת`, translit: `baʿal ha-chalomot`, literal: `Herr der Träume`,
+    meaning: `<em>Baʿal</em> bezeichnet den, dem etwas gehört oder der etwas innehat. Der „Herr der Träume“ ist ein Spott der Brüder, der zugleich ausspricht, was sie fürchten: dass die Träume wahr werden.`,
+    theology: `Die Brüder wollen ihn töten, „dann wollen wir sehen, was aus seinen Träumen wird“ (V. 20). Gerade ihr Tun bringt die Träume zur Erfüllung.` },
+  bor: { greek: `בּוֹר`, translit: `bor`, literal: `Grube, Zisterne`,
+    meaning: `Ein in den Fels gehauener Wasserspeicher. In der trockenen Zeit konnte er leer sein, wie hier. Im Alten Testament steht „Grube“ auch für das Totenreich (Ps 28,1; 30,4).`,
+    theology: `Josef wird in einen Ort gelegt, der wie ein Grab wirkt, und kommt wieder herauf. Diese Bewegung von unten nach oben prägt seinen ganzen Weg.` },
+  makar: { greek: `מָכַר`, translit: `makar`, literal: `verkaufen`,
+    meaning: `Das gewöhnliche Wort für den Verkauf einer Sache oder einer Person. Dass die Brüder ihn verkauft haben, hält Josef ihnen später ausdrücklich vor (45,4–5).`,
+    theology: `V. 28 lässt offen, wer genau handelt: die Brüder, die Josef heraufziehen, oder die vorbeikommenden Händler. Josef stellt später klar, dass die Brüder verantwortlich sind, und deutet doch Gottes Absicht darin (50,20).` },
+  scheol: { greek: `שְׁאוֹל`, translit: `scheʾol`, literal: `Totenreich`,
+    meaning: `Im Alten Testament der Ort der Toten, still und fern von den Lebenden. Die Herkunft des Wortes ist nicht sicher geklärt.`,
+    theology: `Jakob will „trauernd zu meinem Sohn hinabfahren“. Er kennt keinen Trost, weil er Josef für tot hält, und der Leser weiß schon, dass das nicht stimmt.` }
+};
+
+        const churchFathers = {
+  chrysostomus: { name: `Johannes Chrysostomus`, dates: `ca. 349–407`, role: `Bischof von Konstantinopel, Prediger`,
+    classificationNote: `Auch von Reformatoren wie Calvin geschätzt.`,
+    bio: `Er hielt über die Genesis eine Reihe von Homilien, darunter mehrere über die Josefsgeschichte. Er ist vor allem für die schlichte, am Wortsinn orientierte Auslegung bekannt.`,
+    focusInGen37: `Er führt den Hass der Brüder auf Neid zurück und hebt hervor, dass Josef die Träume nicht aus Hochmut erzählt. Die Lehre: Gottes Vorsehung setzt sich gegen menschliche Bosheit durch.` },
+  ambrosius: { name: `Ambrosius von Mailand`, dates: `ca. 339–397`, role: `Bischof von Mailand`,
+    classificationNote: `Auch von Luther und Calvin als Lehrer der Kirche angeführt.`,
+    bio: `Er verfasste die Schrift „De Ioseph patriarcha“, eine Auslegung der Josefsgeschichte als Lehre der Tugend.`,
+    focusInGen37: `Er liest Josef als Vorbild der Tugend und der Geduld im Leiden und deutet seinen Weg zugleich auf Christus hin, der von den Seinen verworfen wird.` },
+  augustinus: { name: `Augustinus von Hippo`, dates: `354–430`, role: `Bischof und Kirchenlehrer`,
+    classificationNote: `Von den Reformatoren besonders hoch geschätzt.`,
+    bio: `Er deutete Josef in seinen Predigten und Schriften typologisch, also als Vorausbild auf Christus.`,
+    focusInGen37: `Er sieht in Josef einen Typus Christi: vom Vater gesandt, von den Brüdern verworfen und verkauft, und gerade dadurch zum Retter vieler.` },
+  hieronymus: { name: `Hieronymus`, dates: `ca. 347–420`, role: `Gelehrter, Bibelübersetzer (Vulgata)`,
+    classificationNote: `Von den Reformatoren als Sprachgelehrter geschätzt.`,
+    bio: `Er übersetzte die Bibel aus dem Hebräischen ins Lateinische (Vulgata) und schrieb die „Hebräischen Fragen zur Genesis“. Er übersetzte auch das Ortsverzeichnis des Euseb.`,
+    focusInGen37: `Seine Vulgata gibt den Leibrock mit <em>tunica polymita</em> („vielfarbig“) wieder und hat so das Bild vom bunten Rock geprägt. In V. 35 steht bei ihm für Scheol das Wort <em>infernus</em>.` }
+};
+
+        const studySections = [
+{
+  id: `traeume`, sectionTitle: `Josef, der Lieblingssohn, und seine Träume`, sectionRange: `Gen 37,1–11`,
+  sectionIntro: `Mit der „Geschichte Jakobs“ beginnt die Josefserzählung (Gen 37–50). Die Bevorzugung durch den Vater und Josefs Träume wecken Hass und Neid bei den Brüdern.`,
+  blocks: [
+  { verses: `1–4`,
+    bibleText: `<span class="verse-num">1</span>Und Jakob wohnte in dem Land der Fremdlingschaft seines Vaters, im Land Kanaan. <span class="verse-num">2</span>Dies ist die Geschichte Jakobs: Josef, siebzehn Jahre alt, weidete mit seinen Brüdern das Kleinvieh; und er war als Knabe bei den Söhnen Bilhas und den Söhnen Silpas, der Frauen seines Vaters; und Josef brachte ihren bösen Ruf vor ihren Vater. <span class="verse-num">3</span>Und Israel hatte Josef lieber als alle seine Söhne, weil er der Sohn seines Alters war; und er machte ihm einen langen Leibrock. <span class="verse-num">4</span>Und als seine Brüder sahen, dass ihr Vater ihn lieber hatte als alle seine Brüder, da hassten sie ihn und konnten ihn nicht friedlich grüßen.`,
+    commentary: {
+      history: `Mit <span class="greek-term" onclick="openGreek('toledot')">„Geschichte Jakobs“</span> beginnt der letzte große Abschnitt der Genesis. Josef, Rahels erster Sohn (30,22–24), ist siebzehn und hütet das Kleinvieh mit den Söhnen der Mägde Bilha und Silpa; Benjamin ist noch der Jüngste. Das lange Gewand ist ein Statuskleid. Die jüdische Auslegung (Raschi, 11. Jh.) greift den Midrasch auf, wonach Jakob Ruhe wollte, dann aber der Kummer um Josef über ihn kam.`,
+      greek: `<span class="greek-term" onclick="openGreek('passim')">Ketonet passim</span> ist ein Ehrengewand; die Bedeutung von <em>passim</em> ist unsicher (bunt oder lang mit Ärmeln). Dass die Brüder ihn nicht <span class="greek-term" onclick="openGreek('schalom')">zum Schalom</span> grüßen konnten, heißt: Sie brachten kein Wort des Heils über die Lippen.`,
+      fathers: `<span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> erkennt im Hass der Brüder Neid auf das Vorrecht des Jüngsten. <span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> gibt das Gewand in der Vulgata mit <em>tunica polymita</em> wieder und prägt damit das Bild vom bunten Rock.` } },
+  { verses: `5–11`,
+    bibleText: `<span class="verse-num">5</span>Und Josef hatte einen Traum und teilte ihn seinen Brüdern mit; da hassten sie ihn noch mehr. <span class="verse-num">6</span>Und er sprach zu ihnen: Hört doch diesen Traum, den ich gehabt habe: <span class="verse-num">7</span>Siehe, wir banden Garben mitten auf dem Feld, und siehe, meine Garbe richtete sich auf und blieb auch stehen; und siehe, eure Garben umringten sie und neigten sich vor meiner Garbe. <span class="verse-num">8</span>Da sprachen seine Brüder zu ihm: Willst du etwa König über uns werden? Willst du gar über uns herrschen? Und sie hassten ihn noch mehr um seiner Träume und um seiner Worte willen. <span class="verse-num">9</span>Und er hatte noch einen anderen Traum und erzählte ihn seinen Brüdern und sprach: Siehe, ich habe noch einen Traum gehabt: Siehe, die Sonne und der Mond und elf Sterne neigten sich vor mir. <span class="verse-num">10</span>Und er erzählte ihn seinem Vater und seinen Brüdern; da schalt ihn sein Vater und sprach zu ihm: Was ist das für ein Traum, den du gehabt hast? Sollen wir etwa kommen, ich und deine Mutter und deine Brüder, und uns vor dir niederbeugen zur Erde? <span class="verse-num">11</span>Und seine Brüder beneideten ihn; sein Vater aber bewahrte die Sache.`,
+    commentary: {
+      history: `Träume gelten im Alten Orient als Botschaften der Götter; aus Ägypten sind Traumbücher erhalten. Die Garben setzen Ackerbau voraus, den auch die Erzväter betrieben (26,12). Rahel war schon gestorben (35,19); nach der Auslegung bei Raschi ist mit „Mutter“ deshalb Bilha gemeint. Die Reaktion der Brüder („Willst du König über uns werden?“) zeigt, dass sie den Traum als Anspruch auf Herrschaft verstehen.`,
+      greek: `<span class="greek-term" onclick="openGreek('chalom')">Chalom</span>, „Traum“, steht in diesem Abschnitt fünfmal. Der Neid der Brüder in V. 11 ist <span class="greek-term" onclick="openGreek('qinne')">qinne</span>, dasselbe Wortfeld wie „Eifer“. Das Verb für „bewahren“ in V. 11 bedeutet auch „hüten, beachten“: Jakob merkt sich die Sache.`,
+      fathers: `<span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> betont, dass Josef die Träume nicht aus Prahlerei erzählt, sondern in Einfalt. <span class="father-link" onclick="openFather('ambrosius')">Ambrosius</span> sieht in den Träumen Gottes Zeichen für den Weg, den Josef erst im Leiden begreift. <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> liest die Huldigung der Brüder als Bild für die Unterwerfung der Völker unter Christus.` } }
+  ]
+},
+{
+  id: `dotan`, sectionTitle: `Josef wird zu den Brüdern gesandt`, sectionRange: `Gen 37,12–24`,
+  sectionIntro: `Jakob sendet Josef zu den Brüdern auf die Weide. Aus der Ferne fassen sie den Plan, ihn zu töten; Ruben rettet ihn vor dem Tod, und sie werfen ihn in die Grube.`,
+  blocks: [
+  { verses: `12–17`,
+    bibleText: `<span class="verse-num">12</span>Und seine Brüder gingen hin, um das Kleinvieh ihres Vaters in Sichem zu weiden. <span class="verse-num">13</span>Und Israel sprach zu Josef: Weiden nicht deine Brüder bei Sichem? Komm, ich will dich zu ihnen senden. Er aber sprach zu ihm: Hier bin ich. <span class="verse-num">14</span>Und er sprach zu ihm: Geh doch hin, sieh nach dem Wohlergehen deiner Brüder und nach dem Wohlergehen des Kleinviehs und bring mir Antwort. Und er sandte ihn aus dem Tal von Hebron, und er kam nach Sichem. <span class="verse-num">15</span>Da fand ihn ein Mann, und siehe, er irrte auf dem Feld umher; und der Mann fragte ihn: Was suchst du? <span class="verse-num">16</span>Er sprach: Ich suche meine Brüder; teile mir doch mit, wo sie weiden. <span class="verse-num">17</span>Und der Mann sprach: Sie sind von hier aufgebrochen, denn ich hörte sagen: Lasst uns nach Dotan ziehen. Da ging Josef seinen Brüdern nach und fand sie in Dotan.`,
+    commentary: {
+      history: `Hebron liegt im Süden, Sichem weit im Norden; schon das ist ein langer Weg. In Sichem hatten Simeon und Levi zuvor Gewalt verübt (Kap. 34), der Ort ist also nicht harmlos. Dotan liegt noch weiter nördlich an einer Verkehrsverbindung Richtung Küste und Ägypten. Nach jüdischer Überlieferung (Raschi) war der „Mann“ in V. 15 ein Engel, nämlich Gabriel.`,
+      greek: `Josefs Antwort <span class="greek-term" onclick="openGreek('hinneni')">hinneni</span> („Hier bin ich“) ist das Wort der Bereitschaft. Der Auftrag, nach dem <span class="greek-term" onclick="openGreek('schalom')">Schalom</span> der Brüder zu sehen, steht in bitterem Gegensatz zu V. 4.`,
+      fathers: `<span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> kennt Dotan aus dem Ortsverzeichnis des Euseb, das er ins Lateinische übersetzte. <span class="father-link" onclick="openFather('ambrosius')">Ambrosius</span> rühmt Josefs Gehorsam gegenüber dem Vater, der ihn trotz der Gefahr sendet. <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> sieht im gesandten Sohn ein Bild für Christus, den der Vater zu den Seinen sendet.` } },
+  { verses: `18–24`,
+    bibleText: `<span class="verse-num">18</span>Und sie sahen ihn von ferne; und ehe er ihnen nahte, ersannen sie gegen ihn den Anschlag, ihn zu töten. <span class="verse-num">19</span>Und sie sprachen zueinander: Siehe, da kommt jener Träumer! <span class="verse-num">20</span>Und nun kommt und lasst uns ihn erschlagen und ihn in eine der Gruben werfen, und wir wollen sagen: Ein böses Tier hat ihn gefressen; dann wollen wir sehen, was aus seinen Träumen wird. <span class="verse-num">21</span>Als Ruben das hörte, errettete er ihn aus ihrer Hand und sprach: Wir wollen ihn nicht totschlagen. <span class="verse-num">22</span>Und Ruben sprach zu ihnen: Vergießt kein Blut; werft ihn in diese Grube, die in der Wüste ist, aber legt nicht Hand an ihn! – um ihn aus ihrer Hand zu erretten, ihn zu seinem Vater zurückzubringen. <span class="verse-num">23</span>Und es geschah, als Josef zu seinen Brüdern kam, da zogen sie Josef seinen Leibrock aus, den langen Leibrock, den er anhatte, <span class="verse-num">24</span>und nahmen ihn und warfen ihn in die Grube; die Grube aber war leer, es war kein Wasser darin.`,
+    commentary: {
+      history: `Der Plan, den Bruder zu töten und das Blut zu verbergen, erinnert an Kain und Abel (4,8–10). Ruben als Erstgeborener fühlt sich verantwortlich. Die „Grube“ ist eine in den Fels gehauene Zisterne, in der trockenen Zeit leer. Raschi bemerkt im Anschluss an den Talmud, sie sei ohne Wasser, aber voller Schlangen und Skorpione gewesen. Das Ausziehen des Gewandes nimmt Josef das sichtbare Zeichen seiner Stellung.`,
+      greek: `Die Brüder nennen Josef <span class="greek-term" onclick="openGreek('baal')">baʿal ha-chalomot</span>, „Herr der Träume“: Spott und Furcht zugleich. Die <span class="greek-term" onclick="openGreek('bor')">bor</span> ist eine Zisterne; dasselbe Wort steht im Alten Testament auch für das Totenreich.`,
+      fathers: `<span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> hebt hervor, dass Gott Josef in der Not bewahrt und seine Unschuld nicht untergehen lässt. <span class="father-link" onclick="openFather('augustinus')">Augustinus</span> deutet das Ausziehen des Rocks und die Grube als Bild für Leiden und Tod Christi.` } }
+  ]
+},
+{
+  id: `verkauf`, sectionTitle: `Der Verkauf nach Ägypten und die Täuschung Jakobs`, sectionRange: `Gen 37,25–36`,
+  sectionIntro: `Während die Brüder essen, kommt eine Karawane vorbei, und auf Judas Vorschlag wird Josef verkauft. Mit dem blutigen Leibrock täuschen sie den Vater, der keinen Trost annimmt.`,
+  blocks: [
+  { verses: `25–30`,
+    bibleText: `<span class="verse-num">25</span>Und sie setzten sich nieder, um zu essen. Und sie hoben ihre Augen auf und sahen, und siehe, eine Karawane von Ismaelitern kam von Gilead her, und ihre Kamele trugen Tragant und Balsam und Harz, die sie nach Ägypten hinabbringen wollten. <span class="verse-num">26</span>Da sprach Juda zu seinen Brüdern: Was gewinnen wir, wenn wir unseren Bruder erschlagen und sein Blut bedecken? <span class="verse-num">27</span>Kommt, wir wollen ihn an die Ismaeliter verkaufen; aber unsere Hand soll nicht an ihm sein, denn er ist unser Bruder, unser Fleisch. Und seine Brüder hörten darauf. <span class="verse-num">28</span>Und es kamen midianitische Männer, Kaufleute, vorüber; und sie zogen und holten Josef aus der Grube herauf und verkauften Josef an die Ismaeliter für zwanzig Silberstücke; und sie brachten Josef nach Ägypten. <span class="verse-num">29</span>Und Ruben kehrte zur Grube zurück, und siehe, Josef war nicht in der Grube; da zerriss er seine Kleider. <span class="verse-num">30</span>Und er kehrte zu seinen Brüdern zurück und sprach: Der Knabe ist nicht da; und ich, wohin soll ich gehen?`,
+    commentary: {
+      history: `Die Karawane kommt aus Gilead, das für seinen Balsam bekannt war (Jer 8,22), und führt Gewürze nach Ägypten. „Ismaeliter“ und „Midianiter“ scheinen hier Bezeichnungen für Karawanenhändler zu sein (vgl. Ri 8,24). Zwanzig Silberstücke entsprechen dem Wert eines Jungen von fünf bis zwanzig Jahren in Lev 27,5; für einen Sklaven werden später dreißig Schekel genannt (Ex 21,32). Rubens zerrissene Kleider zeigen seine Trauer und Hilflosigkeit.`,
+      greek: `<span class="greek-term" onclick="openGreek('makar')">Makar</span>, „verkaufen“, ist das nüchterne Wort des Handels. Wer in V. 28 verkauft, bleibt offen; in 45,4 sagt Josef den Brüdern, dass sie ihn verkauft haben.`,
+      fathers: `<span class="father-link" onclick="openFather('augustinus')">Augustinus</span> sieht im Verkauf um Silber einen Vorverweis auf Judas’ Verrat an Jesus (Mt 26,15). <span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> betont, dass Gott aus dem Verkauf Gutes entstehen lässt (vgl. 45,5; 50,20).` } },
+  { verses: `31–36`,
+    bibleText: `<span class="verse-num">31</span>Da nahmen sie den Leibrock Josefs und schlachteten einen Ziegenbock und tauchten den Leibrock in das Blut. <span class="verse-num">32</span>Und sie schickten den langen Leibrock hin und ließen ihn ihrem Vater bringen und sagen: Diesen haben wir gefunden; erkenne doch, ob es der Leibrock deines Sohnes ist oder nicht. <span class="verse-num">33</span>Und er erkannte ihn und sprach: Der Leibrock meines Sohnes! Ein böses Tier hat ihn gefressen; Josef ist gewiss zerrissen worden! <span class="verse-num">34</span>Und Jakob zerriss seine Kleider und legte Sacktuch um seine Lenden und trauerte um seinen Sohn viele Tage. <span class="verse-num">35</span>Und alle seine Söhne und alle seine Töchter machten sich auf, ihn zu trösten; er aber weigerte sich, sich trösten zu lassen, und sprach: Nein, trauernd werde ich zu meinem Sohn hinabfahren in den Scheol! Und sein Vater beweinte ihn. <span class="verse-num">36</span>Die Midianiter aber verkauften ihn nach Ägypten an Potifar, einen Hofbeamten des Pharao, den Obersten der Leibwache.`,
+    commentary: {
+      history: `Der Ziegenbock erinnert an Jakobs eigene Täuschung seines Vaters mit Ziegenfell (Kap. 27): Der Täuscher wird nun selbst getäuscht. Zerrissene Kleider und Sacktuch sind Zeichen der Trauer. Raschi führt zu V. 35 die Überlieferung an, wonach man sich über einen Lebenden nicht trösten lässt; es sei ein Zeichen gewesen, dass Josef lebte. Potifar trägt einen ägyptischen Namen; in V. 36 steht im hebräischen Text „Medaniter“, viele Übersetzungen lesen „Midianiter“.`,
+      greek: `<span class="greek-term" onclick="openGreek('scheol')">Scheol</span> meint das Totenreich, nicht einen Strafort. Jakobs Satz ist eine Totenklage über einen Sohn, der in Wahrheit lebt.`,
+      fathers: `<span class="father-link" onclick="openFather('chrysostomus')">Chrysostomus</span> weist auf die Tiefe der Vaterliebe und auf die Not der Brüder hin, die ihre Tat verbergen müssen. <span class="father-link" onclick="openFather('hieronymus')">Hieronymus</span> übersetzt Scheol in der Vulgata mit <em>infernus</em>, was hier die Unterwelt der Toten meint, nicht die Strafe.` } }
+  ]
+}
+];
+
+
+        // ==========================================
+        // ZUSTAND & STEUERUNG
+        // ==========================================
+        let activeFilters = { greek: true, history: true, fathers: true };
+        const CHAPTER = 37;
+        const NOTES_KEY = 'gen' + CHAPTER + '_notes';
+        let userNotes = {};
+        try { userNotes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}'); } catch (e) {}
+
+        function renderStudy() {
+            const container = document.getElementById('study-container');
+            container.innerHTML = '';
+
+            studySections.forEach(section => {
+                const sectionEl = document.createElement('section');
+                sectionEl.id = section.id;
+                sectionEl.className = 'folio-page rounded-2xl border border-parchment-300 overflow-hidden scroll-mt-16';
+
+                let html = `
+                    <div class="bg-parchment-100/90 px-5 sm:px-8 py-5 border-b border-parchment-300">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <h3 class="font-display text-2xl sm:text-3xl font-bold text-burgundy-900">
+                                ${section.sectionTitle}
+                            </h3>
+                            <span class="font-sans text-xs font-semibold tracking-wider uppercase px-2.5 py-1 rounded bg-parchment-200 text-parchment-900 border border-parchment-300">
+                                ${section.sectionRange}
+                            </span>
+                        </div>
+                        <p class="font-serif italic text-stone-700 text-base mt-1.5">
+                            ${section.sectionIntro}
+                        </p>
+                    </div>
+                    <div class="divide-y divide-parchment-200">
+                `;
+
+                section.blocks.forEach((block, idx) => {
+                    const blockKey = `${section.id}-${idx}`;
+                    const savedNote = userNotes[blockKey] || '';
+
+                    let commentaryParts = [];
+                    if (activeFilters.history && block.commentary.history) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-amber-700/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-amber-800 block mb-0.5">Historischer & Jüdischer Kontext</span>
+                                <div class="text-stone-800">${block.commentary.history}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.greek && block.commentary.greek) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-sky-800/60">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-sky-900 block mb-0.5">Hebräischer Urtext & Wortbedeutung</span>
+                                <div class="text-stone-800">${block.commentary.greek}</div>
+                            </div>
+                        `);
+                    }
+                    if (activeFilters.fathers && block.commentary.fathers) {
+                        commentaryParts.push(`
+                            <div class="relative pl-3 border-l-2 border-burgundy-800/70">
+                                <span class="not-italic font-sans text-[10px] font-semibold uppercase tracking-wider text-burgundy-800 block mb-0.5">Kirchenväter</span>
+                                <div class="text-stone-800">${block.commentary.fathers}</div>
+                            </div>
+                        `);
+                    }
+
+                    const commentaryHtml = commentaryParts.length > 0
+                        ? `<div class="space-y-3.5 font-serif italic text-[15.5px] sm:text-base leading-relaxed">${commentaryParts.join('')}</div>`
+                        : `<div class="font-sans text-xs text-stone-400 italic">Alle Kommentar-Ebenen sind ausgeblendet.</div>`;
+
+                    html += `
+                        <div class="p-5 sm:p-8 bg-parchment-50 max-w-4xl mx-auto">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-sans text-[11px] font-semibold uppercase tracking-wider text-gold-700">
+                                    Genesis ${CHAPTER},${block.verses}
+                                </span>
+                                <button onclick="toggleNoteBox('${blockKey}')" class="text-xs font-sans text-stone-400 hover:text-burgundy-800 flex items-center gap-1 transition no-print">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    ${savedNote ? 'Notiz bearbeiten' : 'Notiz'}
+                                </button>
+                            </div>
+                            <p class="font-serif text-xl sm:text-[21px] leading-[1.8] text-parchment-900 mb-5">
+                                ${block.bibleText}
+                            </p>
+                            <div class="bg-parchment-100/80 rounded-xl p-4 sm:p-5 border border-parchment-300/80">
+                                ${commentaryHtml}
+                            </div>
+                            ${renderNoteArea(blockKey, savedNote)}
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                sectionEl.innerHTML = html;
+                container.appendChild(sectionEl);
+            });
+        }
+
+        function renderNoteArea(blockKey, savedNote) {
+            const isHidden = savedNote ? '' : 'hidden';
+            return `
+                <div id="note-box-${blockKey}" class="${isHidden} mt-4 pt-3 border-t border-parchment-200 no-print">
+                    <label class="block font-sans text-[11px] font-medium text-stone-500 mb-1">Eigene Studiennotiz:</label>
+                    <textarea 
+                        onchange="saveNote('${blockKey}', this.value)"
+                        onkeyup="saveNote('${blockKey}', this.value)"
+                        rows="2" 
+                        placeholder="Deine Gedanken..."
+                        class="w-full rounded-lg bg-white border border-parchment-300 p-2 text-xs font-sans text-parchment-900 focus:outline-none focus:border-gold-600"
+                    >${savedNote}</textarea>
+                </div>
+            `;
+        }
+
+        function toggleNoteBox(blockKey) {
+            const box = document.getElementById(`note-box-${blockKey}`);
+            if (box) {
+                box.classList.toggle('hidden');
+                if (!box.classList.contains('hidden')) box.querySelector('textarea').focus();
+            }
+        }
+
+        function saveNote(blockKey, text) {
+            if (text.trim() === '') delete userNotes[blockKey];
+            else userNotes[blockKey] = text;
+            try { localStorage.setItem(NOTES_KEY, JSON.stringify(userNotes)); } catch (e) {}
+        }
+
+        function toggleFilter(type) {
+            activeFilters[type] = !activeFilters[type];
+            const btn = document.getElementById(`filter-${type}`);
+            if (activeFilters[type]) btn.classList.remove('opacity-45', 'line-through');
+            else btn.classList.add('opacity-45', 'line-through');
+            renderStudy();
+        }
+
+        function openGreek(key) {
+            const item = greekLexicon[key];
+            if (!item) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Hebräisches Original';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-sky-900/10 text-sky-900 border border-sky-800/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <div class="text-3xl font-serif font-bold text-greek-800">${item.greek}</div>
+                    <div class="text-sm font-sans text-stone-500 mt-0.5">Umschrift: <span class="italic font-medium text-stone-700">${item.translit}</span> · Wörtlich: <span class="font-medium text-stone-700">${item.literal}</span></div>
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Bedeutung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${item.meaning}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Theologische Tiefe</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${item.theology}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        // Schwerpunkt-Text: Feld heißt je Kapitel anders (focusInMtN)
+        function fatherFocus(f) {
+            const k = Object.keys(f).find(x => x === 'focus' || x.startsWith('focusIn'));
+            return k ? f[k] : '';
+        }
+
+        function openFather(key) {
+            const father = churchFathers[key];
+            if (!father) return;
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Kirchenväter';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-red-900/10 text-burgundy-900 border border-red-900/30';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="border-b border-parchment-200 pb-3">
+                    <h3 class="text-2xl font-display font-bold text-burgundy-900">${father.name}</h3>
+                    <div class="text-xs font-sans text-stone-600 mt-0.5">${father.dates} · ${father.role}</div>
+                    ${father.classificationNote ? `<p class="text-xs font-sans text-burgundy-800 mt-1.5 font-medium">${father.classificationNote}</p>` : ''}
+                </div>
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Biografie & Einordnung</h4>
+                    <p class="text-base leading-relaxed text-stone-800">${father.bio}</p>
+                </div>
+                <div class="bg-parchment-100 p-3.5 rounded-xl border border-parchment-300">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-gold-700 mb-1">Schwerpunkt in Gen ${CHAPTER}</h4>
+                    <p class="text-sm italic leading-relaxed text-stone-800">${fatherFocus(father)}</p>
+                </div>
+            `;
+            showModal();
+        }
+
+        function openGlossaryModal() {
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = 'Lexikon & Kirchenväter';
+            badge.className = 'text-xs font-sans uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded bg-amber-900/10 text-amber-900 border border-amber-800/30';
+            
+            let greekList = Object.entries(greekLexicon).map(([k, v]) => `
+                <button onclick="openGreek('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-sky-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-serif font-bold text-greek-800 text-base">${v.greek}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${v.translit}</span>
+                </button>
+            `).join('');
+
+            let fathersList = Object.entries(churchFathers).map(([k, f]) => `
+                <button onclick="openFather('${k}')" class="text-left p-2.5 rounded-lg bg-white hover:bg-amber-50 border border-parchment-300 transition flex flex-col">
+                    <span class="font-display font-bold text-burgundy-900 text-base">${f.name}</span>
+                    <span class="font-sans text-[11px] text-stone-500">${f.dates} · ${f.role}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('modal-body').innerHTML = `
+                <div>
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-sky-900 mb-2">Hebräische Begriffe</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${greekList}</div>
+                </div>
+                <div class="pt-3 border-t border-parchment-200">
+                    <h4 class="font-sans text-xs font-semibold uppercase tracking-wider text-burgundy-800 mb-1">Kirchenväter</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${fathersList}</div>
+                </div>
+            `;
+            showModal();
+        }
+
+        function showModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeModalOnBackdrop(e) {
+            if (e.target.id === 'detail-modal') closeModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderStudy);
+    </script>
+</body>
+</html>
